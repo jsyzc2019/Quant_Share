@@ -146,19 +146,95 @@ format_futures('CFFEX.IC')  # return 'IC'
 
 #### `readPkl`
 
+读取`PKL`文件
+
 #### `savePkl`
+
+储存`PKL`文件
 
 #### `data2score`
 
+将宽表格式的数据，根据`rank`转化为分数
+
+```python
+data2score(data, neg=False, ascending=True, axis=1)
+"""
+use rank as score
+:param data:
+:param neg: if Ture, score span [-1, 1], default FALSE
+:param ascending:
+:param axis:
+:return:
+"""
+```
+
 #### `reindex`
+
+将宽表数据转化为统一格式，即`index`为`datetime`，`column`为`wind`格式的股票代码
+
+需要注意的是，无论传入的`column`有多少，统一使用`stockList`进行`reindex`，即变为5219列
+
+而`index`是根据，传入数据的范围，进行填补。如果有缺失，则补全为`np.NAN`
 
 #### `info_lag`
 
+将宽表数据进行滞后，与传统`shift`不同，直接对`index`进行操作，不会损失数据
+
+```python
+info_lag(data, n_lag)
+"""
+Delay the time corresponding to the data by n trading days
+:param data:
+:param n_lag:
+:return:
+"""
+```
+
 #### `save_data_h5`
+
+将数据存储为`.h5`文件，仅支持传入`DataFrame`
+
+```python
+save_data_h5(toSaveData, name, subPath='dataFile', reWrite=False)
+"""
+Store the pd.Data Frame data as a file in .h5 format
+:param toSaveData:
+:param name: file name will to store
+:param subPath: The path to store the file will be 'cwd/subPath/name.h5', default 'dataFile'
+:param reWrite: if Ture, will rewrite file, default False
+:return:
+"""
+```
 
 #### `get_tradeDate`
 
+获取交易日信息，根据传入不同的n，获取不同的交易日信息
+
+```python
+get_tradeDate(date, n=0)
+"""
+Returns the date related to date based on the setting of n
+if n = 0, will return the future the nearest trade date, if date is trade date, will return itself
+if n = -1, will return the backward the nearest trade date, if date is trade date, will return itself
+else will returns information from the delay n days (calendar, tradeDate_fore and tradeDate_back）
+:param date:
+:param n: default 0
+:return:
+"""
+```
+
 ### 常量
+
+#### `tableInfo`
+
+储存数据表信息，格式为`dict`
+
+```python
+from Utils import tableInfo
+tableInfo.keys()  # 查看目前能调用数据表
+
+tableInfo['bench_price']  # 查看bench_price的具体信息
+```
 
 #### `stock_info`
 

@@ -55,6 +55,12 @@ tableInfo = {
         'date_column': 'repForeDate',
         'ticker_column': 'secCode'
     },
+    'FdmtDerPit': {
+            'assets': 'stock',
+            'description': '',
+            'date_column': 'publishDate',
+            'ticker_column': 'ticker'
+        },
     # 期货数据组织形式的表
     'Broker_Data': {
         'assets': 'future',
