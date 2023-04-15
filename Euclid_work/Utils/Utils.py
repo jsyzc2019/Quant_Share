@@ -255,3 +255,20 @@ def get_price_vol(year):
     return get_history_instruments(symbols=stock_info['symbol'].to_list(),
                                    start_date=get_tradeDate(year_begin).strftime('%Y-%m-%d'),
                                    end_date=get_tradeDate(year_end, -1).strftime('%Y-%m-%d'), df=True)
+
+
+# 分季度存储, 但获取数据时候, 每月获取后stack
+def quarter_download_save_monthStack(year):
+    for quarter in range(0, 4):
+        quarter_begin_day = str(year) + quarter_begin[quarter]
+        quarter_end_day = str(year) + quarter_end[quarter]
+        dateSpan = pd.date_range(quarter_begin_day, quarter_end_day, freq='m').tolist()
+        dateSpan.insert(0, pd.to_datetime(quarter_begin_day))
+        outData = pd.DataFrame()
+        for month in range(dateSpan.__len__() - 1):
+            begin = dateSpan[month].strftime('%Y%m%d')
+            end = dateSpan[month + 1].strftime('%Y%m%d')
+            tmpData = DataAPI.RMExposureDayGet(secID=u"", ticker=u"", tradeDate=u"",
+                                               beginDate=begin, endDate=end, field=u"", pandas="1")
+            outData = pd.concat([outData, tmpData], axis=0, ignore_index=True)
+        save_data_h5(outData, name='RMExposureDay_Y{}_Q{}'.format(year, quarter + 1), reWrite=True, subPath="dataFile/RMExposureDay")

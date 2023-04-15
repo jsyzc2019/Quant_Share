@@ -61,6 +61,12 @@ tableInfo = {
             'date_column': 'publishDate',
             'ticker_column': 'ticker'
         },
+    'RMExposureDay': {
+        'assets': 'stock',
+        'description': '',
+        'date_column': 'tradeDate',
+        'ticker_column': 'ticker'
+    },
     # 期货数据组织形式的表
     'Broker_Data': {
         'assets': 'future',
