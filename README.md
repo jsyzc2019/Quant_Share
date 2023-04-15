@@ -1,4 +1,4 @@
-此项目拟使用Python构建一套便捷可用的投研框架，道阻且长，持续更新
+此项目拟使用Python构建一套便捷可用的投研框架，道阻且长，持续更新，分版块说明在[Wiki](https://gitee.com/Euclid-Jie/Quant_Share/wikis/%E5%BF%AB%E9%80%9F%E4%BD%BF%E7%94%A8)中
 
 # 快速使用
 
@@ -34,6 +34,8 @@ print(data.info())
 ```
 
 ### 已支持导入的表
+
+查看最新的[更新](https://gitee.com/Euclid-Jie/Quant_Share/wikis/%E5%B7%B2%E6%94%AF%E6%8C%81%E7%9A%84%E8%A1%A8)
 
 目前的表多位`ts`组织形式，即时间轴`t`和个体标识`s`双重索引
 
