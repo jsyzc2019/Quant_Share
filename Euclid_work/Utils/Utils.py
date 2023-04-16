@@ -11,7 +11,6 @@ import pickle
 import numpy as np
 import pandas as pd
 from gm.api import *
-from uqer import DataAPI
 
 __all__ = ['readPkl', 'savePkl', 'save_data_h5',  # files operation
            'get_tradeDate', 'format_date', 'format_stockCode', 'reindex', 'data2score', 'info_lag',
