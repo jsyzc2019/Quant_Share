@@ -5,3 +5,4 @@
 from .Utils import *
 from .Euclid_get_data import *
 from .BackTest import *
+from .FactorTest import *
