@@ -3,90 +3,18 @@
 # @Author  : Euclid-Jie
 # @File    : Euclid_get_data.py
 import os
+import time
+
 import pandas as pd
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import multiprocessing
 from joblib import Parallel, delayed
 from .Utils import format_date, format_stockCode, format_futures, futures_list
+from .tableInfo import tableInfo
 
 dataBase_root_path = r'D:\Share\Euclid_work\dataFile'
 dataBase_root_path_future = r"D:\Share\Fut_Data"
-tableInfo = {
-    'bench_price': {
-        'assets': 'stock',
-        'description': '',
-        'date_column': 'trade_date',
-        'ticker_column': 'symbol'
-    },
-    'stock_price': {
-        'assets': 'stock',
-        'description': '',
-        'date_column': 'trade_date',
-        'ticker_column': 'symbol'
-    },
-    'HKshszHold': {
-        'assets': 'stock',
-        'description': '',
-        'date_column': 'endDate',
-        'ticker_column': 'ticker'
-    },
-    'MktEqud': {
-        'assets': 'stock',
-        'description': '',
-        'date_column': 'tradeDate',
-        'ticker_column': 'ticker'
-    },
-    # 'industry_info': {
-    #     'description': '',
-    #     'date_column': 'tradeDate',
-    #     'ticker_column': 'aiq_ticker'
-    # }
-    'MktLimit': {
-        'assets': 'stock',
-        'description': '',
-        'date_column': 'tradeDate',
-        'ticker_column': 'ticker'
-    },
-
-    'ResConSecCorederi': {
-        'assets': 'stock',
-        'description': '',
-        'date_column': 'repForeDate',
-        'ticker_column': 'secCode'
-    },
-    'FdmtDerPit': {
-            'assets': 'stock',
-            'description': '',
-            'date_column': 'publishDate',
-            'ticker_column': 'ticker'
-        },
-    'RMExposureDay': {
-        'assets': 'stock',
-        'description': '',
-        'date_column': 'tradeDate',
-        'ticker_column': 'ticker'
-    },
-    # 期货数据组织形式的表
-    'Broker_Data': {
-        'assets': 'future',
-        'description': '',
-        'date_column': 'date',
-        'ticker_column': ''
-    },
-    'Price_Volume_Data/main': {
-        'assets': 'future',
-        'description': '',
-        'date_column': 'bob',
-        'ticker_column': ''
-    },
-    'Price_Volume_Data/submain': {
-        'assets': 'future',
-        'description': '',
-        'date_column': 'bob',
-        'ticker_column': ''
-    },
-}
 
 
 # 并行加速
@@ -107,16 +35,17 @@ def load_file(toLoadList):
     res = run_thread_pool_sub(pd.read_hdf, toLoadList, max_work_count=10)
     for future in as_completed(res):
         res = future.result()
-        # 拼接数据
-        if isinstance(res.index[0], datetime) or pd.to_datetime(res.index[0]).year >= 2015:
-            res = res.reset_index()
-        load_data = pd.concat((load_data, res), axis=0, ignore_index=True)
+        if len(res) > 0:
+            # 拼接数据
+            if isinstance(res.index[0], datetime) or pd.to_datetime(res.index[0]).year >= 2015:
+                res = res.reset_index()
+            load_data = pd.concat((load_data, res), axis=0, ignore_index=True)
     return load_data
 
 
-def get_data(tabelName, begin='20150101', end=None, sources='gm', fields: list = None, ticker: list = None):
+def get_data(tableName, begin='20150101', end=None, sources='gm', fields: list = None, ticker: list = None):
     """
-    :param tabelName: bench_info / bench_price / stock_info / stock_price / tradeDate_info / HKshszHold
+    :param tableName: bench_info / bench_price / stock_info / stock_price / tradeDate_info / HKshszHold
     :param begin:
     :param end:
     :param sources:
@@ -130,23 +59,25 @@ def get_data(tabelName, begin='20150101', end=None, sources='gm', fields: list =
     begin = format_date(begin)
     end = format_date(end)
 
-    if tabelName not in list(tableInfo.keys()):
-        raise KeyError("{} is not ready for use!".format(tabelName))
+    if tableName not in list(tableInfo.keys()):
+        raise KeyError("{} is not ready for use!".format(tableName))
 
-    if tableInfo[tabelName]['assets'] == 'stock':
-        return get_data_stock(tabelName, begin, end, fields, ticker)
-    elif tableInfo[tabelName]['assets'] == 'future':
-        return get_data_future(tabelName, begin, end, sources, fields, ticker)
+    if tableInfo[tableName]['assets'] == 'stock':
+        return get_data_stock(tableName, begin, end, fields, ticker)
+    elif tableInfo[tableName]['assets'] == 'future':
+        return get_data_future(tableName, begin, end, sources, fields, ticker)
+    elif tableInfo[tableName]['assets'] == 'info':
+        return get_data_stock(tableName, begin, end, fields, ticker)
 
 
-def get_data_stock(tabelName, begin, end, fields, ticker):
-    tabelFoldPath = os.path.join(dataBase_root_path, tabelName)
+def get_data_stock(tableName, begin, end, fields, ticker):
+    tabelFoldPath = os.path.join(dataBase_root_path, tableName)
     if not os.path.exists(tabelFoldPath):
         try:
             data = pd.read_hdf(tabelFoldPath + '.h5')
             return data
         except FileNotFoundError:
-            print("{} no exits!".format(tabelName))
+            print("{} no exits!".format(tableName))
 
     h5_file_name_list = os.listdir(tabelFoldPath)
     # 如果文件是季度组织的
@@ -154,35 +85,35 @@ def get_data_stock(tabelName, begin, end, fields, ticker):
         load_begin = begin - pd.tseries.offsets.QuarterBegin(0)
         load_end = end + pd.tseries.offsets.QuarterEnd(0)
         toLoadList = []
-        for fileName in ["{}_Y{}_Q{:.0f}.h5".format(tabelName, QuarterEnd.year, QuarterEnd.month / 3) for QuarterEnd in pd.date_range(load_begin, load_end, freq='q')]:
+        for fileName in ["{}_Y{}_Q{:.0f}.h5".format(tableName, QuarterEnd.year, QuarterEnd.month / 3) for QuarterEnd in pd.date_range(load_begin, load_end, freq='q')]:
             if fileName not in h5_file_name_list:
                 raise AttributeError("{} is not exit!".format(fileName))
             else:
                 filePath = os.path.join(tabelFoldPath, fileName)
                 toLoadList.append(filePath)
         load_data = load_file(toLoadList)
-        return selectFields(load_data, tabelName, begin, end, fields, ticker)
+        return selectFields(load_data, tableName, begin, end, fields, ticker)
     # 按照年组织
     elif "Y" in h5_file_name_list[0]:
         load_begin = begin - pd.tseries.offsets.YearBegin(0)
         load_end = end + pd.tseries.offsets.YearEnd(0)
         toLoadList = []
-        for fileName in ["{}_Y{}.h5".format(tabelName, YearEnd.year) for YearEnd in pd.date_range(load_begin, load_end, freq='Y')]:
+        for fileName in ["{}_Y{}.h5".format(tableName, YearEnd.year) for YearEnd in pd.date_range(load_begin, load_end, freq='Y')]:
             if fileName not in h5_file_name_list:
                 raise AttributeError("{} is not exit!".format(fileName))
             else:
                 filePath = os.path.join(tabelFoldPath, fileName)
                 toLoadList.append(filePath)
         load_data = load_file(toLoadList)
-        return selectFields(load_data, tabelName, begin, end, fields, ticker)
+        return selectFields(load_data, tableName, begin, end, fields, ticker)
     else:
-        raise KeyError("请检查{}, 文件不符合{}_Y*_Q*组织形式".format(tabelFoldPath, tabelName))
+        raise KeyError("请检查{}, 文件不符合{}_Y*_Q*组织形式".format(tabelFoldPath, tableName))
 
 
-def get_data_future(tabelName, begin='20160101', end=None, sources='gm', fields: list = None, ticker: list = None):
+def get_data_future(tableName, begin='20160101', end=None, sources='gm', fields: list = None, ticker: list = None):
     if not end:
         end = datetime.today().now().strftime('%Y%m%d')
-    tabelFoldPath = os.path.join(dataBase_root_path_future, tabelName)
+    tabelFoldPath = os.path.join(dataBase_root_path_future, tableName)
     begin = format_date(begin)
     end = format_date(end)
 
@@ -197,15 +128,15 @@ def get_data_future(tabelName, begin='20160101', end=None, sources='gm', fields:
             toLoadList.extend([os.path.join(tmpFolder, target[0])])
     if toLoadList.__len__() > 0:
         load_data = load_file(toLoadList)
-        return selectFields(load_data, tabelName, begin, end, fields, ticker)
+        return selectFields(load_data, tableName, begin, end, fields, ticker)
     else:
-        raise KeyError("未找到{}文件".format(tabelName))
+        raise KeyError("未找到{}文件".format(tableName))
 
 
-def selectFields(data, tabelName, begin, end, fields: list = None, ticker: list = None):
+def selectFields(data, tableName, begin, end, fields: list = None, ticker: list = None):
     outData = data.copy()
-    date_column = tableInfo[tabelName]['date_column']
-    ticker_column = tableInfo[tabelName]['ticker_column']
+    date_column = tableInfo[tableName]['date_column']
+    ticker_column = tableInfo[tableName]['ticker_column']
     # date filter
     if ticker_column != '':
         outData.sort_values(by=[ticker_column, date_column], ascending=[1, 1], inplace=True)
@@ -226,5 +157,77 @@ def selectFields(data, tabelName, begin, end, fields: list = None, ticker: list 
             outData = outData[fields]
         else:
             notExitField = "\\".join(list(set(fields) - set(outData.columns)))
-            raise AttributeError("{} is not exit in {}".format(notExitField, tabelName))
+            raise AttributeError("{} is not exit in {}".format(notExitField, tableName))
     return outData.reset_index(drop=True)
+
+
+def get_all_file(folderPath, query='.h5'):
+    # 得到所有文件
+    FileList = []
+    file_full_path_list = []
+    for path, file_dir, files in os.walk(folderPath):
+        FileList.extend([file_name for file_name in files if file_name.endswith(query)])
+        file_full_path_list.extend([os.path.join(path, file_name) for file_name in files if file_name.endswith(query)])
+    return FileList, file_full_path_list
+
+
+def get_table_info(tableName):
+    if tableName not in list(tableInfo.keys()):
+        raise KeyError("{} is not ready for use!".format(tableName))
+    tableSource = tableInfo[tableName]['tableSource']
+    description = tableInfo[tableName]['description']
+
+    # tablePath should be a folder or a .h5 file
+    if tableSource == 'gmFuture':
+        tablePath = os.path.join(dataBase_root_path_future, tableName)
+
+        # if table has single h5 file
+        if not os.path.exists(tablePath):
+            tableFolder = dataBase_root_path_future
+            tablePath = tablePath + '.h5'
+            # file not exits!
+            if not os.path.isfile(tablePath):
+                raise FileNotFoundError("{} no exits!".format(tablePath))
+            file_name_list = os.path.split(tablePath)[-1]
+            file_full_path_list = [tablePath]
+        else:  # table has a folder
+            tableFolder = tablePath
+            file_name_list, file_full_path_list = get_all_file(tablePath)
+
+    else:
+        tablePath = os.path.join(dataBase_root_path, tableName)
+        if not os.path.exists(tablePath):
+            tableFolder = dataBase_root_path
+            tablePath = tablePath + '.h5'
+            if not os.path.exists(tablePath):
+                raise FileNotFoundError("{} no exits!".format(tablePath))
+            file_name_list = os.path.split(tablePath)[-1]
+            file_full_path_list = [tablePath]
+        else:
+            tableFolder = tablePath
+            file_name_list, file_full_path_list = get_all_file(tablePath)
+
+    # stat time
+    """
+    atime Access Time 访问时间 最后一次访问文件（读取或执行）的时间
+    ctime Change Time 变化时间 最后一次改变文件（属性或权限）或者目录（属性或权限）的时间
+    mtime Modify Time 修改时间 最后一次修改文件（内容）或者目录（内容）的时间
+    """
+
+    stat_list = [os.stat(file_full_path) for file_full_path in file_full_path_list]
+    st_atime = max(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(stat.st_atime)) for stat in stat_list)
+    st_ctime = max(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(stat.st_ctime)) for stat in stat_list)
+    st_mtime = max(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(stat.st_mtime)) for stat in stat_list)
+    outJson = {
+        'tableSource': tableSource,
+        'description': description,
+        'tableFolder': tableFolder,
+        # 'tablePath': tablePath,
+        'file_name_list': file_name_list,
+        'Access Time': st_atime,
+        'Change Time': st_ctime,
+        'Modify Time': st_mtime,
+
+    }
+
+    return outJson

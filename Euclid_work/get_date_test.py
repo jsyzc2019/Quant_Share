@@ -2,7 +2,11 @@
 # @Time    : 2023/4/9 11:28
 # @Author  : Euclid-Jie
 # @File    : get_date_test.py
-from Utils import get_data
+import json
+from Utils import get_table_info, get_data
 
-data = get_data('FdmtDerPit', begin='20180101', end=None, ticker='000001')
-print(data.info())
+# for tabelName in tableInfo.keys():
+#     print(json.dumps(get_table_info(tabelName), ensure_ascii=False, indent=2))
+tableName = 'EquDiv_info'
+print(get_data(tableName).info())
+print(json.dumps(get_table_info(tableName), ensure_ascii=False, indent=2))

@@ -7,7 +7,8 @@ import datetime
 import os
 import os.path
 import pickle
-
+from tqdm import tqdm
+from uqer import DataAPI
 import numpy as np
 import pandas as pd
 from gm.api import *
@@ -256,7 +257,7 @@ def get_price_vol(year):
                                    end_date=get_tradeDate(year_end, -1).strftime('%Y-%m-%d'), df=True)
 
 
-# 分季度存储, 但获取数据时候, 每月获取后stack
+# ---- 分季度存储Uqer数据, 但获取数据时候, 每月获取后stack
 def quarter_download_save_monthStack(year):
     for quarter in range(0, 4):
         quarter_begin_day = str(year) + quarter_begin[quarter]
@@ -271,3 +272,23 @@ def quarter_download_save_monthStack(year):
                                                beginDate=begin, endDate=end, field=u"", pandas="1")
             outData = pd.concat([outData, tmpData], axis=0, ignore_index=True)
         save_data_h5(outData, name='RMExposureDay_Y{}_Q{}'.format(year, quarter + 1), reWrite=True, subPath="dataFile/RMExposureDay")
+
+
+# ---- 年度获取Uqer数据
+def year_download_save():
+    for year in tqdm(range(2015, 2024)):
+        year_begin = format_date(str(year) + '0101')
+        year_end = format_date(str(year) + '1231')
+        # Uqer data
+        data = DataAPI.ResConSecTarpriScoreGet(secCode=stockNumList, secName=u"", repForeDate=u"", beginDate=year_begin, endDate=year_end, field=u"", pandas="1")
+        save_data_h5(data, 'ResConSecTarpriScore_Y{}'.format(year), subPath='dataFile/ResConSecTarpriScore')
+
+
+# --- 季度获取Uqer数据
+def quarter_download_save(year):
+    for quarter in range(0, 4):
+        quarter_begin_day = str(year) + quarter_begin[quarter]
+        quarter_begin_day = str(year) + quarter_end[quarter]
+        data = DataAPI.ResConSecCoredataGet(secCode=stockNumList, secName=u"", repForeDate=u"",
+                                            beginDate=quarter_begin_day, endDate=quarter_begin_day, field=u"", pandas="1")
+        save_data_h5(data, name='ResConSecCoredata_Y{}_Q{}'.format(year, quarter + 1), subPath="dataFile/ResConSecCoredata")
