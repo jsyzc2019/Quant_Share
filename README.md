@@ -37,7 +37,7 @@ print(data.info())
 
 查看最新的[更新](https://gitee.com/Euclid-Jie/Quant_Share/wikis/%E5%B7%B2%E6%94%AF%E6%8C%81%E7%9A%84%E8%A1%A8)
 
-目前的表多位`ts`组织形式，即时间轴`t`和个体标识`s`双重索引
+目前的表多位`ts`组织形式，即时间轴`t`和个体标识`s`双重索引，其中`date_cokumn`与`get_data`中的`begin`，`end`区间一致，`ticker_column`与`get_data`中的`ticker`一致
 
 | tabelName                 | description        | assets | date_column | ticker_column |
 | ------------------------- | ------------------ | ------ | ----------- | ------------- |
@@ -117,6 +117,22 @@ print(outMetrics)  # 输出指标
 除`get_data`外，本项目内置大量常量和函数，方便投研过程中调用，现进行说明
 
 ### 函数
+
+#### `get_data`
+
+根据表名获取数据
+
+```python
+get_data(tableName, begin='20150101', end=None, sources='gm', fields: list = None, ticker: list = None)
+```
+
+#### `get_table_info`
+
+根据表名，获取数据表的信息
+
+```python
+get_table_info(tableName)
+```
 
 #### `format_date`
 
