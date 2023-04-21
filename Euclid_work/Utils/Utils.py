@@ -13,12 +13,15 @@ import numpy as np
 import pandas as pd
 from gm.api import *
 
+dataBase_root_path = r'D:\Share\Euclid_work\dataFile'
+dataBase_root_path_future = r"D:\Share\Fut_Data"
+
 __all__ = ['readPkl', 'savePkl', 'save_data_h5',  # files operation
            'get_tradeDate', 'format_date', 'format_stockCode', 'reindex', 'data2score', 'info_lag',
            'format_futures',
            # Consts
            'stock_info', 'stockList', 'stockNumList', 'bench_info', 'tradeDate_info', 'tradeDateList', 'quarter_begin', 'quarter_end',
-           'futures_list']
+           'futures_list', 'dataBase_root_path', 'dataBase_root_path_future']
 
 
 def format_stockCode(numCode):
@@ -67,15 +70,15 @@ def format_futures(file_name):
 
 
 # consts
-stock_info = pd.read_hdf('dataFile/stock_info.h5')
+stock_info = pd.read_hdf('{}/stock_info.h5'.format(dataBase_root_path))
 stockList = [format_stockCode(code) for code in stock_info['symbol']]  # 000001.SZ
 stockNumList = list(set(stock_info.sec_id))  # 000001
 futures_list = ['AG', 'AL', 'AU', 'A', 'BB', 'BU', 'B', 'CF', 'CS', 'CU', 'C', 'FB', 'FG', 'HC', 'IC', 'IF', 'IH', 'I', 'JD', 'JM', 'JR', 'J', 'LR', 'L', 'MA', 'M', 'NI', 'OI',
                 'PB', 'PM', 'PP', 'P', 'RB', 'RI', 'RM', 'RS', 'RU', 'SF', 'SM', 'SN', 'SR', 'TA', 'TF', 'T', 'V', 'WH', 'Y', 'ZC', 'ZN', 'PG',
                 'EB', 'AP', 'LU', 'SA', 'TS', 'CY', 'IM', 'PF', 'PK', 'CJ', 'UR', 'NR', 'SS', 'FU', 'EG', 'LH', 'SP', 'RR', 'SC', 'WR', 'BC']
 
-bench_info = pd.read_hdf('dataFile/bench_info.h5')
-tradeDate_info = pd.read_hdf("dataFile/tradeDate_info.h5")
+bench_info = pd.read_hdf('{}/bench_info.h5'.format(dataBase_root_path))
+tradeDate_info = pd.read_hdf("{}/tradeDate_info.h5".format(dataBase_root_path))
 tradeDateList = list(set(tradeDate_info['tradeDate']))[1:]
 quarter_begin = ['0101', '0401', '0731', '1001']
 quarter_end = ['0331', '0630', '0930', '1231']

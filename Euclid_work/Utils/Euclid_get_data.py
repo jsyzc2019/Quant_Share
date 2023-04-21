@@ -10,11 +10,8 @@ from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import multiprocessing
 from joblib import Parallel, delayed
-from .Utils import format_date, format_stockCode, format_futures, futures_list
+from .Utils import format_date, format_stockCode, format_futures, futures_list, dataBase_root_path, dataBase_root_path_future
 from .tableInfo import tableInfo
-
-dataBase_root_path = r'D:\Share\Euclid_work\dataFile'
-dataBase_root_path_future = r"D:\Share\Fut_Data"
 
 
 # 并行加速
