@@ -50,14 +50,18 @@ def get_data(tableName, begin='20150101', end=None, sources='gm', fields: list =
     :param ticker:
     :return:
     """
+    if tableName not in list(tableInfo.keys()):
+        raise KeyError("{} is not ready for use!".format(tableName))
+
     if not end:
         end = datetime.today().now().strftime('%Y%m%d')
 
     begin = format_date(begin)
     end = format_date(end)
 
-    if tableName not in list(tableInfo.keys()):
-        raise KeyError("{} is not ready for use!".format(tableName))
+    if not isinstance(ticker, list):
+        if isinstance(ticker, str):
+            ticker = [ticker]
 
     if tableInfo[tableName]['assets'] == 'stock':
         return get_data_stock(tableName, begin, end, fields, ticker)
@@ -120,12 +124,16 @@ def get_data_future(tableName, begin='20160101', end=None, sources='gm', fields:
     for year in [YearEnd.year for YearEnd in pd.date_range(load_begin, load_end, freq='Y')]:
         tmpFolder = os.path.join(tabelFoldPath, str(year), sources)
         tmpFileList = os.listdir(tmpFolder)
-        target = [x for x in tmpFileList if ticker == format_futures(x)]
+        # 已在此处进行ticker筛选，不在selectFields中进行
+        if ticker:
+            target = [x for x in tmpFileList if format_futures(x) in ticker]
+        else:
+            target = tmpFileList
         if target.__len__() > 0:
             toLoadList.extend([os.path.join(tmpFolder, target[0])])
     if toLoadList.__len__() > 0:
         load_data = load_file(toLoadList)
-        return selectFields(load_data, tableName, begin, end, fields, ticker)
+        return selectFields(load_data, tableName, begin, end, fields, ticker=None)
     else:
         raise KeyError("未找到{}文件".format(tableName))
 
@@ -145,7 +153,7 @@ def selectFields(data, tableName, begin, end, fields: list = None, ticker: list 
         dateSpan = pd.to_datetime(outData[date_column]).apply(lambda x: x.replace(tzinfo=None))
     outData = outData.loc[(dateSpan >= format_date(begin)).values & (dateSpan <= format_date(end)).values]
     # ticker filter
-    if ticker and ticker not in futures_list:
+    if ticker:
         tickerSpan = outData[ticker_column].apply(lambda x: format_stockCode(x))
         outData = outData[tickerSpan.isin([format_stockCode(x) for x in ticker])]
 

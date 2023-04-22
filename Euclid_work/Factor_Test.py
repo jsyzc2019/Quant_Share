@@ -4,7 +4,7 @@
 # @File    : Factor_Test.py
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
-from Utils import *
+from Utils import get_data, reindex, FactorTest, info_lag, data2score
 
 # score prepare
 data = get_data('HKshszHold', begin='20200101', end='20221231')
