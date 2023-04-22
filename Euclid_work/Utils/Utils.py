@@ -15,13 +15,14 @@ from gm.api import *
 
 dataBase_root_path = r'D:\Share\Euclid_work\dataFile'
 dataBase_root_path_future = r"D:\Share\Fut_Data"
+dataBase_root_path_gmStockFactor = r"D:\Share\Stk_Data\gm"
 
 __all__ = ['readPkl', 'savePkl', 'save_data_h5',  # files operation
            'get_tradeDate', 'format_date', 'format_stockCode', 'reindex', 'data2score', 'info_lag',
            'format_futures',
            # Consts
            'stock_info', 'stockList', 'stockNumList', 'bench_info', 'tradeDate_info', 'tradeDateList', 'quarter_begin', 'quarter_end',
-           'futures_list', 'dataBase_root_path', 'dataBase_root_path_future']
+           'futures_list', 'dataBase_root_path', 'dataBase_root_path_future', 'dataBase_root_path_gmStockFactor']
 
 
 def format_stockCode(numCode):

@@ -10,7 +10,7 @@ from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import multiprocessing
 from joblib import Parallel, delayed
-from .Utils import format_date, format_stockCode, format_futures, futures_list, dataBase_root_path, dataBase_root_path_future
+from .Utils import format_date, format_stockCode, format_futures, futures_list, dataBase_root_path, dataBase_root_path_future, dataBase_root_path_gmStockFactor
 from .tableInfo import tableInfo
 
 
@@ -63,12 +63,15 @@ def get_data(tableName, begin='20150101', end=None, sources='gm', fields: list =
         if isinstance(ticker, str):
             ticker = [ticker]
 
-    if tableInfo[tableName]['assets'] == 'stock':
+    tableAssets = tableInfo[tableName]['assets']
+    if tableAssets == 'stock':
         return get_data_stock(tableName, begin, end, fields, ticker)
-    elif tableInfo[tableName]['assets'] == 'future':
+    elif tableAssets == 'future':
         return get_data_future(tableName, begin, end, sources, fields, ticker)
-    elif tableInfo[tableName]['assets'] == 'info':
+    elif tableAssets == 'info':
         return get_data_stock(tableName, begin, end, fields, ticker)
+    elif tableAssets == 'gmStockFactor':
+        return get_data_gmStockFactor(tableName, begin, end, fields, ticker)
 
 
 def get_data_stock(tableName, begin, end, fields, ticker):
@@ -112,11 +115,7 @@ def get_data_stock(tableName, begin, end, fields, ticker):
 
 
 def get_data_future(tableName, begin='20160101', end=None, sources='gm', fields: list = None, ticker: list = None):
-    if not end:
-        end = datetime.today().now().strftime('%Y%m%d')
     tabelFoldPath = os.path.join(dataBase_root_path_future, tableName)
-    begin = format_date(begin)
-    end = format_date(end)
 
     load_begin = begin - pd.tseries.offsets.YearBegin(0)
     load_end = end + pd.tseries.offsets.YearEnd(0)
@@ -130,10 +129,29 @@ def get_data_future(tableName, begin='20160101', end=None, sources='gm', fields:
         else:
             target = tmpFileList
         if target.__len__() > 0:
-            toLoadList.extend([os.path.join(tmpFolder, target[0])])
+            toLoadList.extend([os.path.join(tmpFolder, target_i) for target_i in target])
     if toLoadList.__len__() > 0:
         load_data = load_file(toLoadList)
         return selectFields(load_data, tableName, begin, end, fields, ticker=None)
+    else:
+        raise KeyError("未找到{}文件".format(tableName))
+
+
+def get_data_gmStockFactor(tableName, begin='20160101', end=None, fields: list = None, ticker: list = None):
+    # D:\Share\Stk_Data\gm\ACCA
+    tabelFoldPath = os.path.join(dataBase_root_path_gmStockFactor, tableName)
+
+    load_begin = begin - pd.tseries.offsets.YearBegin(0)
+    load_end = end + pd.tseries.offsets.YearEnd(0)
+    toLoadList = []
+    for year in [YearEnd.year for YearEnd in pd.date_range(load_begin, load_end, freq='Y')]:
+        tmpFolder = os.path.join(tabelFoldPath, str(year))  # D:\Share\Stk_Data\gm\ACCA\2013
+        target = os.listdir(tmpFolder)  # D:\Share\Stk_Data\gm\ACCA\2013\ACCA.h5
+        if target.__len__() > 0:
+            toLoadList.extend([os.path.join(tmpFolder, target_i) for target_i in target])
+    if toLoadList.__len__() > 0:
+        load_data = load_file(toLoadList)
+        return selectFields(load_data, tableName, begin, end, fields, ticker)
     else:
         raise KeyError("未找到{}文件".format(tableName))
 
@@ -176,6 +194,23 @@ def get_all_file(folderPath, query='.h5'):
     return FileList, file_full_path_list
 
 
+def get_tablePath_info(tablePath):
+    # if table has single h5 file
+    if not os.path.exists(tablePath):
+        tableFolder = dataBase_root_path_future
+        tablePath = tablePath + '.h5'
+        # file not exits!
+        if not os.path.isfile(tablePath):
+            raise FileNotFoundError("{} no exits!".format(tablePath))
+        file_name_list = os.path.split(tablePath)[-1]
+        file_full_path_list = [tablePath]
+        return tableFolder, file_name_list, file_full_path_list
+    else:  # table has a folder
+        file_name_list, file_full_path_list = get_all_file(tablePath)
+        tableFolder = tablePath
+    return tableFolder, file_name_list, file_full_path_list
+
+
 def get_table_info(tableName):
     if tableName not in list(tableInfo.keys()):
         raise KeyError("{} is not ready for use!".format(tableName))
@@ -185,32 +220,15 @@ def get_table_info(tableName):
     # tablePath should be a folder or a .h5 file
     if tableSource == 'gmFuture':
         tablePath = os.path.join(dataBase_root_path_future, tableName)
+        tableFolder, file_name_list, file_full_path_list = get_tablePath_info(tablePath)
 
-        # if table has single h5 file
-        if not os.path.exists(tablePath):
-            tableFolder = dataBase_root_path_future
-            tablePath = tablePath + '.h5'
-            # file not exits!
-            if not os.path.isfile(tablePath):
-                raise FileNotFoundError("{} no exits!".format(tablePath))
-            file_name_list = os.path.split(tablePath)[-1]
-            file_full_path_list = [tablePath]
-        else:  # table has a folder
-            tableFolder = tablePath
-            file_name_list, file_full_path_list = get_all_file(tablePath)
+    elif tableSource == 'gmStockFactor':
+        tablePath = os.path.join(dataBase_root_path_gmStockFactor, tableName)
+        tableFolder, file_name_list, file_full_path_list = get_tablePath_info(tablePath)
 
-    else:
+    else:  # InfoTable, dataYesStock, gmStock
         tablePath = os.path.join(dataBase_root_path, tableName)
-        if not os.path.exists(tablePath):
-            tableFolder = dataBase_root_path
-            tablePath = tablePath + '.h5'
-            if not os.path.exists(tablePath):
-                raise FileNotFoundError("{} no exits!".format(tablePath))
-            file_name_list = os.path.split(tablePath)[-1]
-            file_full_path_list = [tablePath]
-        else:
-            tableFolder = tablePath
-            file_name_list, file_full_path_list = get_all_file(tablePath)
+        tableFolder, file_name_list, file_full_path_list = get_tablePath_info(tablePath)
 
     # stat time
     """

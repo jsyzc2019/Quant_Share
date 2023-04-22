@@ -171,8 +171,18 @@ gmFuture = {
     },
 }
 
+# 针对D:\Share\Stk_Data\gm 下的表
+gmStockFactor = {
+    'ACCA': {
+        'assets': 'gmStockFactor',
+        'description': '',
+        'date_column': 'pub_date',
+        'ticker_column': 'symbol',
+    }
+}
+
 tableInfo = {}
-for table in ['InfoTable', 'gmStock', 'dataYesStock', 'gmFuture']:
+for table in ['InfoTable', 'gmStock', 'dataYesStock', 'gmFuture', 'gmStockFactor']:
     _table = eval(table)
     for key, value in _table.items():
         _table[key]['tableSource'] = table
