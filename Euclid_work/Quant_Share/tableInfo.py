@@ -4,6 +4,8 @@
 # @Author  : Euclid-Jie
 # @File    : tableInfo.py
 """
+import json
+import os
 
 InfoTable = {
     'IndustryID_info': {
@@ -172,14 +174,11 @@ gmFuture = {
 }
 
 # 针对D:\Share\Stk_Data\gm 下的表
-gmStockFactor = {
-    'ACCA': {
-        'assets': 'gmStockFactor',
-        'description': '',
-        'date_column': 'pub_date',
-        'ticker_column': 'symbol',
-    }
-}
+# 从gmStockFactor_tableInfo.json中读取
+current_dir = os.path.abspath(os.path.dirname(__file__))
+
+with open(os.path.join(current_dir, 'gmStockFactor_tableInfo.json'), 'r') as f:
+    gmStockFactor = json.load(f)  # 此时a是一个字典对象
 
 tableInfo = {}
 for table in ['InfoTable', 'gmStock', 'dataYesStock', 'gmFuture', 'gmStockFactor']:
