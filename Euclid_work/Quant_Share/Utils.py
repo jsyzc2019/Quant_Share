@@ -115,9 +115,10 @@ def data2score(data, neg=False, ascending=True, axis=1):
     return pd.DataFrame(data=score, columns=data.columns, index=data.index)
 
 
-def reindex(data):
+def reindex(data, tradeDate=True):
     """
     Convert wide table to standard format, with index as pd.dt and columns as wind code
+    :param tradeDate: if ture, index is trade day
     :param data:
     :return:
     """
@@ -128,8 +129,10 @@ def reindex(data):
     data.columns = [format_stockCode(x) for x in data.columns]
     if np.NAN in data.columns:
         data.drop(columns=np.NAN, inplace=True)
-
-    new_index = [x for x in pd.date_range(data.index.min(), data.index.max(), freq='D') if x in tradeDateList]
+    if tradeDate:
+        new_index = [x for x in pd.date_range(data.index.min(), data.index.max(), freq='D') if x in tradeDateList]
+    else:
+        new_index = pd.date_range(data.index.min(), data.index.max(), freq='D')
     new_columns = stockList
     return data.reindex(index=new_index, columns=new_columns, fill_value=np.NAN)
 
@@ -209,90 +212,3 @@ def format_date(date):
         return date
     else:
         raise TypeError("date should be str or int!")
-
-
-# 以下函数仅为参照，不能也不应被调用
-def get_tradeDate_info(endDate='2023-12-31'):
-    """
-    use gm get
-    calendar date \
-    trade date \
-    trade date fore(the nearest trade date in future) \
-    trade date back(the nearest trade date in history)
-    """
-    endDate = format_date(endDate)
-    tradeDate_info = pd.DataFrame(get_trading_dates('SHSE', start_date='2015-01-01', end_date=endDate))
-    tradeDate_info.columns = ['tradeDate']
-    tradeDate_info['tradeDate'] = pd.to_datetime(tradeDate_info['tradeDate'])
-
-    date_info = pd.date_range(start='2015-01-01', end='2023-12-31', freq='d').to_frame(name='calendar')
-    tradeDate_info = date_info.merge(tradeDate_info, left_on='calendar', right_on='tradeDate', how='left')
-
-    tradeDate_info['tradeDate_fore'] = tradeDate_info['tradeDate'].fillna(method='bfill')
-    tradeDate_info['tradeDate_back'] = tradeDate_info['tradeDate'].fillna(method='ffill')
-
-    tradeDate_info.index = tradeDate_info['calendar']
-    return tradeDate_info
-
-
-# 设计一个季度存储的数据
-# pd.tseries.offsets.MonthEnd(1)
-def quarter_download_save(year):
-    for quarter in range(0, 4):
-        quarter_begin_day = str(year) + quarter_begin[quarter]
-        quarter_end_day = str(year) + quarter_end[quarter]
-        data = DataAPI.HKshszHoldGet(secID=u"", ticker=u"", tradeCD=['1', '2'],
-                                     beginDate=quarter_begin_day,
-                                     endDate=quarter_end_day, field=u"", pandas="1")
-        save_data_h5(data, name='HKshszHold_Y{}_Q{}'.format(year, quarter + 1), subPath="dataFile/HKshszHold")
-
-
-def year_download_save():
-    for year in range(2015, 2024):
-        data = get_price_vol(year)
-        save_data_h5(data, 'bench_price_Y{}'.format(year), subPath='dataFile/bench_price')
-
-
-def get_price_vol(year):
-    year_begin = format_date(str(year) + '0101')
-    year_end = format_date(str(year) + '1231')
-    return get_history_instruments(symbols=stock_info['symbol'].to_list(),
-                                   start_date=get_tradeDate(year_begin).strftime('%Y-%m-%d'),
-                                   end_date=get_tradeDate(year_end, -1).strftime('%Y-%m-%d'), df=True)
-
-
-# ---- 分季度存储Uqer数据, 但获取数据时候, 每月获取后stack
-def quarter_download_save_monthStack(year):
-    for quarter in range(0, 4):
-        quarter_begin_day = str(year) + quarter_begin[quarter]
-        quarter_end_day = str(year) + quarter_end[quarter]
-        dateSpan = pd.date_range(quarter_begin_day, quarter_end_day, freq='m').tolist()
-        dateSpan.insert(0, pd.to_datetime(quarter_begin_day))
-        outData = pd.DataFrame()
-        for month in range(dateSpan.__len__() - 1):
-            begin = dateSpan[month].strftime('%Y%m%d')
-            end = dateSpan[month + 1].strftime('%Y%m%d')
-            tmpData = DataAPI.RMExposureDayGet(secID=u"", ticker=u"", tradeDate=u"",
-                                               beginDate=begin, endDate=end, field=u"", pandas="1")
-            outData = pd.concat([outData, tmpData], axis=0, ignore_index=True)
-        save_data_h5(outData, name='RMExposureDay_Y{}_Q{}'.format(year, quarter + 1), reWrite=True, subPath="dataFile/RMExposureDay")
-
-
-# ---- 年度获取Uqer数据
-def year_download_save():
-    for year in tqdm(range(2015, 2024)):
-        year_begin = format_date(str(year) + '0101')
-        year_end = format_date(str(year) + '1231')
-        # Uqer data
-        data = DataAPI.ResConSecTarpriScoreGet(secCode=stockNumList, secName=u"", repForeDate=u"", beginDate=year_begin, endDate=year_end, field=u"", pandas="1")
-        save_data_h5(data, 'ResConSecTarpriScore_Y{}'.format(year), subPath='dataFile/ResConSecTarpriScore')
-
-
-# --- 季度获取Uqer数据
-def quarter_download_save(year):
-    for quarter in range(0, 4):
-        quarter_begin_day = str(year) + quarter_begin[quarter]
-        quarter_begin_day = str(year) + quarter_end[quarter]
-        data = DataAPI.ResConSecCoredataGet(secCode=stockNumList, secName=u"", repForeDate=u"",
-                                            beginDate=quarter_begin_day, endDate=quarter_begin_day, field=u"", pandas="1")
-        save_data_h5(data, name='ResConSecCoredata_Y{}_Q{}'.format(year, quarter + 1), subPath="dataFile/ResConSecCoredata")

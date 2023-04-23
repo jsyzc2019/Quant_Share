@@ -34,7 +34,11 @@ InfoTable = {
     },
     'EquDiv_info': {
         'assets': 'info',
-        'description': 'DataAPI.EquDivGet ',
+        'description': 'DataAPI.EquDivGet',
+    },
+    'TradeCal': {
+        'assets': 'info',
+        'description': 'DataAPI.TradeCalGet',
     }
 }
 
@@ -72,12 +76,12 @@ dataYesStock = {
         'date_column': 'tradeDate',
         'ticker_column': 'ticker',
     },
-
-    # 'industry_info': {
-    #     'description': '',
-    #     'date_column': 'tradeDate',
-    #     'ticker_column': 'aiq_ticker'
-    # }
+    'IndustryID_Sw21': {
+        'assets': 'stock',
+        'description': '申万行业分类2021',
+        'date_column': 'date',
+        'ticker_column': 'winCode'
+    },
     'MktLimit': {
         'assets': 'stock',
         'description': '沪深涨跌停限制',
