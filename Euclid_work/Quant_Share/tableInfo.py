@@ -12,9 +12,13 @@ InfoTable = {
         'assets': 'info',
         'description': 'DataAPI.IndustryGet',
     },
-    'SecID_info': {
+    'SecID_E_info': {
         'assets': 'info',
-        'description': 'DataAPI.SecIDGet',
+        'description': 'DataAPI.SecIDGet, assetClass=E',
+    },
+    'SecID_IDX_info': {
+        'assets': 'info',
+        'description': 'DataAPI.SecIDGet, assetClass=IDX, exchangeCD=[XSHE, HSHG]',
     },
     'SysCode_info': {
         'assets': 'info',
@@ -62,6 +66,13 @@ dataYesStock = {
         'date_column': 'tradeDate',
         'ticker_column': 'ticker'
     },
+    'MktIdx': {
+        'assets': 'stock',
+        'description': '指数日行情',
+        'date_column': 'tradeDate',
+        'ticker_column': 'ticker',
+    },
+
     # 'industry_info': {
     #     'description': '',
     #     'date_column': 'tradeDate',

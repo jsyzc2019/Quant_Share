@@ -37,11 +37,11 @@ class DataPrepare:
 
     def get_bench_info(self):
         # bench nav
-        bench_price_df = get_data('bench_price', begin=self.beginDate, end=self.endDate, ticker='000300')
-        bench_price_df['trade_date'] = pd.to_datetime(bench_price_df['trade_date']).apply(lambda x: x.replace(tzinfo=None))
-        bench_price_df['pct_chg'] = bench_price_df['pre_close'].pct_change()
-        bench_price_df.set_index('trade_date', inplace=True)
-        self.BENCH['pct_chg'] = bench_price_df['pct_chg']
+        bench_price_df = get_data('MktIdx', begin=self.beginDate, end=self.endDate, ticker=['000300'])
+        bench_price_df['tradeDate'] = pd.to_datetime(bench_price_df['tradeDate'])
+        bench_price_df = bench_price_df.sort_values('tradeDate', ascending=True)
+        bench_price_df.set_index('tradeDate', inplace=True)
+        self.BENCH['pct_chg'] = bench_price_df['CHGPct']
         # TODO bench con code
         # self.BENCH['con_code']
 
