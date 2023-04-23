@@ -4,6 +4,7 @@
 # @File    : Utils.py
 
 import datetime
+import json
 import os
 import os.path
 import pickle
@@ -19,7 +20,7 @@ dataBase_root_path_gmStockFactor = r"D:\Share\Stk_Data\gm"
 
 __all__ = ['readPkl', 'savePkl', 'save_data_h5',  # files operation
            'get_tradeDate', 'format_date', 'format_stockCode', 'reindex', 'data2score', 'info_lag',
-           'format_futures',
+           'format_futures', 'printJson',
            # Consts
            'stock_info', 'stockList', 'stockNumList', 'bench_info', 'tradeDate_info', 'tradeDateList', 'quarter_begin', 'quarter_end',
            'futures_list', 'dataBase_root_path', 'dataBase_root_path_future', 'dataBase_root_path_gmStockFactor']
@@ -115,7 +116,7 @@ def data2score(data, neg=False, ascending=True, axis=1):
     return pd.DataFrame(data=score, columns=data.columns, index=data.index)
 
 
-def reindex(data, tradeDate=True):
+def reindex(data, tradeDate=True, **kwargs):
     """
     Convert wide table to standard format, with index as pd.dt and columns as wind code
     :param tradeDate: if ture, index is trade day
@@ -134,7 +135,11 @@ def reindex(data, tradeDate=True):
     else:
         new_index = pd.date_range(data.index.min(), data.index.max(), freq='D')
     new_columns = stockList
-    return data.reindex(index=new_index, columns=new_columns, fill_value=np.NAN)
+    # fill na
+    fill_value = np.nan
+    if 'fill_value' in kwargs.keys():
+        fill_value = kwargs['fill_value']
+    return data.reindex(index=new_index, columns=new_columns, fill_value=fill_value)
 
 
 def info_lag(data, n_lag):
@@ -212,3 +217,11 @@ def format_date(date):
         return date
     else:
         raise TypeError("date should be str or int!")
+
+
+def printJson(dataJson):
+    if not isinstance(dataJson, dict):
+        raise TypeError("dataJson should be dict format")
+    print(json.dumps(dataJson, ensure_ascii=False, indent=2))
+
+

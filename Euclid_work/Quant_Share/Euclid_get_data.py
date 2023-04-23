@@ -162,14 +162,15 @@ def selectFields(data, tableName, begin, end, fields: list = None, ticker: list 
     ticker_column = tableInfo[tableName]['ticker_column']
     # date filter
     if ticker_column != '':
-        outData.sort_values(by=[ticker_column, date_column], ascending=[1, 1], inplace=True)
+        outData.sort_values(by=[date_column, ticker_column], ascending=[1, 1], inplace=True)
     else:
         outData.sort_values(by=[date_column], ascending=True, inplace=True)
+    outData.reset_index(drop=True, inplace=True)
     if isinstance(outData[date_column][0], int):
         dateSpan = pd.to_datetime(outData[date_column], format='%Y%m%d')
     else:
         dateSpan = pd.to_datetime(outData[date_column]).apply(lambda x: x.replace(tzinfo=None))
-    outData = outData.loc[(dateSpan >= format_date(begin)).values & (dateSpan <= format_date(end)).values]
+    outData = outData.loc[(dateSpan >= format_date(begin)).values & (dateSpan <= format_date(end))]
     # ticker filter
     if ticker:
         tickerSpan = outData[ticker_column].apply(lambda x: format_stockCode(x))

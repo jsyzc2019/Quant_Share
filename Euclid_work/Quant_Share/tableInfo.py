@@ -88,6 +88,18 @@ dataYesStock = {
         'date_column': 'tradeDate',
         'ticker_column': 'ticker'
     },
+    'SecST': {
+        'assets': 'stock',
+        'description': '沪深ST',
+        'date_column': 'tradeDate',
+        'ticker_column': 'ticker'
+    },
+    'SecHalt': {
+        'assets': 'stock',
+        'description': '沪深停复牌',
+        'date_column': 'haltBeginTime',
+        'ticker_column': 'ticker'
+    },
     'ResConIndex': {
         'assets': 'stock',
         'description': '指数一致预期数据表',
