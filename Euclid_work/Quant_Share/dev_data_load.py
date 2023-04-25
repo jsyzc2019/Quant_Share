@@ -203,6 +203,21 @@ def SecHalt(begin, end, **kwargs):
     return data
 
 
+def FdmtIndiRtnPit(begin, end, **kwargs):
+    """
+    财务指标—盈利能力 (Point in time)
+    :param begin:
+    :param end:
+    :param kwargs: ticker = stockNumList
+    :return:
+    """
+    if 'ticker' not in kwargs.keys():
+        raise AttributeError('ticker should in kwargs!')
+    data = DataAPI.FdmtIndiRtnPitGet(ticker=kwargs['ticker'], secID="", beginDate=begin, endDate=end, beginYear=u"", endYear=u"", reportType=u"",
+                                     publishDateEnd=u"", publishDateBegin=u"", field=u"", pandas="1")
+    return data
+
+
 def get_span_list(begin, end, freq=None):
     begin = format_date(begin)
     end = format_date(end)
@@ -305,7 +320,7 @@ if __name__ == '__main__':
     # induID_Sw = [int(i) for i in induID[induID['industryVersionCD'] == "010321"]['industryID'].to_list()]
 
     # 补数据
-    for tableName in ["SecHalt"]:
+    for tableName in ["FdmtIndiRtnPit"]:
         print(tableName)
         for year in range(2015, 2024):
             begin = "{}0101".format(year)

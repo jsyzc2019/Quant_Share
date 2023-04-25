@@ -178,6 +178,12 @@ dataYesStock = {
         'date_column': 'tradeDate',
         'ticker_column': 'ticker'
     },
+    'FdmtIndiRtnPit': {
+        'assets': 'stock',
+        'description': '财务指标—盈利能力 (Point in time)',
+        'date_column': 'endDate',
+        'ticker_column': 'ticker'
+    },
 }
 gmFuture = {
     'Broker_Data': {
