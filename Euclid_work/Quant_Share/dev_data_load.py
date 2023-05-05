@@ -5,10 +5,12 @@
 # @File    : dev_data_load.py
 """
 import pandas as pd
+from gm.api import *
+from Euclid_work.Quant_Share import stock_info
 from tqdm import tqdm
 from uqer import DataAPI, Client
 from Euclid_work.Quant_Share.Euclid_get_data import get_data
-from Euclid_work.Quant_Share.Utils import stockNumList, format_date, save_data_h5, dataBase_root_path
+from Euclid_work.Quant_Share.Utils import stockNumList, format_date, save_data_h5, dataBase_root_path, dataBase_root_path_gmStockFactor
 
 
 def MktIdx(begin, end, **kwargs):
@@ -218,6 +220,32 @@ def FdmtIndiRtnPit(begin, end, **kwargs):
     return data
 
 
+def MktEqudEval(begin, end, **kwargs):
+    """
+    沪深估值信息
+    DataAPI.MktEqudEvalGet
+    :param begin:
+    :param end:
+    :param kwargs: ticker = stockNumList
+    :return:
+    """
+    if 'ticker' not in kwargs.keys():
+        raise AttributeError('ticker should in kwargs!')
+    if 'ticker' not in kwargs.keys():
+        raise AttributeError('ticker should in kwargs!')
+    data = DataAPI.MktEqudEvalGet(ticker=kwargs['ticker'], secID="", beginDate=begin, endDate=end, field=u"", pandas="1")
+    return data
+
+
+def fundamentals_balance(begin, end, **kwargs):
+    if 'symbol' not in kwargs.keys():
+        raise AttributeError('symbol should in kwargs!')
+    symbol = kwargs['symbol']
+    outData = pd.DataFrame()
+    for symbol_i in symbol:
+        tmpData = stk_get_fundamentals_balance(symbol_i, rpt_type=None, data_type=None, start_date=None, end_date=None, fields=['cash_bal_cb', 'dpst_ob'], df=False)
+
+
 def get_span_list(begin, end, freq=None):
     begin = format_date(begin)
     end = format_date(end)
@@ -307,11 +335,12 @@ def TradeCal(**kwargs):
 
 
 if __name__ == '__main__':
+    # 通联登录
     with open('token.txt', 'rt', encoding='utf-8') as f:
         token = f.read().strip()
     client = Client(token=token)
-    # indexID = get_data("SecID_IDX_info")['secID'].to_list()
 
+    # indexID = get_data("SecID_IDX_info")['secID'].to_list()
     # rolling_save(HKshszHold, 'HKshszHold', 20200103, 20200430, freq='q', monthlyStack=True,
     #              subPath="{}/HKshszHold".format(dataBase_root_path), ticker=stockNumList, reWrite=True)
 
@@ -319,8 +348,8 @@ if __name__ == '__main__':
     # induID_Citic = [int(i) for i in induID[induID['industryVersionCD'] == "010317"]['industryID'].to_list()]
     # induID_Sw = [int(i) for i in induID[induID['industryVersionCD'] == "010321"]['industryID'].to_list()]
 
-    # 补数据
-    for tableName in ["FdmtIndiRtnPit"]:
+    # 优矿补数据
+    for tableName in ["MktEqudEval"]:
         print(tableName)
         for year in range(2015, 2024):
             begin = "{}0101".format(year)
@@ -328,3 +357,17 @@ if __name__ == '__main__':
             rolling_save(eval(tableName), tableName, begin, end, freq='q', monthlyStack=False,
                          subPath="{}/{}".format(dataBase_root_path, tableName),
                          ticker=stockNumList, reWrite=True)
+
+    # 掘金登录
+    # from gm.api import *  # 接口文档 https://www.myquant.cn/docs/python/python_select_api
+    # set_token('cac6f11ecf01f9539af72142faf5c3066cb1915b')
+
+    # 掘金数据
+    # symbolList = list(stock_info.symbol.unique())
+    # for tableName in ["fundamentals_balance"]:
+    #     for year in range(2015, 2024):
+    #         begin = "{}0101".format(year)
+    #         end = "{}1231".format(year)
+    #         rolling_save(eval(tableName), tableName, begin, end, freq='y', monthlyStack=False,
+    #                      subPath="{}/{}".format(dataBase_root_path_gmStockFactor, tableName),
+    #                      symbol=symbolList, reWrite=True)
