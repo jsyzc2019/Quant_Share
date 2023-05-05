@@ -1,0 +1,8 @@
+{
+  "fundamentals_balance": {
+    "assets": "gmStockData",
+    "description": "",
+    "date_column": "pub_date",
+    "ticker_column": "symbol"
+  }
+}
