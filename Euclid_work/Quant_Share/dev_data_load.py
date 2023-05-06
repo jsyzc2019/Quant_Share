@@ -6,7 +6,7 @@
 """
 import pandas as pd
 from gm.api import *
-from Euclid_work.Quant_Share import stock_info
+from Euclid_work.Quant_Share import stock_info, bench_info
 from tqdm import tqdm
 from uqer import DataAPI, Client
 from Euclid_work.Quant_Share.Euclid_get_data import get_data
@@ -231,19 +231,46 @@ def MktEqudEval(begin, end, **kwargs):
     """
     if 'ticker' not in kwargs.keys():
         raise AttributeError('ticker should in kwargs!')
-    if 'ticker' not in kwargs.keys():
-        raise AttributeError('ticker should in kwargs!')
     data = DataAPI.MktEqudEvalGet(ticker=kwargs['ticker'], secID="", beginDate=begin, endDate=end, field=u"", pandas="1")
     return data
 
 
-def fundamentals_balance(begin, end, **kwargs):
+def gmData_history(begin, end, **kwargs):
     if 'symbol' not in kwargs.keys():
         raise AttributeError('symbol should in kwargs!')
-    symbol = kwargs['symbol']
+
+    begin = format_date(begin).strftime("%Y-%m-%d")
+    end = format_date(end).strftime("%Y-%m-%d")
+
     outData = pd.DataFrame()
-    for symbol_i in symbol:
-        tmpData = stk_get_fundamentals_balance(symbol_i, rpt_type=None, data_type=None, start_date=None, end_date=None, fields=['cash_bal_cb', 'dpst_ob'], df=False)
+    with tqdm(kwargs['symbol']) as t:
+        for symbol_i in t:
+            try:
+                data = history(symbol_i, frequency='1d', start_time=begin, end_time=end, df=True)
+                t.set_postfix({"状态": "已写入{}数据".format(symbol_i)})  # 进度条右边显示信息
+            except GmError:
+                t.set_postfix({"状态": "GmError{}条".format(GmError)})  # 进度条右边显示信息
+            outData = pd.concat([outData, data], axis=0, ignore_index=True)
+    return outData
+
+
+def gmData_bench_price(begin, end, **kwargs):
+    if 'symbol' not in kwargs.keys():
+        raise AttributeError('symbol should in kwargs!')
+
+    begin = format_date(begin).strftime("%Y-%m-%d")
+    end = format_date(end).strftime("%Y-%m-%d")
+
+    outData = pd.DataFrame()
+    with tqdm(kwargs['symbol']) as t:
+        for symbol_i in t:
+            try:
+                data = get_history_symbol(symbol_i, start_date=begin, end_date=end, df=True)
+                t.set_postfix({"状态": "已写入{}数据".format(symbol_i)})  # 进度条右边显示信息
+            except GmError:
+                t.set_postfix({"状态": "GmError{}条".format(GmError)})  # 进度条右边显示信息
+            outData = pd.concat([outData, data], axis=0, ignore_index=True)
+    return outData
 
 
 def get_span_list(begin, end, freq=None):
@@ -336,9 +363,9 @@ def TradeCal(**kwargs):
 
 if __name__ == '__main__':
     # 通联登录
-    with open('token.txt', 'rt', encoding='utf-8') as f:
-        token = f.read().strip()
-    client = Client(token=token)
+    # with open('token.txt', 'rt', encoding='utf-8') as f:
+    #     token = f.read().strip()
+    # client = Client(token=token)
 
     # indexID = get_data("SecID_IDX_info")['secID'].to_list()
     # rolling_save(HKshszHold, 'HKshszHold', 20200103, 20200430, freq='q', monthlyStack=True,
@@ -349,25 +376,27 @@ if __name__ == '__main__':
     # induID_Sw = [int(i) for i in induID[induID['industryVersionCD'] == "010321"]['industryID'].to_list()]
 
     # 优矿补数据
-    for tableName in ["MktEqudEval"]:
-        print(tableName)
-        for year in range(2015, 2024):
-            begin = "{}0101".format(year)
-            end = "{}1231".format(year)
-            rolling_save(eval(tableName), tableName, begin, end, freq='q', monthlyStack=False,
-                         subPath="{}/{}".format(dataBase_root_path, tableName),
-                         ticker=stockNumList, reWrite=True)
-
-    # 掘金登录
-    # from gm.api import *  # 接口文档 https://www.myquant.cn/docs/python/python_select_api
-    # set_token('cac6f11ecf01f9539af72142faf5c3066cb1915b')
-
-    # 掘金数据
-    # symbolList = list(stock_info.symbol.unique())
-    # for tableName in ["fundamentals_balance"]:
+    # for tableName in ["MktEqudEval"]:
+    #     print(tableName)
     #     for year in range(2015, 2024):
     #         begin = "{}0101".format(year)
     #         end = "{}1231".format(year)
-    #         rolling_save(eval(tableName), tableName, begin, end, freq='y', monthlyStack=False,
-    #                      subPath="{}/{}".format(dataBase_root_path_gmStockFactor, tableName),
-    #                      symbol=symbolList, reWrite=True)
+    #         rolling_save(eval(tableName), tableName, begin, end, freq='q', monthlyStack=False,
+    #                      subPath="{}/{}".format(dataBase_root_path, tableName),
+    #                      ticker=stockNumList, reWrite=True)
+
+    # 掘金登录
+    from gm.api import *  # 接口文档 https://www.myquant.cn/docs/python/python_select_api
+
+    set_token('cac6f11ecf01f9539af72142faf5c3066cb1915b')
+
+    # 掘金数据
+    # symbolList = list(stock_info.symbol.unique())  # stk symbol
+    symbolList = list(bench_info.symbol.unique())  # stk symbol
+    for tableName in ["gmData_bench_price"]:
+        for year in range(2015, 2024):
+            begin = "{}0101".format(year)
+            end = "{}1231".format(year)
+            rolling_save(eval(tableName), tableName, begin, end, freq='y', monthlyStack=False,
+                         subPath="{}/{}".format(dataBase_root_path_gmStockFactor, tableName),
+                         symbol=symbolList, reWrite=True)

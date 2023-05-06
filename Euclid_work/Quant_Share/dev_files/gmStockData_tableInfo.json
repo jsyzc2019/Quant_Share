@@ -4,5 +4,17 @@
     "description": "",
     "date_column": "pub_date",
     "ticker_column": "symbol"
+  },
+    "gmData_history": {
+    "assets": "gmStockData",
+    "description": "",
+    "date_column": "bob",
+    "ticker_column": "symbol"
+  },
+  "gmData_bench_price": {
+    "assets": "gmStockData",
+    "description": "",
+    "date_column": "trade_date",
+    "ticker_column": "symbol"
   }
 }
