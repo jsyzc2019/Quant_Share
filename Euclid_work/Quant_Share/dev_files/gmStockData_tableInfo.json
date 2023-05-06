@@ -5,6 +5,24 @@
     "date_column": "pub_date",
     "ticker_column": "symbol"
   },
+    "fundamentals_cashflow": {
+    "assets": "gmStockData",
+    "description": "",
+    "date_column": "pub_date",
+    "ticker_column": "symbol"
+  },
+    "fundamentals_income": {
+    "assets": "gmStockData",
+    "description": "",
+    "date_column": "pub_date",
+    "ticker_column": "symbol"
+  },
+    "share_change": {
+    "assets": "gmStockData",
+    "description": "",
+    "date_column": "pub_date",
+    "ticker_column": "symbol"
+  },
     "gmData_history": {
     "assets": "gmStockData",
     "description": "",
