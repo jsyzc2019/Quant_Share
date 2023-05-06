@@ -184,6 +184,18 @@ dataYesStock = {
         'date_column': 'endDate',
         'ticker_column': 'ticker'
     },
+    'MktEqudEval': {
+        'assets': 'stock',
+        'description': '沪深估值信息',
+        'date_column': 'tradeDate',
+        'ticker_column': 'ticker'
+    },
+    'FdmtIndiPSPit': {
+        'assets': 'stock',
+        'description': '财务指标—每股 (Point in time)',
+        'date_column': 'endDate',
+        'ticker_column': 'ticker'
+    },
 }
 gmFuture = {
     'Broker_Data': {

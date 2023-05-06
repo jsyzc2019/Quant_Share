@@ -235,6 +235,21 @@ def MktEqudEval(begin, end, **kwargs):
     return data
 
 
+def FdmtIndiPSPit(begin, end, **kwargs):
+    """
+    财务指标—每股 (Point in time)
+    DataAPI.FdmtIndiPSPitGet
+    :param begin:
+    :param end:
+    :param kwargs: ticker = stockNumList
+    :return:
+    """
+    if 'ticker' not in kwargs.keys():
+        raise AttributeError('ticker should in kwargs!')
+    data = DataAPI.FdmtIndiPSPitGet(ticker=kwargs['ticker'], secID="", beginDate=begin, endDate=end, field=u"", pandas="1")
+    return data
+
+
 def gmData_history(begin, end, **kwargs):
     if 'symbol' not in kwargs.keys():
         raise AttributeError('symbol should in kwargs!')
@@ -363,9 +378,9 @@ def TradeCal(**kwargs):
 
 if __name__ == '__main__':
     # 通联登录
-    # with open('token.txt', 'rt', encoding='utf-8') as f:
-    #     token = f.read().strip()
-    # client = Client(token=token)
+    with open('token.txt', 'rt', encoding='utf-8') as f:
+        token = f.read().strip()
+    client = Client(token=token)
 
     # indexID = get_data("SecID_IDX_info")['secID'].to_list()
     # rolling_save(HKshszHold, 'HKshszHold', 20200103, 20200430, freq='q', monthlyStack=True,
@@ -375,28 +390,28 @@ if __name__ == '__main__':
     # induID_Citic = [int(i) for i in induID[induID['industryVersionCD'] == "010317"]['industryID'].to_list()]
     # induID_Sw = [int(i) for i in induID[induID['industryVersionCD'] == "010321"]['industryID'].to_list()]
 
-    # 优矿补数据
-    # for tableName in ["MktEqudEval"]:
-    #     print(tableName)
-    #     for year in range(2015, 2024):
-    #         begin = "{}0101".format(year)
-    #         end = "{}1231".format(year)
-    #         rolling_save(eval(tableName), tableName, begin, end, freq='q', monthlyStack=False,
-    #                      subPath="{}/{}".format(dataBase_root_path, tableName),
-    #                      ticker=stockNumList, reWrite=True)
-
-    # 掘金登录
-    from gm.api import *  # 接口文档 https://www.myquant.cn/docs/python/python_select_api
-
-    set_token('cac6f11ecf01f9539af72142faf5c3066cb1915b')
-
-    # 掘金数据
-    # symbolList = list(stock_info.symbol.unique())  # stk symbol
-    symbolList = list(bench_info.symbol.unique())  # stk symbol
-    for tableName in ["gmData_bench_price"]:
+    # 优矿数据
+    for tableName in ["FdmtIndiPSPit"]:
+        print(tableName)
         for year in range(2015, 2024):
             begin = "{}0101".format(year)
             end = "{}1231".format(year)
-            rolling_save(eval(tableName), tableName, begin, end, freq='y', monthlyStack=False,
-                         subPath="{}/{}".format(dataBase_root_path_gmStockFactor, tableName),
-                         symbol=symbolList, reWrite=True)
+            rolling_save(eval(tableName), tableName, begin, end, freq='q', monthlyStack=False,
+                         subPath="{}/{}".format(dataBase_root_path, tableName),
+                         ticker=stockNumList, reWrite=True)
+
+    # # 掘金登录
+    # from gm.api import *  # 接口文档 https://www.myquant.cn/docs/python/python_select_api
+    #
+    # set_token('cac6f11ecf01f9539af72142faf5c3066cb1915b')
+    #
+    # # 掘金数据
+    # # symbolList = list(stock_info.symbol.unique())  # stk symbol
+    # symbolList = list(bench_info.symbol.unique())  # stk symbol
+    # for tableName in ["gmData_bench_price"]:
+    #     for year in range(2015, 2024):
+    #         begin = "{}0101".format(year)
+    #         end = "{}1231".format(year)
+    #         rolling_save(eval(tableName), tableName, begin, end, freq='y', monthlyStack=False,
+    #                      subPath="{}/{}".format(dataBase_root_path_gmStockFactor, tableName),
+    #                      symbol=symbolList, reWrite=True)
