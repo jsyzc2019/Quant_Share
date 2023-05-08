@@ -10,7 +10,8 @@ from Euclid_work.Quant_Share import stock_info, bench_info
 from tqdm import tqdm
 from uqer import DataAPI, Client
 from Euclid_work.Quant_Share.Euclid_get_data import get_data
-from Euclid_work.Quant_Share.Utils import stockNumList, format_date, save_data_h5, dataBase_root_path, dataBase_root_path_gmStockFactor
+from Euclid_work.Quant_Share.Utils import stockNumList, format_date, save_data_h5, dataBase_root_path, \
+    dataBase_root_path_gmStockFactor, extend_date_span
 
 
 def MktIdx(begin, end, **kwargs):
@@ -293,31 +294,21 @@ def get_span_list(begin, end, freq=None):
     end = format_date(end)
     # pd.tseries.offsets 与 pd.offsets 使用无差异
     if freq in ['Y', 'y']:
-        if not pd.offsets.DateOffset().is_year_start(begin):
-            begin = begin - pd.offsets.YearBegin(n=1)
-        if not pd.offsets.DateOffset().is_year_end(end):
-            end = end + pd.offsets.YearEnd(n=1)
+        begin, end = extend_date_span(begin, end, 'Y')
 
         span_end_list = pd.date_range(begin, end, freq='y')
         span_list = [(span_end - pd.offsets.YearBegin(1), span_end, "Y{}".format(span_end.year)) for span_end in span_end_list]
         return span_list
 
     elif freq in ['M', 'm']:
-        if not pd.DateOffset().is_month_start(begin):
-            begin = begin - pd.offsets.MonthBegin(n=1)
-        if not pd.offsets.DateOffset().is_month_end(end):
-            end = end + pd.offsets.MonthEnd(n=1)
+        begin, end = extend_date_span(begin, end, 'M')
 
         span_end_list = pd.date_range(begin, end, freq='m')
         span_list = [(span_end - pd.offsets.MonthBegin(1), span_end, "Y{}_M{}".format(span_end.year, span_end.month)) for span_end in span_end_list]
         return span_list
 
     elif freq in ['Q', 'q']:
-        if not pd.DateOffset().is_quarter_start(begin):
-            begin = begin - pd.offsets.QuarterBegin(n=1, startingMonth=1)
-        if not pd.offsets.DateOffset().is_quarter_end(end):
-            end = end + pd.offsets.QuarterEnd(n=1)
-
+        begin, end = extend_date_span(begin, end, 'Q')
         span_end_list = pd.date_range(begin, end, freq='q')
         span_list = [(span_end - pd.offsets.QuarterBegin(n=1, startingMonth=1), span_end, "Y{}_Q{}".format(span_end.year, span_end.quarter)) for span_end in span_end_list]
         return span_list

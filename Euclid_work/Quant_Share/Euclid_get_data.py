@@ -10,7 +10,8 @@ from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import multiprocessing
 from joblib import Parallel, delayed
-from .Utils import format_date, format_stockCode, format_futures, futures_list, dataBase_root_path, dataBase_root_path_future, dataBase_root_path_gmStockFactor
+from .Utils import format_date, format_stockCode, format_futures, futures_list, dataBase_root_path, \
+    dataBase_root_path_future, dataBase_root_path_gmStockFactor, extend_date_span
 from .tableInfo import tableInfo
 
 
@@ -88,10 +89,12 @@ def get_data_stock(tableName, begin, end, fields, ticker):
     h5_file_name_list = os.listdir(tabelFoldPath)
     # 如果文件是季度组织的
     if 'Q' in h5_file_name_list[0]:
-        load_begin = begin - pd.tseries.offsets.QuarterBegin(0)
-        load_end = end + pd.tseries.offsets.QuarterEnd(0)
+        load_begin, load_end = extend_date_span(begin, end, 'Q')
+        # load_begin = begin - pd.tseries.offsets.QuarterBegin(n=1, startingMonth=1)
+        # load_end = end + pd.tseries.offsets.QuarterEnd()
         toLoadList = []
-        for fileName in ["{}_Y{}_Q{:.0f}.h5".format(tableName, QuarterEnd.year, QuarterEnd.month / 3) for QuarterEnd in pd.date_range(load_begin, load_end, freq='q')]:
+        for fileName in ["{}_Y{}_Q{:.0f}.h5".format(tableName, QuarterEnd.year, QuarterEnd.month / 3) for QuarterEnd in
+                         pd.date_range(load_begin, load_end, freq='q')]:
             if fileName not in h5_file_name_list:
                 raise AttributeError("{} is not exit!".format(fileName))
             else:
@@ -101,10 +104,12 @@ def get_data_stock(tableName, begin, end, fields, ticker):
         return selectFields(load_data, tableName, begin, end, fields, ticker)
     # 按照年组织
     elif "Y" in h5_file_name_list[0]:
-        load_begin = begin - pd.tseries.offsets.YearBegin(0)
-        load_end = end + pd.tseries.offsets.YearEnd(0)
+        load_begin, load_end = extend_date_span(begin, end, 'Y')
+        # load_begin = begin - pd.tseries.offsets.YearBegin(0)
+        # load_end = end + pd.tseries.offsets.YearEnd(0)
         toLoadList = []
-        for fileName in ["{}_Y{}.h5".format(tableName, YearEnd.year) for YearEnd in pd.date_range(load_begin, load_end, freq='Y')]:
+        for fileName in ["{}_Y{}.h5".format(tableName, YearEnd.year) for YearEnd in
+                         pd.date_range(load_begin, load_end, freq='Y')]:
             if fileName not in h5_file_name_list:
                 raise AttributeError("{} is not exit!".format(fileName))
             else:
@@ -118,9 +123,9 @@ def get_data_stock(tableName, begin, end, fields, ticker):
 
 def get_data_future(tableName, begin='20160101', end=None, sources='gm', fields: list = None, ticker: list = None):
     tabelFoldPath = os.path.join(dataBase_root_path_future, tableName)
-
-    load_begin = begin - pd.tseries.offsets.YearBegin(0)
-    load_end = end + pd.tseries.offsets.YearEnd(0)
+    load_begin, load_end = extend_date_span(begin, end, 'Y')
+    # load_begin = begin - pd.tseries.offsets.YearBegin(0)
+    # load_end = end + pd.tseries.offsets.YearEnd(0)
     toLoadList = []
     for year in [YearEnd.year for YearEnd in pd.date_range(load_begin, load_end, freq='Y')]:
         tmpFolder = os.path.join(tabelFoldPath, str(year), sources)
@@ -142,9 +147,9 @@ def get_data_future(tableName, begin='20160101', end=None, sources='gm', fields:
 def get_data_gmStockFactor(tableName, begin='20160101', end=None, fields: list = None, ticker: list = None):
     # D:\Share\Stk_Data\gm\ACCA
     tabelFoldPath = os.path.join(dataBase_root_path_gmStockFactor, tableName)
-
-    load_begin = begin - pd.tseries.offsets.YearBegin(0)
-    load_end = end + pd.tseries.offsets.YearEnd(0)
+    load_begin, load_end = extend_date_span(begin, end, 'Y')
+    # load_begin = begin - pd.tseries.offsets.YearBegin(n=1)
+    # load_end = end + pd.tseries.offsets.YearEnd(n=1)
     toLoadList = []
     for year in [YearEnd.year for YearEnd in pd.date_range(load_begin, load_end, freq='Y')]:
         tmpFolder = os.path.join(tabelFoldPath, str(year))  # D:\Share\Stk_Data\gm\ACCA\2013
@@ -170,10 +175,12 @@ def get_data_gmStockData(tableName, begin, end, fields, ticker):
     h5_file_name_list = os.listdir(tabelFoldPath)
     # 如果文件是季度组织的
     if 'Q' in h5_file_name_list[0]:
-        load_begin = begin - pd.tseries.offsets.QuarterBegin(0)
-        load_end = end + pd.tseries.offsets.QuarterEnd(0)
+        load_begin, load_end = extend_date_span(begin, end, 'Q')
+        # load_begin = begin - pd.tseries.offsets.QuarterBegin(n=1, startingMonth=1)
+        # load_end = end + pd.tseries.offsets.QuarterEnd()
         toLoadList = []
-        for fileName in ["{}_Y{}_Q{:.0f}.h5".format(tableName, QuarterEnd.year, QuarterEnd.month / 3) for QuarterEnd in pd.date_range(load_begin, load_end, freq='q')]:
+        for fileName in ["{}_Y{}_Q{:.0f}.h5".format(tableName, QuarterEnd.year, QuarterEnd.month / 3) for QuarterEnd in
+                         pd.date_range(load_begin, load_end, freq='q')]:
             if fileName not in h5_file_name_list:
                 raise AttributeError("{} is not exit!".format(fileName))
             else:
@@ -183,10 +190,12 @@ def get_data_gmStockData(tableName, begin, end, fields, ticker):
         return selectFields(load_data, tableName, begin, end, fields, ticker)
     # 按照年组织
     elif "Y" in h5_file_name_list[0]:
-        load_begin = begin - pd.tseries.offsets.YearBegin(0)
-        load_end = end + pd.tseries.offsets.YearEnd(0)
+        load_begin, load_end = extend_date_span(begin, end, 'Y')
+        # load_begin = begin - pd.tseries.offsets.YearBegin(n=1)
+        # load_end = end + pd.tseries.offsets.YearEnd(n=1)
         toLoadList = []
-        for fileName in ["{}_Y{}.h5".format(tableName, YearEnd.year) for YearEnd in pd.date_range(load_begin, load_end, freq='Y')]:
+        for fileName in ["{}_Y{}.h5".format(tableName, YearEnd.year) for YearEnd in
+                         pd.date_range(load_begin, load_end, freq='Y')]:
             if fileName not in h5_file_name_list:
                 raise AttributeError("{} is not exit!".format(fileName))
             else:

@@ -20,7 +20,7 @@ dataBase_root_path_gmStockFactor = r"D:\Share\Stk_Data\gm"
 
 __all__ = ['readPkl', 'savePkl', 'save_data_h5',  # files operation
            'get_tradeDate', 'format_date', 'format_stockCode', 'reindex', 'data2score', 'info_lag',
-           'format_futures', 'printJson',
+           'format_futures', 'printJson', 'extend_date_span',
            # Consts
            'stock_info', 'stockList', 'stockNumList', 'bench_info', 'tradeDate_info', 'tradeDateList', 'quarter_begin', 'quarter_end',
            'futures_list', 'dataBase_root_path', 'dataBase_root_path_future', 'dataBase_root_path_gmStockFactor']
@@ -225,3 +225,27 @@ def printJson(dataJson):
     print(json.dumps(dataJson, ensure_ascii=False, indent=2))
 
 
+def extend_date_span(begin, end, freq):
+    begin = format_date(begin)
+    end = format_date(end)
+    if freq in ["Q", "q"]:
+        if not pd.DateOffset().is_quarter_start(begin):
+            begin = begin - pd.offsets.QuarterBegin(n=1, startingMonth=1)
+        if not pd.offsets.DateOffset().is_quarter_end(end):
+            end = end + pd.offsets.QuarterEnd(n=1)
+        return begin, end
+
+    elif freq in ["Y", "y"]:
+        if not pd.offsets.DateOffset().is_year_start(begin):
+            begin = begin - pd.offsets.YearBegin(n=1)
+        if not pd.offsets.DateOffset().is_year_end(end):
+            end = end + pd.offsets.YearEnd(n=1)
+        return begin, end
+    elif freq in ["M", "m"]:
+        if not pd.DateOffset().is_month_start(begin):
+            begin = begin - pd.offsets.MonthBegin(n=1)
+        if not pd.offsets.DateOffset().is_month_end(end):
+            end = end + pd.offsets.MonthEnd(n=1)
+        return begin, end
+    else:
+        raise AttributeError("frq should be M, Q or Y!")
