@@ -34,5 +34,11 @@
     "description": "",
     "date_column": "trade_date",
     "ticker_column": "symbol"
+  },
+    "trading_derivative_indicator": {
+    "assets": "gmStockData",
+    "description": "",
+    "date_column": "pub_date",
+    "ticker_column": "symbol"
   }
 }

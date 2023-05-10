@@ -26,6 +26,10 @@ __all__ = ['readPkl', 'savePkl', 'save_data_h5',  # files operation
            'futures_list', 'dataBase_root_path', 'dataBase_root_path_future', 'dataBase_root_path_gmStockFactor']
 
 
+def patList(InList: list, pat: int):
+    return [InList[i: i + pat] for i in range(0, len(InList), pat)]
+
+
 def format_stockCode(numCode):
     """
     Standardize the stock code to wind format
