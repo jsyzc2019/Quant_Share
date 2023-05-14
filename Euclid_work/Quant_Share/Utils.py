@@ -14,9 +14,13 @@ import numpy as np
 import pandas as pd
 from gm.api import *
 
-dataBase_root_path = r'D:\Share\Euclid_work\dataFile'
-dataBase_root_path_future = r"D:\Share\Fut_Data"
-dataBase_root_path_gmStockFactor = r"D:\Share\Stk_Data\gm"
+dataBase_root_path = r'E:\Share\Stk_Data\dataFile'
+dataBase_root_path_future = r"E:\Share\Fut_Data"
+dataBase_root_path_gmStockFactor = r"E:\Share\Stk_Data\gm"
+
+# dataBase_root_path = r'D:\Share\Euclid_work\dataFile'
+# dataBase_root_path_future = r"D:\Share\Fut_Data"
+# dataBase_root_path_gmStockFactor = r"D:\Share\Stk_Data\gm"
 
 __all__ = ['readPkl', 'savePkl', 'save_data_h5',  # files operation
            'get_tradeDate', 'format_date', 'format_stockCode', 'reindex', 'data2score', 'info_lag',

@@ -52,5 +52,17 @@
     "description": "",
     "date_column": "pub_date",
     "ticker_column": "symbol"
+  },
+    "continuous_contracts": {
+    "assets": "gmStockData",
+    "description": "",
+    "date_column": "trade_date",
+    "ticker_column": "symbol"
+  },
+    "future_daily": {
+    "assets": "gmStockData",
+    "description": "",
+    "date_column": "trade_date",
+    "ticker_column": "symbol"
   }
 }

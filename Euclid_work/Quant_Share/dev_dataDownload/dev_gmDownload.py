@@ -1,12 +1,17 @@
-import time
 
+import time
+from datetime import datetime as dt
+
+import numpy as np
 import pandas as pd
 from gm.api import *
+import sys
+sys.path.append('../../../')
 from Euclid_work.Quant_Share import stock_info
 from tqdm import tqdm
-from Euclid_work.Quant_Share import save_data_h5, dataBase_root_path_gmStockFactor, format_date, patList
-import os
-from Test.AutoEmail import AutoEmail
+from Euclid_work.Quant_Share import save_data_h5, dataBase_root_path_gmStockFactor, format_date, patList, tradeDateList
+# import os
+# from Test.AutoEmail import AutoEmail
 
 
 def fundamentals_balance(begin, end, **kwargs):
@@ -192,6 +197,67 @@ def balance_sheet(begin, end, **kwargs):
             outData = pd.concat([outData, tmpData], ignore_index=True)
     return outData
 
+def continuous_contracts(begin, end, **kwargs):
+    # if 'balance_sheet_fields' not in kwargs.keys():
+    #     raise AttributeError('balance sheet fields should in kwargs!')
+    if 'csymbol' not in kwargs.keys():
+        raise AttributeError('csymbol should in kwargs!')
+
+    begin = format_date(begin).strftime("%Y-%m-%d")
+    end = format_date(end).strftime("%Y-%m-%d")
+    csymbol = kwargs['csymbol']
+    # balance_sheet_fields = kwargs['balance_sheet_fields']
+    outData = pd.DataFrame()
+    # with tqdm(patList(csymbol, 30)) as t:
+    with tqdm(csymbol) as t:
+        t.set_description("begin:{} -- end:{}".format(begin, end))
+        for patSymbol in t:
+            try:
+                # tmpData = get_fundamentals(table='balance_sheet', symbols=patSymbol, limit=1000,
+                #                            start_date=begin, end_date=end, fields=balance_sheet_fields, df=True)
+                # print(patSymbol)
+                tmpData = get_continuous_contracts(
+                    csymbol=patSymbol,
+                    start_date=begin,
+                    end_date=end,
+                )
+                t.set_postfix({"状态": "已成功获取{}条数据".format(len(tmpData))})  # 进度条右边显示信息
+                errors_num = 0
+                if len(tmpData) == 0: continue
+            except GmError:
+                errors_num += 1
+                if errors_num > 5:
+                    raise RuntimeError("重试五次后，仍旧GmError")
+                time.sleep(60)
+                t.set_postfix({"状态": "GmError:{}, 将第{}次重试".format(GmError, errors_num)})
+            tmpData = pd.DataFrame(tmpData)
+            tmpData.trade_date =  tmpData.trade_date.dt.strftime('%Y-%m-%d')
+            outData = pd.concat([outData, tmpData], ignore_index=True, axis=0)
+    return outData
+
+def future_daily(**kwargs):
+    if 'tradeDateArr' not in kwargs.keys():
+        raise AttributeError('tradeDateArr should in kwargs!')
+
+    outData = pd.DataFrame()
+    with tqdm(tradeDateArr) as t:
+        for patSymbol in t:
+            t.set_description("trade date:{}".format(patSymbol))
+            try:
+                tmpData = get_symbols(1040, df=True, trade_date=dt.strftime(patSymbol, "%Y-%m-%d"))
+                t.set_postfix({"状态": "已成功获取{}条数据".format(len(tmpData))})  # 进度条右边显示信息
+                errors_num = 0
+                if len(tmpData) == 0: continue
+            except GmError:
+                errors_num += 1
+                if errors_num > 5:
+                    raise RuntimeError("重试五次后，仍旧GmError")
+                time.sleep(60)
+                t.set_postfix({"状态": "GmError:{}, 将第{}次重试".format(GmError, errors_num)})
+            tmpData = pd.DataFrame(tmpData)
+            tmpData.trade_date =  tmpData.trade_date.dt.strftime('%Y-%m-%d')
+            outData = pd.concat([outData, tmpData], ignore_index=True, axis=0)
+    return outData
 
 def save_gm_data_Y(df, date_column_name, tableName, reWrite=False):
     df["year"] = df[date_column_name].apply(lambda x: format_date(x).year)
@@ -216,7 +282,7 @@ def save_gm_dataQ(df, date_column_name, tableName, reWrite=False):
 
 if __name__ == '__main__':
     set_token('cac6f11ecf01f9539af72142faf5c3066cb1915b')
-    symbolList = list(stock_info.symbol.unique())
+    # symbolList = list(stock_info.symbol.unique())
 
     # fundamentals_balance_info = pd.read_excel(r'E:\Euclid\Quant_Share\Euclid_work\Quant_Share\dev_files\fundamentals_balance_info.xlsx')
     # fundamentals_balance_fields = ",".join(fundamentals_balance_info['字段名'].to_list())
@@ -235,17 +301,17 @@ if __name__ == '__main__':
     # data = fundamentals_income(begin='20150101', end='20231231', symbol=symbolList,
     #                            fundamentals_income_fields=fundamentals_income_fields)
 
-    trading_derivative_indicator_info = pd.read_excel(r'E:\Euclid\Quant_Share\Euclid_work\Quant_Share\dev_files\trading_derivative_indicator.xlsx')
-    trading_derivative_indicator_fields = trading_derivative_indicator_info['列名'].to_list()
-
-    for year in range(2023, 2024):
-        begin = "{}0101".format(year)
-        end = "{}1231".format(year)
-        data = trading_derivative_indicator(begin=begin, end=end, symbol=symbolList,
-                                            trading_derivative_indicator_fields=trading_derivative_indicator_fields)
-
-        save_gm_dataQ(data, 'pub_date', 'trading_derivative_indicator', reWrite=True)
-        AutoEmail('trading_derivative_indicator for {} has done'.format(year))
+    # trading_derivative_indicator_info = pd.read_excel(r'E:\Euclid\Quant_Share\Euclid_work\Quant_Share\dev_files\trading_derivative_indicator.xlsx')
+    # trading_derivative_indicator_fields = trading_derivative_indicator_info['列名'].to_list()
+    #
+    # for year in range(2023, 2024):
+    #     begin = "{}0101".format(year)
+    #     end = "{}1231".format(year)
+    #     data = trading_derivative_indicator(begin=begin, end=end, symbol=symbolList,
+    #                                         trading_derivative_indicator_fields=trading_derivative_indicator_fields)
+    #
+    #     save_gm_dataQ(data, 'pub_date', 'trading_derivative_indicator', reWrite=True)
+    #     AutoEmail('trading_derivative_indicator for {} has done'.format(year))
 
     # deriv_finance_indicator_info = pd.read_excel(r'E:\Euclid\Quant_Share\Euclid_work\Quant_Share\dev_files\deriv_finance_indicator.xlsx')
     # deriv_finance_indicator_fields = deriv_finance_indicator_info['列名'].to_list()
@@ -258,4 +324,16 @@ if __name__ == '__main__':
     # data = balance_sheet(begin='20150101', end='20231231', symbol=symbolList,
     #                      balance_sheet_fields=balance_sheet_fields)
     # save_gm_data_Y(data, 'pub_date', 'balance_sheet', reWrite=True)
+
+    # continuous_contracts_info = pd.read_excel(r'E:\yuankangrui\Quant_Share_Local\Euclid_work\Quant_Share\dev_files\continuous_contracts_csymbol.xlsx')
+    # csymbol = continuous_contracts_info.csymbol.tolist()
+    # data = continuous_contracts(begin='20150101', end='20231231', csymbol=csymbol)
+    # save_gm_data_Y(data, 'trade_date', 'continuous_contracts', reWrite=True)
+
+    tradeDateArr = np.sort(np.array(tradeDateList))
+    begin = format_date('20150101')
+    end = format_date('20231231')
+    tradeDateArr = tradeDateArr[(begin <= tradeDateArr) & (tradeDateArr <= end)]
+    data = future_daily(tradeDateArr=tradeDateArr)
+    save_gm_data_Y(data, 'trade_date', 'future_daily', reWrite=True)
     # AutoEmail('balance_sheet has done')
