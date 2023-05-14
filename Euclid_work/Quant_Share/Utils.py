@@ -20,7 +20,7 @@ dataBase_root_path_gmStockFactor = r"D:\Share\Stk_Data\gm"
 
 __all__ = ['readPkl', 'savePkl', 'save_data_h5',  # files operation
            'get_tradeDate', 'format_date', 'format_stockCode', 'reindex', 'data2score', 'info_lag',
-           'format_futures', 'printJson', 'extend_date_span',
+           'format_futures', 'printJson', 'extend_date_span', 'patList',
            # Consts
            'stock_info', 'stockList', 'stockNumList', 'bench_info', 'tradeDate_info', 'tradeDateList', 'quarter_begin', 'quarter_end',
            'futures_list', 'dataBase_root_path', 'dataBase_root_path_future', 'dataBase_root_path_gmStockFactor']
