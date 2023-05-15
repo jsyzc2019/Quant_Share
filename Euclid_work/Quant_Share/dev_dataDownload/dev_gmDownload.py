@@ -1,4 +1,3 @@
-
 import time
 from datetime import datetime as dt
 
@@ -6,10 +5,11 @@ import numpy as np
 import pandas as pd
 from gm.api import *
 import sys
-sys.path.append('../../../')
 from Euclid_work.Quant_Share import stock_info
 from tqdm import tqdm
 from Euclid_work.Quant_Share import save_data_h5, dataBase_root_path_gmStockFactor, format_date, patList, tradeDateList
+
+
 # import os
 # from Test.AutoEmail import AutoEmail
 
@@ -197,6 +197,7 @@ def balance_sheet(begin, end, **kwargs):
             outData = pd.concat([outData, tmpData], ignore_index=True)
     return outData
 
+
 def continuous_contracts(begin, end, **kwargs):
     # if 'balance_sheet_fields' not in kwargs.keys():
     #     raise AttributeError('balance sheet fields should in kwargs!')
@@ -231,9 +232,10 @@ def continuous_contracts(begin, end, **kwargs):
                 time.sleep(60)
                 t.set_postfix({"状态": "GmError:{}, 将第{}次重试".format(GmError, errors_num)})
             tmpData = pd.DataFrame(tmpData)
-            tmpData.trade_date =  tmpData.trade_date.dt.strftime('%Y-%m-%d')
+            tmpData.trade_date = tmpData.trade_date.dt.strftime('%Y-%m-%d')
             outData = pd.concat([outData, tmpData], ignore_index=True, axis=0)
     return outData
+
 
 def future_daily(**kwargs):
     if 'tradeDateArr' not in kwargs.keys():
@@ -255,9 +257,10 @@ def future_daily(**kwargs):
                 time.sleep(60)
                 t.set_postfix({"状态": "GmError:{}, 将第{}次重试".format(GmError, errors_num)})
             tmpData = pd.DataFrame(tmpData)
-            tmpData.trade_date =  tmpData.trade_date.dt.strftime('%Y-%m-%d')
+            tmpData.trade_date = tmpData.trade_date.dt.strftime('%Y-%m-%d')
             outData = pd.concat([outData, tmpData], ignore_index=True, axis=0)
     return outData
+
 
 def save_gm_data_Y(df, date_column_name, tableName, reWrite=False):
     df["year"] = df[date_column_name].apply(lambda x: format_date(x).year)
