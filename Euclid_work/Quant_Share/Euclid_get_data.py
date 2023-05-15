@@ -4,16 +4,20 @@
 # @File    : Euclid_get_data.py
 import os
 import time
-
+from tqdm import tqdm
 import pandas as pd
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import multiprocessing
 from joblib import Parallel, delayed
-from .Utils import format_date, format_stockCode, format_futures, futures_list, dataBase_root_path, \
-    dataBase_root_path_future, dataBase_root_path_gmStockFactor, extend_date_span
-from .tableInfo import tableInfo
-
+from Utils import format_date, format_stockCode, format_futures, futures_list, dataBase_root_path, \
+    dataBase_root_path_future, dataBase_root_path_gmStockFactor, extend_date_span, lazyproperty
+from tableInfo import tableInfo
+import json
+from collections import defaultdict
+from fuzzywuzzy import process
+import warnings
+warnings.filterwarnings('ignore')
 
 # 并行加速
 def applyParallel(dfGrouped, function):
@@ -61,7 +65,7 @@ def get_data(tableName, begin='20150101', end=None, sources='gm', fields: list =
     end = format_date(end)
 
     if not isinstance(ticker, list):
-        if isinstance(ticker, str):
+        if isinstance(ticker, (str, int)):
             ticker = [ticker]
 
     tableAssets = tableInfo[tableName]['assets']
@@ -310,3 +314,37 @@ def get_table_info(tableName):
     }
 
     return outJson
+
+
+if not os.path.exists('./dev_files/attrsMap.json'):
+    attrsMap = defaultdict(list)
+    for tableName in tqdm(tableInfo.keys()):
+        try:
+            _df = get_data(tableName, begin='20230101')
+            _col = list(_df.columns)
+            for c in _col:
+                attrsMap[c].append(tableName)
+        except:
+            continue
+    with open("./dev_files/attrsMap.json", "w") as write_file:
+        json.dump(attrsMap, write_file, indent=4)
+else:
+    with open("./dev_files/attrsMap.json", "r") as read_file:
+        attrsMap = json.load(read_file)
+
+def search_keyword(keyword:str, fuzzy=True, limit=5):
+    global attrsMap
+    if 'attrsMap' not in globals():
+        print('Please check the variable attsMap!')
+        raise NameError
+    if fuzzy:
+        res = process.extract(keyword, attrsMap.keys(), limit=limit)
+        for candiate, score in res:
+            print(f"{candiate} in {attrsMap[candiate]}")
+    else:
+        res = list(filter(lambda x: keyword in x, tableInfo.keys()))
+        for candiate in res:
+            print(f"{candiate} in {attrsMap[candiate]}")
+
+if __name__ == '__main__':
+    search_keyword('rtn')

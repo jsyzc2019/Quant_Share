@@ -54,6 +54,7 @@ def future_daily(**kwargs):
     if 'tradeDateArr' not in kwargs.keys():
         raise AttributeError('tradeDateArr should in kwargs!')
 
+    tradeDateArr = kwargs['tradeDateArr']
     outData = pd.DataFrame()
     with tqdm(tradeDateArr) as t:
         for patSymbol in t:
@@ -82,9 +83,10 @@ if __name__ == '__main__':
     # data = continuous_contracts(begin='20150101', end='20231231', csymbol=csymbol)
     # save_gm_data_Y(data, 'trade_date', 'continuous_contracts', reWrite=True)
 
-    tradeDateArr = np.sort(np.array(tradeDateList))
-    begin = format_date('20150101')
-    end = format_date('20231231')
-    tradeDateArr = tradeDateArr[(begin <= tradeDateArr) & (tradeDateArr <= end)]
-    data = future_daily(tradeDateArr=tradeDateArr)
-    save_gm_data_Y(data, 'trade_date', 'future_daily', reWrite=True)
+    # tradeDateArr = np.sort(np.array(tradeDateList))
+    # begin = format_date('20150101')
+    # end = format_date('20231231')
+    # tradeDateArr = tradeDateArr[(begin <= tradeDateArr) & (tradeDateArr <= end)]
+    # data = future_daily(tradeDateArr=tradeDateArr)
+    # save_gm_data_Y(data, 'trade_date', 'future_daily', reWrite=True)
+    pass

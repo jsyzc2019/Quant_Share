@@ -13,6 +13,7 @@ from uqer import DataAPI
 import numpy as np
 import pandas as pd
 from gm.api import *
+from functools import reduce, wraps
 
 dataBase_root_path = r'E:\Share\Stk_Data\dataFile'
 dataBase_root_path_future = r"E:\Share\Fut_Data"
@@ -27,8 +28,30 @@ __all__ = ['readPkl', 'savePkl', 'save_data_h5',  # files operation
            'format_futures', 'printJson', 'extend_date_span', 'patList',
            # Consts
            'stock_info', 'stockList', 'stockNumList', 'bench_info', 'tradeDate_info', 'tradeDateList', 'quarter_begin', 'quarter_end',
-           'futures_list', 'dataBase_root_path', 'dataBase_root_path_future', 'dataBase_root_path_gmStockFactor']
+           'futures_list', 'dataBase_root_path', 'dataBase_root_path_future', 'dataBase_root_path_gmStockFactor',
+           'time_decorator', 'lazyproperty']
 
+def time_decorator(func):
+    @wraps(func)
+    def timer(*args, **kwargs):
+        start = datetime.now()
+        result = func(*args, **kwargs)
+        end = datetime.now()
+        print(f'“{func.__name__}” run time: {end - start}.')
+        return result
+    return timer
+
+class lazyproperty:
+    def __init__(self, func):
+        self.func = func
+
+    def __get__(self, instance, cls):
+        if instance is None:
+            return self
+        else:
+            value = self.func(instance)
+            setattr(instance, self.func.__name__, value)
+            return value
 
 def patList(InList: list, pat: int):
     return [InList[i: i + pat] for i in range(0, len(InList), pat)]
@@ -89,13 +112,13 @@ futures_list = ['AG', 'AL', 'AU', 'A', 'BB', 'BU', 'B', 'CF', 'CS', 'CU', 'C', '
 
 bench_info = pd.read_hdf('{}/bench_info.h5'.format(dataBase_root_path))
 tradeDate_info = pd.read_hdf("{}/tradeDate_info.h5".format(dataBase_root_path))
-tradeDateList = list(set(tradeDate_info['tradeDate']))[1:]
+#  = sorted(list(set(tradeDate_info['tradeDate']))[1:])
+tradeDateList = tradeDate_info['tradeDate'].dropna().unique()
 quarter_begin = ['0101', '0401', '0701', '1001']
 quarter_end = ['0331', '0630', '0930', '1231']
 
 
 # TODO 股票池 行业中心化 标准回测 groupBy加速
-
 
 def readPkl(fpath):
     with open(fpath, "rb") as f:

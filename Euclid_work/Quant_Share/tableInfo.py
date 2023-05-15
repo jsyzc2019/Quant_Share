@@ -233,3 +233,5 @@ for table in ['InfoTable', 'gmStock', 'dataYesStock', 'gmFuture', 'gmStockFactor
     for key, value in _table.items():
         _table[key]['tableSource'] = table
     tableInfo.update(_table)
+
+
