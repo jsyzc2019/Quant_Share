@@ -10,4 +10,4 @@ statsmodels
 rqfactor
 pyecharts
 uqer
-tables
+fuzzywuzzy

@@ -10,14 +10,16 @@ from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import multiprocessing
 from joblib import Parallel, delayed
-from Utils import format_date, format_stockCode, format_futures, futures_list, dataBase_root_path, \
+from .Utils import format_date, format_stockCode, format_futures, futures_list, dataBase_root_path, \
     dataBase_root_path_future, dataBase_root_path_gmStockFactor, extend_date_span, lazyproperty
-from tableInfo import tableInfo
+from .tableInfo import tableInfo
 import json
 from collections import defaultdict
 from fuzzywuzzy import process
 import warnings
+
 warnings.filterwarnings('ignore')
+
 
 # 并行加速
 def applyParallel(dfGrouped, function):
@@ -316,27 +318,29 @@ def get_table_info(tableName):
     return outJson
 
 
-if not os.path.exists('./dev_files/attrsMap.json'):
-    attrsMap = defaultdict(list)
-    for tableName in tqdm(tableInfo.keys()):
-        try:
-            _df = get_data(tableName, begin='20230101')
-            _col = list(_df.columns)
-            for c in _col:
-                attrsMap[c].append(tableName)
-        except:
-            continue
-    with open("./dev_files/attrsMap.json", "w") as write_file:
-        json.dump(attrsMap, write_file, indent=4)
-else:
-    with open("./dev_files/attrsMap.json", "r") as read_file:
-        attrsMap = json.load(read_file)
+def search_keyword(keyword: str, fuzzy=True, limit=5):
+    # attrsMap.json check
+    current_dir = os.path.abspath(os.path.dirname(__file__))
+    attrsMapPath = os.path.join(current_dir, 'dev_files/attrsMap.json')
+    if not os.path.exists(attrsMapPath):
+        attrsMap = defaultdict(list)
+        with tqdm(tableInfo.keys()) as t:
+            t.set_description("attrsMap正在初始化...")
+            for tableName in t:
+                try:
+                    _df = get_data(tableName, begin='20230101')
+                    _col = list(_df.columns)
+                    for c in _col:
+                        attrsMap[c].append(tableName)
+                    t.set_postfix({"状态": "tableName 写入成功".format(tableName)})
+                except FileNotFoundError as e:
+                    t.set_postfix({"状态": "Warning {} not found".format(e.filename)})
+            with open(attrsMapPath, "w") as write_file:
+                json.dump(attrsMap, write_file, indent=4)
+    else:
+        with open(attrsMapPath, "r") as read_file:
+            attrsMap = json.load(read_file)
 
-def search_keyword(keyword:str, fuzzy=True, limit=5):
-    global attrsMap
-    if 'attrsMap' not in globals():
-        print('Please check the variable attsMap!')
-        raise NameError
     if fuzzy:
         res = process.extract(keyword, attrsMap.keys(), limit=limit)
         for candiate, score in res:
@@ -345,6 +349,3 @@ def search_keyword(keyword:str, fuzzy=True, limit=5):
         res = list(filter(lambda x: keyword in x, tableInfo.keys()))
         for candiate in res:
             print(f"{candiate} in {attrsMap[candiate]}")
-
-if __name__ == '__main__':
-    search_keyword('rtn')
