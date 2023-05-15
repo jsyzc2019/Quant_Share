@@ -8,10 +8,6 @@ import json
 import os
 
 InfoTable = {
-    'IndustryID_info': {
-        'assets': 'info',
-        'description': 'DataAPI.IndustryGet',
-    },
     'SecID_E_info': {
         'assets': 'info',
         'description': 'DataAPI.SecIDGet, assetClass=E',

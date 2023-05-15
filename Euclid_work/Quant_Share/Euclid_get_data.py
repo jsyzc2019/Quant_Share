@@ -135,7 +135,7 @@ def get_data_future(tableName, begin='20160101', end=None, sources='gm', fields:
     toLoadList = []
     for year in [YearEnd.year for YearEnd in pd.date_range(load_begin, load_end, freq='Y')]:
         tmpFolder = os.path.join(tabelFoldPath, str(year), sources)
-        tmpFileList = os.listdir(tmpFolder)
+        tmpFileList = [tmpFile for tmpFile in os.listdir(tmpFolder) if tmpFile.endswith('.h5')]
         # 已在此处进行ticker筛选，不在selectFields中进行
         if ticker:
             target = [x for x in tmpFileList if format_futures(x) in ticker]
@@ -332,7 +332,7 @@ def search_keyword(keyword: str, fuzzy=True, limit=5):
                     _col = list(_df.columns)
                     for c in _col:
                         attrsMap[c].append(tableName)
-                    t.set_postfix({"状态": "tableName 写入成功".format(tableName)})
+                    t.set_postfix({"状态": "{} 写入成功".format(tableName)})
                 except FileNotFoundError as e:
                     t.set_postfix({"状态": "Warning {} not found".format(e.filename)})
             with open(attrsMapPath, "w") as write_file:
