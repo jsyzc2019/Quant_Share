@@ -4,7 +4,7 @@
 # @Author  : Euclid-Jie
 # @File    : trading_derivative_indicator.py
 """
-from .base_package import *
+from base_package import *
 
 
 def trading_derivative_indicator(begin, end, **kwargs):
@@ -38,3 +38,16 @@ def trading_derivative_indicator(begin, end, **kwargs):
 
             outData = pd.concat([outData, tmpData], ignore_index=True)
     return outData
+
+
+if __name__ == '__main__':
+    trading_derivative_indicator_info = pd.read_excel(r'E:\Euclid\Quant_Share\Euclid_work\Quant_Share\dev_files\trading_derivative_indicator.xlsx')
+    trading_derivative_indicator_fields = trading_derivative_indicator_info['列名'].to_list()
+
+    for year in range(2023, 2024):
+        begin = "{}0101".format(year)
+        end = "{}1231".format(year)
+        data = trading_derivative_indicator(begin=begin, end=end, symbol=symbolList,
+                                            trading_derivative_indicator_fields=trading_derivative_indicator_fields)
+
+        save_gm_dataQ(data, 'pub_date', 'trading_derivative_indicator', reWrite=True)

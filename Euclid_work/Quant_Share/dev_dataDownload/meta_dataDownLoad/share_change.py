@@ -4,7 +4,7 @@
 # @Author  : Euclid-Jie
 # @File    : share_change.py
 """
-from .base_package import *
+from base_package import *
 
 
 def share_change(begin, end, **kwargs):
@@ -21,3 +21,8 @@ def share_change(begin, end, **kwargs):
         tmpData = stk_get_share_change(symbol=symbol_i, start_date=begin, end_date=end)
         outData = pd.concat([outData, tmpData], ignore_index=True)
     return outData
+
+
+if __name__ == '__main__':
+    data = share_change(begin='20150101', end='20231231', symbol=symbolList)
+    save_gm_data_Y(data, 'pub_date', 'share_change', reWrite=True)

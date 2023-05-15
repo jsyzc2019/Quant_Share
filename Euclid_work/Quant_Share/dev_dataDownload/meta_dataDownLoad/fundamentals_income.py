@@ -4,7 +4,7 @@
 # @Author  : Euclid-Jie
 # @File    : fundamentals_income.py
 """
-from .base_package import *
+from base_package import *
 
 
 def fundamentals_income(begin, end, **kwargs):
@@ -28,3 +28,11 @@ def fundamentals_income(begin, end, **kwargs):
                                               fields=fundamentals_income_fields, df=True)
         outData = pd.concat([outData, tmpData], ignore_index=True)
     return outData
+
+
+if __name__ == '__main__':
+    fundamentals_income_info = pd.read_excel(r'E:\Euclid\Quant_Share\Euclid_work\Quant_Share\dev_files\fundamentals_income_info.xlsx')
+    fundamentals_income_fields = ",".join(fundamentals_income_info['字段名'].to_list()[:-3])  # 最后三个字段没有
+    data = fundamentals_income(begin='20150101', end='20231231', symbol=symbolList,
+                               fundamentals_income_fields=fundamentals_income_fields)
+    save_gm_data_Y(data, 'pub_date', 'fundamentals_income', reWrite=True)

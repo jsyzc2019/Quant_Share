@@ -4,7 +4,8 @@
 # @Author  : Euclid-Jie
 # @File    : deriv_finance_indicator.py
 """
-from .base_package import *
+
+from base_package import *
 
 
 def deriv_finance_indicator(begin, end, **kwargs):
@@ -38,3 +39,11 @@ def deriv_finance_indicator(begin, end, **kwargs):
 
             outData = pd.concat([outData, tmpData], ignore_index=True)
     return outData
+
+
+if __name__ == '__main__':
+    deriv_finance_indicator_info = pd.read_excel(r'E:\Euclid\Quant_Share\Euclid_work\Quant_Share\dev_files\deriv_finance_indicator.xlsx')
+    deriv_finance_indicator_fields = deriv_finance_indicator_info['列名'].to_list()
+    data = deriv_finance_indicator(begin='20150101', end='20231231', symbol=symbolList,
+                                   deriv_finance_indicator_fields=deriv_finance_indicator_fields)
+    save_gm_data_Y(data, 'pub_date', 'deriv_finance_indicator', reWrite=True)
