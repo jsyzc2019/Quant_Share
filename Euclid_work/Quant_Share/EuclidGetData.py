@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2023/4/8 21:38
 # @Author  : Euclid-Jie
-# @File    : Euclid_get_data.py
+# @File    : EuclidGetData.py
 import os
 import time
 from tqdm import tqdm
@@ -12,7 +12,7 @@ import multiprocessing
 from joblib import Parallel, delayed
 from .Utils import format_date, format_stockCode, format_futures, futures_list, dataBase_root_path, \
     dataBase_root_path_future, dataBase_root_path_gmStockFactor, extend_date_span, lazyproperty
-from .tableInfo import tableInfo
+from .TableInfo import tableInfo
 import json
 from collections import defaultdict
 from fuzzywuzzy import process
@@ -318,11 +318,18 @@ def get_table_info(tableName):
     return outJson
 
 
-def search_keyword(keyword: str, fuzzy=True, limit=5):
+def search_keyword(keyword: str, fuzzy=True, limit=5, update:bool=False):
+    '''
+    :param keyword: the content you want to search for
+    :param fuzzy: fuzzy matching or not
+    :param limit: number of the results
+    :param update: forced updating
+    :return:
+    '''
     # attrsMap.json check
     current_dir = os.path.abspath(os.path.dirname(__file__))
     attrsMapPath = os.path.join(current_dir, 'dev_files/attrsMap.json')
-    if not os.path.exists(attrsMapPath):
+    if not os.path.exists(attrsMapPath) or update:
         attrsMap = defaultdict(list)
         with tqdm(tableInfo.keys()) as t:
             t.set_description("attrsMap正在初始化...")
@@ -341,11 +348,16 @@ def search_keyword(keyword: str, fuzzy=True, limit=5):
         with open(attrsMapPath, "r") as read_file:
             attrsMap = json.load(read_file)
 
+    dic = {}
     if fuzzy:
         res = process.extract(keyword, attrsMap.keys(), limit=limit)
         for candiate, score in res:
-            print(f"{candiate} in {attrsMap[candiate]}")
+            dic[candiate] = attrsMap[candiate]
+            # print(f"{candiate} in {attrsMap[candiate]}")
     else:
-        res = list(filter(lambda x: keyword in x, tableInfo.keys()))
+        res = list(filter(lambda x: keyword in x or keyword == x, attrsMap.keys()))
         for candiate in res:
-            print(f"{candiate} in {attrsMap[candiate]}")
+            dic[candiate] = attrsMap[candiate]
+            # print(f"{candiate} in {attrsMap[candiate]}")
+
+    return dic

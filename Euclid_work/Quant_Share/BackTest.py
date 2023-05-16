@@ -14,7 +14,7 @@ import datetime
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 from .Utils import *
-from .Euclid_get_data import get_data
+from .EuclidGetData import get_data
 
 
 class DataPrepare:

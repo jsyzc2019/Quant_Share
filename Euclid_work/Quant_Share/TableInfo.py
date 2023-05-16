@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2023/4/20 14:59
 # @Author  : Euclid-Jie
-# @File    : tableInfo.py
+# @File    : TableInfo.py
 """
 import json
 import os

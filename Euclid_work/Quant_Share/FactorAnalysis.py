@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2023/4/22 15:33
 # @Author  : Euclid-Jie
-# @File    : factorAnalysis.py
+# @File    : FactorAnalysis.py
 """
 import numpy as np
 import pandas as pd

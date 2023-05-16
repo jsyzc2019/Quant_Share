@@ -1,0 +1,4461 @@
+{
+    "secID": [
+        "SecID_E_info",
+        "SecID_IDX_info",
+        "EquDiv_info",
+        "HKshszHold",
+        "MktEqud",
+        "MktLimit",
+        "SecST",
+        "SecHalt",
+        "FdmtDerPit",
+        "RMExposureDay",
+        "FdmtIndiRtnPit",
+        "MktEqudEval",
+        "FdmtIndiPSPit"
+    ],
+    "ticker": [
+        "SecID_E_info",
+        "SecID_IDX_info",
+        "EquDiv_info",
+        "HKshszHold",
+        "MktEqud",
+        "MktIdx",
+        "MktLimit",
+        "SecST",
+        "SecHalt",
+        "FdmtDerPit",
+        "RMExposureDay",
+        "FdmtIndiRtnPit",
+        "MktEqudEval",
+        "FdmtIndiPSPit"
+    ],
+    "secShortName": [
+        "SecID_E_info",
+        "SecID_IDX_info",
+        "EquDiv_info",
+        "HKshszHold",
+        "MktEqud",
+        "MktIdx",
+        "MktLimit",
+        "SecHalt",
+        "FdmtDerPit",
+        "RMExposureDay",
+        "FdmtIndiRtnPit",
+        "MktEqudEval",
+        "FdmtIndiPSPit"
+    ],
+    "cnSpell": [
+        "SecID_E_info",
+        "SecID_IDX_info"
+    ],
+    "exchangeCD": [
+        "SecID_E_info",
+        "SecID_IDX_info",
+        "EquDiv_info",
+        "TradeCal",
+        "MktEqud",
+        "MktIdx",
+        "MktLimit",
+        "SecST",
+        "SecHalt",
+        "FdmtDerPit",
+        "RMExposureDay",
+        "FdmtIndiRtnPit",
+        "MktEqudEval",
+        "FdmtIndiPSPit"
+    ],
+    "assetClass": [
+        "SecID_E_info",
+        "SecID_IDX_info",
+        "SecHalt"
+    ],
+    "listStatusCD": [
+        "SecID_E_info",
+        "SecID_IDX_info",
+        "SecHalt"
+    ],
+    "listDate": [
+        "SecID_E_info",
+        "SecID_IDX_info"
+    ],
+    "transCurrCD": [
+        "SecID_E_info",
+        "SecID_IDX_info"
+    ],
+    "ISIN": [
+        "SecID_E_info",
+        "SecID_IDX_info"
+    ],
+    "partyID": [
+        "SecID_E_info",
+        "SecID_IDX_info",
+        "PartyID_info",
+        "FdmtDerPit",
+        "FdmtIndiRtnPit",
+        "FdmtIndiPSPit"
+    ],
+    "delistDate": [
+        "SecID_E_info",
+        "SecID_IDX_info",
+        "SecHalt"
+    ],
+    "codeTypeID": [
+        "SysCode_info"
+    ],
+    "valueCD": [
+        "SysCode_info"
+    ],
+    "valueName": [
+        "SysCode_info"
+    ],
+    "partyFullName": [
+        "PartyID_info"
+    ],
+    "partyFullNameEn": [
+        "PartyID_info"
+    ],
+    "partyShortName": [
+        "PartyID_info"
+    ],
+    "partyShortNameEn": [
+        "PartyID_info"
+    ],
+    "officeAddr": [
+        "PartyID_info"
+    ],
+    "primeOperating": [
+        "PartyID_info"
+    ],
+    "partyNatureCD": [
+        "PartyID_info"
+    ],
+    "instStatus": [
+        "PartyID_info"
+    ],
+    "isIssBond": [
+        "PartyID_info"
+    ],
+    "regDate": [
+        "PartyID_info"
+    ],
+    "legalRep": [
+        "PartyID_info"
+    ],
+    "regCountryCD": [
+        "PartyID_info"
+    ],
+    "regProvince": [
+        "PartyID_info"
+    ],
+    "regCity": [
+        "PartyID_info"
+    ],
+    "regAddr": [
+        "PartyID_info"
+    ],
+    "regCap": [
+        "PartyID_info"
+    ],
+    "regCapCurrCD": [
+        "PartyID_info"
+    ],
+    "email": [
+        "PartyID_info"
+    ],
+    "website": [
+        "PartyID_info"
+    ],
+    "tel": [
+        "PartyID_info"
+    ],
+    "fax": [
+        "PartyID_info"
+    ],
+    "boardSecry": [
+        "PartyID_info"
+    ],
+    "genMana": [
+        "PartyID_info"
+    ],
+    "opaScope": [
+        "PartyID_info"
+    ],
+    "legalEntityID": [
+        "PartyID_info"
+    ],
+    "isIssMf": [
+        "PartyID_info"
+    ],
+    "closeDate": [
+        "PartyID_info"
+    ],
+    "profile": [
+        "PartyID_info"
+    ],
+    "symbol": [
+        "bench_info",
+        "bench_price",
+        "stock_price",
+        "Price_Volume_Data/submain",
+        "ACCA",
+        "accounts_payable_turnover_days",
+        "accounts_payable_turnover_rate",
+        "account_receivable_turnover_days",
+        "account_receivable_turnover_rate",
+        "adjusted_profit_to_total_profit",
+        "administration_expense_ttm",
+        "admin_expense_rate",
+        "asset_impairment_loss_ttm",
+        "capital_reserve_fund_per_share",
+        "cashflow_per_share_ttm",
+        "cash_and_equivalents_per_share",
+        "cash_rate_of_sales",
+        "cash_to_current_liability",
+        "cfo_to_ev",
+        "circulating_market_cap",
+        "current_asset_turnover_rate",
+        "current_ratio",
+        "debt_to_asset_ratio",
+        "debt_to_equity_ratio",
+        "debt_to_tangible_equity_ratio",
+        "DSRI",
+        "EBIT",
+        "equity_to_asset_ratio",
+        "equity_to_fixed_asset_ratio",
+        "equity_turnover_rate",
+        "financial_expense_rate",
+        "financial_expense_ttm",
+        "financing_cash_growth_rate",
+        "fixed_assets_turnover_rate",
+        "fixed_asset_ratio",
+        "goods_sale_and_service_render_cash_ttm",
+        "goods_service_cash_to_operating_revenue_ttm",
+        "gross_income_ratio",
+        "Index_Market_data",
+        "intangible_asset_ratio",
+        "interest_carry_current_liability",
+        "interest_free_current_liability",
+        "inventory_turnover_days",
+        "inventory_turnover_rate",
+        "invest_income_associates_to_total_profit",
+        "long_debt_to_asset_ratio",
+        "long_debt_to_working_capital_ratio",
+        "long_term_debt_to_asset_ratio",
+        "LVGI",
+        "market_cap",
+        "Market_data",
+        "MLEV",
+        "net_asset_growth_rate",
+        "net_debt",
+        "net_finance_cash_flow_ttm",
+        "net_interest_expense",
+        "net_invest_cash_flow_ttm",
+        "net_non_operating_income_to_total_profit",
+        "net_operate_cashflow_growth_rate",
+        "net_operate_cash_flow_per_share",
+        "net_operate_cash_flow_to_asset",
+        "net_operate_cash_flow_to_net_debt",
+        "net_operate_cash_flow_to_operate_income",
+        "net_operate_cash_flow_to_total_current_liability",
+        "net_operate_cash_flow_to_total_liability",
+        "net_operate_cash_flow_ttm",
+        "net_operating_cash_flow_coverage",
+        "net_profit_growth_rate",
+        "net_profit_ratio",
+        "net_profit_to_total_operate_revenue_ttm",
+        "net_profit_ttm",
+        "net_working_capital",
+        "non_current_asset_ratio",
+        "non_operating_net_profit_ttm",
+        "non_recurring_gain_loss",
+        "np_parent_company_owners_growth_rate",
+        "np_parent_company_owners_ttm",
+        "OperateNetIncome",
+        "OperatingCycle",
+        "operating_cost_to_operating_revenue_ratio",
+        "operating_cost_ttm",
+        "operating_profit_growth_rate",
+        "operating_profit_ratio",
+        "operating_profit_to_operating_revenue",
+        "operating_profit_to_total_profit",
+        "operating_profit_ttm",
+        "operating_revenue_growth_rate",
+        "operating_revenue_per_share",
+        "operating_revenue_ttm",
+        "operating_tax_to_operating_revenue_ratio_ttm",
+        "profit_margin_ttm",
+        "quick_ratio",
+        "retained_earnings",
+        "retained_earnings_per_share",
+        "retained_profit_per_share",
+        "ROAEBITTTM",
+        "roa_ttm",
+        "roa_ttm_8y",
+        "roe_ttm",
+        "roe_ttm_8y",
+        "sale_expense_to_operating_revenue",
+        "sale_expense_ttm",
+        "SGI",
+        "super_quick_ratio",
+        "surplus_reserve_fund_per_share",
+        "total_asset_growth_rate",
+        "total_asset_turnover_rate",
+        "total_operating_cost_ttm",
+        "total_operating_revenue_per_share",
+        "total_operating_revenue_per_share_ttm",
+        "total_operating_revenue_ttm",
+        "total_profit_growth_rate",
+        "total_profit_to_cost_ratio",
+        "total_profit_ttm",
+        "value_change_profit_ttm",
+        "fundamentals_balance",
+        "fundamentals_cashflow",
+        "fundamentals_income",
+        "share_change",
+        "gmData_history",
+        "gmData_bench_price",
+        "trading_derivative_indicator",
+        "deriv_finance_indicator",
+        "balance_sheet",
+        "continuous_contracts",
+        "future_daily"
+    ],
+    "sec_type1": [
+        "bench_info",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "sec_type2": [
+        "bench_info",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "exchange": [
+        "bench_info",
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "sec_id": [
+        "bench_info",
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "sec_name": [
+        "bench_info",
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "sec_abbr": [
+        "bench_info",
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "price_tick": [
+        "bench_info",
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "trade_n": [
+        "bench_info",
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "listed_date": [
+        "bench_info",
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "delisted_date": [
+        "bench_info",
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "board": [
+        "bench_info",
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "underlying_symbol": [
+        "bench_info",
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "option_type": [
+        "bench_info",
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "option_margin_ratio1": [
+        "bench_info",
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "option_margin_ratio2": [
+        "bench_info",
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "call_or_put": [
+        "bench_info",
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "conversion_start_date": [
+        "bench_info",
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "endDate": [
+        "EquDiv_info",
+        "HKshszHold",
+        "FdmtDerPit",
+        "FdmtIndiRtnPit",
+        "FdmtIndiPSPit"
+    ],
+    "publishDate": [
+        "EquDiv_info",
+        "FdmtDerPit",
+        "FdmtIndiRtnPit",
+        "FdmtIndiPSPit"
+    ],
+    "eventProcessCD": [
+        "EquDiv_info"
+    ],
+    "perShareDivRatio": [
+        "EquDiv_info"
+    ],
+    "perShareTransRatio": [
+        "EquDiv_info"
+    ],
+    "perCashDiv": [
+        "EquDiv_info"
+    ],
+    "perCashDivAfTax": [
+        "EquDiv_info"
+    ],
+    "currencyCD": [
+        "EquDiv_info"
+    ],
+    "frPerCashDiv": [
+        "EquDiv_info"
+    ],
+    "frPerCashDivAfTax": [
+        "EquDiv_info"
+    ],
+    "frCurrencyCD": [
+        "EquDiv_info"
+    ],
+    "recordDate": [
+        "EquDiv_info"
+    ],
+    "exDivDate": [
+        "EquDiv_info"
+    ],
+    "bLastTradeDate": [
+        "EquDiv_info"
+    ],
+    "payCashDate": [
+        "EquDiv_info"
+    ],
+    "bonusShareListDate": [
+        "EquDiv_info"
+    ],
+    "ftdAfExdiv": [
+        "EquDiv_info"
+    ],
+    "sharesBfDiv": [
+        "EquDiv_info"
+    ],
+    "sharesAfDiv": [
+        "EquDiv_info"
+    ],
+    "baseShares": [
+        "EquDiv_info"
+    ],
+    "calendarDate": [
+        "TradeCal"
+    ],
+    "isOpen": [
+        "TradeCal",
+        "MktEqud"
+    ],
+    "prevTradeDate": [
+        "TradeCal"
+    ],
+    "isWeekEnd": [
+        "TradeCal"
+    ],
+    "isMonthEnd": [
+        "TradeCal"
+    ],
+    "isQuarterEnd": [
+        "TradeCal"
+    ],
+    "isYearEnd": [
+        "TradeCal"
+    ],
+    "sec_level": [
+        "bench_price",
+        "stock_price"
+    ],
+    "multiplier": [
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "margin_ratio": [
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "pre_close": [
+        "bench_price",
+        "stock_price",
+        "gmData_history",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "is_suspended": [
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "settle_price": [
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "position": [
+        "bench_price",
+        "stock_price",
+        "Price_Volume_Data/submain",
+        "gmData_history",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "pre_settle": [
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "upper_limit": [
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "lower_limit": [
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "adj_factor": [
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "conversion_price": [
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "redemption_record_date": [
+        "bench_price",
+        "stock_price"
+    ],
+    "sec_type": [
+        "bench_price",
+        "stock_price"
+    ],
+    "sec_asset": [
+        "bench_price",
+        "stock_price"
+    ],
+    "sec_type_ext": [
+        "bench_price",
+        "stock_price"
+    ],
+    "quote_unit": [
+        "bench_price",
+        "stock_price"
+    ],
+    "exercise_price": [
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "trade_date": [
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "continuous_contracts",
+        "future_daily"
+    ],
+    "is_adjusted": [
+        "bench_price",
+        "stock_price",
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "tradeCD": [
+        "HKshszHold"
+    ],
+    "ticketCode": [
+        "HKshszHold"
+    ],
+    "partyName": [
+        "HKshszHold"
+    ],
+    "partyVol": [
+        "HKshszHold"
+    ],
+    "partyPct": [
+        "HKshszHold"
+    ],
+    "updateTime": [
+        "HKshszHold",
+        "ResConIndex",
+        "ResConIndexFy12",
+        "ResConIndustryCitic",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySw",
+        "ResConIndustrySwFy12",
+        "ResConSecReportHeat",
+        "ResConSecFy12",
+        "ResConSecCoredata",
+        "ResConSecTarpriScore",
+        "ResConSecCorederi",
+        "RMExposureDay",
+        "MktEqudEval"
+    ],
+    "tradeDate": [
+        "MktEqud",
+        "MktIdx",
+        "MktLimit",
+        "SecST",
+        "RMExposureDay",
+        "MktEqudEval"
+    ],
+    "preClosePrice": [
+        "MktEqud"
+    ],
+    "actPreClosePrice": [
+        "MktEqud"
+    ],
+    "openPrice": [
+        "MktEqud"
+    ],
+    "highestPrice": [
+        "MktEqud"
+    ],
+    "lowestPrice": [
+        "MktEqud"
+    ],
+    "closePrice": [
+        "MktEqud",
+        "ResConSecTarpriScore"
+    ],
+    "turnoverVol": [
+        "MktEqud",
+        "MktIdx"
+    ],
+    "turnoverValue": [
+        "MktEqud",
+        "MktIdx"
+    ],
+    "dealAmount": [
+        "MktEqud"
+    ],
+    "turnoverRate": [
+        "MktEqud"
+    ],
+    "accumAdjFactor": [
+        "MktEqud"
+    ],
+    "negMarketValue": [
+        "MktEqud",
+        "MktEqudEval"
+    ],
+    "marketValue": [
+        "MktEqud",
+        "MktEqudEval"
+    ],
+    "chgPct": [
+        "MktEqud"
+    ],
+    "PE": [
+        "MktEqud",
+        "MktEqudEval"
+    ],
+    "PE1": [
+        "MktEqud",
+        "MktEqudEval"
+    ],
+    "PB": [
+        "MktEqud",
+        "MktEqudEval",
+        "trading_derivative_indicator"
+    ],
+    "vwap": [
+        "MktEqud"
+    ],
+    "indexID": [
+        "MktIdx",
+        "ResConIndex",
+        "ResConIndexFy12",
+        "ResConIndustryCitic",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySw",
+        "ResConIndustrySwFy12"
+    ],
+    "porgFullName": [
+        "MktIdx"
+    ],
+    "preCloseIndex": [
+        "MktIdx"
+    ],
+    "openIndex": [
+        "MktIdx"
+    ],
+    "lowestIndex": [
+        "MktIdx"
+    ],
+    "highestIndex": [
+        "MktIdx"
+    ],
+    "closeIndex": [
+        "MktIdx"
+    ],
+    "CHG": [
+        "MktIdx"
+    ],
+    "CHGPct": [
+        "MktIdx"
+    ],
+    "date": [
+        "IndustryID_Sw21",
+        "Broker_Data"
+    ],
+    "winCode": [
+        "IndustryID_Sw21"
+    ],
+    "industryID1": [
+        "IndustryID_Sw21"
+    ],
+    "industryVersionCD": [
+        "IndustryID_Sw21"
+    ],
+    "industryName1": [
+        "IndustryID_Sw21"
+    ],
+    "industry": [
+        "IndustryID_Sw21"
+    ],
+    "secShortNameEn": [
+        "MktLimit"
+    ],
+    "limitUpPrice": [
+        "MktLimit"
+    ],
+    "limitDownPrice": [
+        "MktLimit"
+    ],
+    "upLimitReachedTimes": [
+        "MktLimit"
+    ],
+    "downLimitReachedTimes": [
+        "MktLimit"
+    ],
+    "tradeAbbrName": [
+        "SecST"
+    ],
+    "STflg": [
+        "SecST"
+    ],
+    "haltBeginTime": [
+        "SecHalt"
+    ],
+    "haltEndTime": [
+        "SecHalt"
+    ],
+    "indexCode": [
+        "ResConIndex",
+        "ResConIndexFy12",
+        "ResConIndustryCitic",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySw",
+        "ResConIndustrySwFy12"
+    ],
+    "indexName": [
+        "ResConIndex",
+        "ResConIndexFy12",
+        "ResConIndustryCitic",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySw",
+        "ResConIndustrySwFy12"
+    ],
+    "secNum": [
+        "ResConIndex",
+        "ResConIndexFy12",
+        "ResConIndustryCitic",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySw",
+        "ResConIndustrySwFy12"
+    ],
+    "repForeDate": [
+        "ResConIndex",
+        "ResConIndexFy12",
+        "ResConIndustryCitic",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySw",
+        "ResConIndustrySwFy12",
+        "ResConSecReportHeat",
+        "ResConSecFy12",
+        "ResConSecCoredata",
+        "ResConSecTarpriScore",
+        "ResConSecCorederi"
+    ],
+    "foreYear": [
+        "ResConIndex",
+        "ResConIndustryCitic",
+        "ResConIndustrySw",
+        "ResConSecCoredata",
+        "ResConSecCorederi"
+    ],
+    "conProfit": [
+        "ResConIndex",
+        "ResConIndustryCitic",
+        "ResConIndustrySw",
+        "ResConSecCoredata"
+    ],
+    "conIncome": [
+        "ResConIndex",
+        "ResConIndustryCitic",
+        "ResConIndustrySw",
+        "ResConSecCoredata"
+    ],
+    "conPe": [
+        "ResConIndex",
+        "ResConIndustryCitic",
+        "ResConIndustrySw",
+        "ResConSecCorederi"
+    ],
+    "conPb": [
+        "ResConIndex",
+        "ResConIndustryCitic",
+        "ResConIndustrySw",
+        "ResConSecCorederi"
+    ],
+    "conPs": [
+        "ResConIndex",
+        "ResConIndustryCitic",
+        "ResConIndustrySw",
+        "ResConSecCorederi"
+    ],
+    "conNa": [
+        "ResConIndex",
+        "ResConIndustryCitic",
+        "ResConIndustrySw",
+        "ResConSecCorederi"
+    ],
+    "conRoe": [
+        "ResConIndex",
+        "ResConIndustryCitic",
+        "ResConIndustrySw",
+        "ResConSecCorederi"
+    ],
+    "conProfitYoy": [
+        "ResConIndex",
+        "ResConIndustryCitic",
+        "ResConIndustrySw",
+        "ResConSecCorederi"
+    ],
+    "conIncomeYoy": [
+        "ResConIndex",
+        "ResConIndustryCitic",
+        "ResConIndustrySw",
+        "ResConSecCorederi"
+    ],
+    "conProfitCgr2y": [
+        "ResConIndex",
+        "ResConIndustryCitic",
+        "ResConIndustrySw",
+        "ResConSecCorederi"
+    ],
+    "conIncomeCgr2y": [
+        "ResConIndex",
+        "ResConIndustryCitic",
+        "ResConIndustrySw",
+        "ResConSecCorederi"
+    ],
+    "conPeg1": [
+        "ResConIndex",
+        "ResConIndustryCitic",
+        "ResConIndustrySw",
+        "ResConSecCorederi"
+    ],
+    "conPsg1": [
+        "ResConIndex",
+        "ResConIndustryCitic",
+        "ResConIndustrySw",
+        "ResConSecCorederi"
+    ],
+    "conPeg2": [
+        "ResConIndex",
+        "ResConIndustryCitic",
+        "ResConIndustrySw",
+        "ResConSecCorederi"
+    ],
+    "conPsg2": [
+        "ResConIndex",
+        "ResConIndustryCitic",
+        "ResConIndustrySw",
+        "ResConSecCorederi"
+    ],
+    "conProfitFy12": [
+        "ResConIndexFy12",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySwFy12",
+        "ResConSecFy12"
+    ],
+    "conIncomeFy12": [
+        "ResConIndexFy12",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySwFy12",
+        "ResConSecFy12"
+    ],
+    "conPeFy12": [
+        "ResConIndexFy12",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySwFy12",
+        "ResConSecFy12"
+    ],
+    "conPbFy12": [
+        "ResConIndexFy12",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySwFy12",
+        "ResConSecFy12"
+    ],
+    "conPsFy12": [
+        "ResConIndexFy12",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySwFy12",
+        "ResConSecFy12"
+    ],
+    "conNaFy12": [
+        "ResConIndexFy12",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySwFy12",
+        "ResConSecFy12"
+    ],
+    "conRoeFy12": [
+        "ResConIndexFy12",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySwFy12",
+        "ResConSecFy12"
+    ],
+    "conProfitFy12Yoy": [
+        "ResConIndexFy12",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySwFy12",
+        "ResConSecFy12"
+    ],
+    "conIncomeFy12Yoy": [
+        "ResConIndexFy12",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySwFy12",
+        "ResConSecFy12"
+    ],
+    "conProfitFy12Cgr2y": [
+        "ResConIndexFy12",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySwFy12",
+        "ResConSecFy12"
+    ],
+    "conIncomeFy12Cgr2y": [
+        "ResConIndexFy12",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySwFy12",
+        "ResConSecFy12"
+    ],
+    "conPeg1Fy12": [
+        "ResConIndexFy12",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySwFy12",
+        "ResConSecFy12"
+    ],
+    "conPsg1Fy12": [
+        "ResConIndexFy12",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySwFy12",
+        "ResConSecFy12"
+    ],
+    "conPeg2Fy12": [
+        "ResConIndexFy12",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySwFy12",
+        "ResConSecFy12"
+    ],
+    "conPsg2Fy12": [
+        "ResConIndexFy12",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySwFy12",
+        "ResConSecFy12"
+    ],
+    "conProfitFy12Chgpct1y": [
+        "ResConIndexFy12",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySwFy12",
+        "ResConSecFy12"
+    ],
+    "conIncomeFy12Chgpct1y": [
+        "ResConIndexFy12",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySwFy12",
+        "ResConSecFy12"
+    ],
+    "induID": [
+        "ResConIndustryCitic",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySw",
+        "ResConIndustrySwFy12"
+    ],
+    "induName": [
+        "ResConIndustryCitic",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySw",
+        "ResConIndustrySwFy12"
+    ],
+    "induLevel": [
+        "ResConIndustryCitic",
+        "ResConIndustryCiticFy12",
+        "ResConIndustrySw",
+        "ResConIndustrySwFy12"
+    ],
+    "secCode": [
+        "ResConSecReportHeat",
+        "ResConSecFy12",
+        "ResConSecCoredata",
+        "ResConSecTarpriScore",
+        "ResConSecCorederi"
+    ],
+    "secName": [
+        "ResConSecReportHeat",
+        "ResConSecFy12",
+        "ResConSecCoredata",
+        "ResConSecTarpriScore",
+        "ResConSecCorederi"
+    ],
+    "allReportCover1w": [
+        "ResConSecReportHeat"
+    ],
+    "allReportCover1m": [
+        "ResConSecReportHeat"
+    ],
+    "allReportCover1q": [
+        "ResConSecReportHeat"
+    ],
+    "allReportCover1h": [
+        "ResConSecReportHeat"
+    ],
+    "allReportCover1y": [
+        "ResConSecReportHeat"
+    ],
+    "allOrgCover1w": [
+        "ResConSecReportHeat"
+    ],
+    "allOrgCover1m": [
+        "ResConSecReportHeat"
+    ],
+    "allOrgCover1q": [
+        "ResConSecReportHeat"
+    ],
+    "allOrgCover1h": [
+        "ResConSecReportHeat"
+    ],
+    "allOrgCover1y": [
+        "ResConSecReportHeat"
+    ],
+    "relativeAllCover1w": [
+        "ResConSecReportHeat"
+    ],
+    "relativeAllCover1m": [
+        "ResConSecReportHeat"
+    ],
+    "relativeAllCover1q": [
+        "ResConSecReportHeat"
+    ],
+    "relativeAllCover1h": [
+        "ResConSecReportHeat"
+    ],
+    "relativeAllCover1y": [
+        "ResConSecReportHeat"
+    ],
+    "stkReportCover1w": [
+        "ResConSecReportHeat"
+    ],
+    "stkReportCover1m": [
+        "ResConSecReportHeat"
+    ],
+    "stkReportCover1q": [
+        "ResConSecReportHeat"
+    ],
+    "stkReportCover1h": [
+        "ResConSecReportHeat"
+    ],
+    "stkReportCover1y": [
+        "ResConSecReportHeat"
+    ],
+    "stkOrgCover1w": [
+        "ResConSecReportHeat"
+    ],
+    "stkOrgCover1m": [
+        "ResConSecReportHeat"
+    ],
+    "stkOrgCover1q": [
+        "ResConSecReportHeat"
+    ],
+    "stkOrgCover1h": [
+        "ResConSecReportHeat"
+    ],
+    "stkOrgCover1y": [
+        "ResConSecReportHeat"
+    ],
+    "relativeStkCover1w": [
+        "ResConSecReportHeat"
+    ],
+    "relativeStkCover1m": [
+        "ResConSecReportHeat"
+    ],
+    "relativeStkCover1q": [
+        "ResConSecReportHeat"
+    ],
+    "relativeStkCover1h": [
+        "ResConSecReportHeat"
+    ],
+    "relativeStkCover1y": [
+        "ResConSecReportHeat"
+    ],
+    "allOrgCover10d": [
+        "ResConSecReportHeat"
+    ],
+    "allOrgCover25d": [
+        "ResConSecReportHeat"
+    ],
+    "allOrgCover75d": [
+        "ResConSecReportHeat"
+    ],
+    "conEpsFy12": [
+        "ResConSecFy12"
+    ],
+    "secType": [
+        "ResConSecCoredata",
+        "ResConSecCorederi"
+    ],
+    "foreType": [
+        "ResConSecCoredata",
+        "ResConSecCorederi"
+    ],
+    "conEpsType": [
+        "ResConSecCoredata"
+    ],
+    "conEps": [
+        "ResConSecCoredata"
+    ],
+    "conProfitType": [
+        "ResConSecCoredata",
+        "ResConSecCorederi"
+    ],
+    "conIncomeType": [
+        "ResConSecCoredata",
+        "ResConSecCorederi"
+    ],
+    "conTarPriceType": [
+        "ResConSecTarpriScore"
+    ],
+    "conTarPrice": [
+        "ResConSecTarpriScore"
+    ],
+    "tarPriceLastDate": [
+        "ResConSecTarpriScore"
+    ],
+    "conScoreType": [
+        "ResConSecTarpriScore"
+    ],
+    "conScore": [
+        "ResConSecTarpriScore"
+    ],
+    "scoreLastDate": [
+        "ResConSecTarpriScore"
+    ],
+    "conTarReturn": [
+        "ResConSecTarpriScore"
+    ],
+    "conProfitChgpct1w": [
+        "ResConSecCorederi"
+    ],
+    "conProfitChgpct1m": [
+        "ResConSecCorederi"
+    ],
+    "conProfitChgpct1q": [
+        "ResConSecCorederi"
+    ],
+    "conProfitChgpct1h": [
+        "ResConSecCorederi"
+    ],
+    "conProfitChgpct1y": [
+        "ResConSecCorederi"
+    ],
+    "conIncomeChgpct1w": [
+        "ResConSecCorederi"
+    ],
+    "conIncomeChgpct1m": [
+        "ResConSecCorederi"
+    ],
+    "conIncomeChgpct1q": [
+        "ResConSecCorederi"
+    ],
+    "conIncomeChgpct1h": [
+        "ResConSecCorederi"
+    ],
+    "conIncomeChgpct1y": [
+        "ResConSecCorederi"
+    ],
+    "actPubtime": [
+        "FdmtDerPit",
+        "FdmtIndiRtnPit",
+        "FdmtIndiPSPit"
+    ],
+    "tFixedAssets": [
+        "FdmtDerPit"
+    ],
+    "intFreeCl": [
+        "FdmtDerPit"
+    ],
+    "intFreeNcl": [
+        "FdmtDerPit"
+    ],
+    "intCl": [
+        "FdmtDerPit"
+    ],
+    "intDebt": [
+        "FdmtDerPit"
+    ],
+    "nDebt": [
+        "FdmtDerPit"
+    ],
+    "nTanAssets": [
+        "FdmtDerPit"
+    ],
+    "workCapital": [
+        "FdmtDerPit"
+    ],
+    "nWorkCapital": [
+        "FdmtDerPit"
+    ],
+    "IC": [
+        "FdmtDerPit"
+    ],
+    "tRe": [
+        "FdmtDerPit"
+    ],
+    "grossProfit": [
+        "FdmtDerPit"
+    ],
+    "opaProfit": [
+        "FdmtDerPit"
+    ],
+    "valChgProfit": [
+        "FdmtDerPit"
+    ],
+    "nIntExp": [
+        "FdmtDerPit"
+    ],
+    "EBIT": [
+        "FdmtDerPit",
+        "deriv_finance_indicator"
+    ],
+    "EBITDA": [
+        "FdmtDerPit",
+        "deriv_finance_indicator"
+    ],
+    "EBIAT": [
+        "FdmtDerPit"
+    ],
+    "nrProfitLoss": [
+        "FdmtDerPit"
+    ],
+    "niAttrPCut": [
+        "FdmtDerPit"
+    ],
+    "FCFF": [
+        "FdmtDerPit",
+        "deriv_finance_indicator"
+    ],
+    "FCFE": [
+        "FdmtDerPit",
+        "deriv_finance_indicator"
+    ],
+    "DA": [
+        "FdmtDerPit"
+    ],
+    "BETA": [
+        "RMExposureDay"
+    ],
+    "MOMENTUM": [
+        "RMExposureDay"
+    ],
+    "SIZE": [
+        "RMExposureDay"
+    ],
+    "EARNYILD": [
+        "RMExposureDay"
+    ],
+    "RESVOL": [
+        "RMExposureDay"
+    ],
+    "GROWTH": [
+        "RMExposureDay"
+    ],
+    "BTOP": [
+        "RMExposureDay"
+    ],
+    "LEVERAGE": [
+        "RMExposureDay"
+    ],
+    "LIQUIDTY": [
+        "RMExposureDay"
+    ],
+    "SIZENL": [
+        "RMExposureDay"
+    ],
+    "Bank": [
+        "RMExposureDay"
+    ],
+    "RealEstate": [
+        "RMExposureDay"
+    ],
+    "Health": [
+        "RMExposureDay"
+    ],
+    "Transportation": [
+        "RMExposureDay"
+    ],
+    "Mining": [
+        "RMExposureDay"
+    ],
+    "NonFerMetal": [
+        "RMExposureDay"
+    ],
+    "HouseApp": [
+        "RMExposureDay"
+    ],
+    "LeiService": [
+        "RMExposureDay"
+    ],
+    "MachiEquip": [
+        "RMExposureDay"
+    ],
+    "BuildDeco": [
+        "RMExposureDay"
+    ],
+    "CommeTrade": [
+        "RMExposureDay"
+    ],
+    "CONMAT": [
+        "RMExposureDay"
+    ],
+    "Auto": [
+        "RMExposureDay"
+    ],
+    "Textile": [
+        "RMExposureDay"
+    ],
+    "FoodBever": [
+        "RMExposureDay"
+    ],
+    "Electronics": [
+        "RMExposureDay"
+    ],
+    "Computer": [
+        "RMExposureDay"
+    ],
+    "LightIndus": [
+        "RMExposureDay"
+    ],
+    "Utilities": [
+        "RMExposureDay"
+    ],
+    "Telecom": [
+        "RMExposureDay"
+    ],
+    "AgriForest": [
+        "RMExposureDay"
+    ],
+    "CHEM": [
+        "RMExposureDay"
+    ],
+    "Media": [
+        "RMExposureDay"
+    ],
+    "IronSteel": [
+        "RMExposureDay"
+    ],
+    "NonBankFinan": [
+        "RMExposureDay"
+    ],
+    "ELECEQP": [
+        "RMExposureDay"
+    ],
+    "AERODEF": [
+        "RMExposureDay"
+    ],
+    "Conglomerates": [
+        "RMExposureDay"
+    ],
+    "COUNTRY": [
+        "RMExposureDay"
+    ],
+    "grossMARgin": [
+        "FdmtIndiRtnPit"
+    ],
+    "npMARgin": [
+        "FdmtIndiRtnPit"
+    ],
+    "ROE": [
+        "FdmtIndiRtnPit"
+    ],
+    "ROEA": [
+        "FdmtIndiRtnPit"
+    ],
+    "ROEW": [
+        "FdmtIndiRtnPit"
+    ],
+    "ROECut": [
+        "FdmtIndiRtnPit"
+    ],
+    "ROECutW": [
+        "FdmtIndiRtnPit"
+    ],
+    "ROA": [
+        "FdmtIndiRtnPit",
+        "deriv_finance_indicator"
+    ],
+    "ROAEBIT": [
+        "FdmtIndiRtnPit"
+    ],
+    "ROIC": [
+        "FdmtIndiRtnPit",
+        "deriv_finance_indicator"
+    ],
+    "PE2": [
+        "MktEqudEval"
+    ],
+    "PS": [
+        "MktEqudEval"
+    ],
+    "PS1": [
+        "MktEqudEval"
+    ],
+    "PCF": [
+        "MktEqudEval"
+    ],
+    "PCF1": [
+        "MktEqudEval"
+    ],
+    "PCF2": [
+        "MktEqudEval"
+    ],
+    "PCF3": [
+        "MktEqudEval"
+    ],
+    "EV": [
+        "MktEqudEval",
+        "trading_derivative_indicator"
+    ],
+    "EVEBITDA": [
+        "MktEqudEval",
+        "trading_derivative_indicator"
+    ],
+    "EVSales": [
+        "MktEqudEval"
+    ],
+    "EPS": [
+        "FdmtIndiPSPit"
+    ],
+    "basicEPS": [
+        "FdmtIndiPSPit"
+    ],
+    "dilutedEPS": [
+        "FdmtIndiPSPit"
+    ],
+    "nAssetPS": [
+        "FdmtIndiPSPit"
+    ],
+    "tRevPS": [
+        "FdmtIndiPSPit"
+    ],
+    "revPS": [
+        "FdmtIndiPSPit"
+    ],
+    "opPS": [
+        "FdmtIndiPSPit"
+    ],
+    "EBITPS": [
+        "FdmtIndiPSPit",
+        "deriv_finance_indicator"
+    ],
+    "cReserPS": [
+        "FdmtIndiPSPit"
+    ],
+    "sReserPS": [
+        "FdmtIndiPSPit"
+    ],
+    "reserPS": [
+        "FdmtIndiPSPit"
+    ],
+    "rePS": [
+        "FdmtIndiPSPit"
+    ],
+    "tRePS": [
+        "FdmtIndiPSPit"
+    ],
+    "nCfOperAPS": [
+        "FdmtIndiPSPit"
+    ],
+    "nCInCashPS": [
+        "FdmtIndiPSPit"
+    ],
+    "FCFFPS": [
+        "FdmtIndiPSPit",
+        "deriv_finance_indicator"
+    ],
+    "FCFEPS": [
+        "FdmtIndiPSPit",
+        "deriv_finance_indicator"
+    ],
+    "contract": [
+        "Broker_Data"
+    ],
+    "company": [
+        "Broker_Data"
+    ],
+    "volume": [
+        "Broker_Data",
+        "Price_Volume_Data/submain",
+        "Index_Market_data",
+        "Market_data",
+        "gmData_history"
+    ],
+    "change": [
+        "Broker_Data"
+    ],
+    "number": [
+        "Broker_Data"
+    ],
+    "rankname": [
+        "Broker_Data"
+    ],
+    "open": [
+        "Price_Volume_Data/submain",
+        "Market_data",
+        "gmData_history"
+    ],
+    "high": [
+        "Price_Volume_Data/submain",
+        "Index_Market_data",
+        "Market_data",
+        "gmData_history"
+    ],
+    "low": [
+        "Price_Volume_Data/submain",
+        "Index_Market_data",
+        "Market_data",
+        "gmData_history"
+    ],
+    "close": [
+        "Price_Volume_Data/submain",
+        "Index_Market_data",
+        "Market_data",
+        "gmData_history"
+    ],
+    "amount": [
+        "Price_Volume_Data/submain",
+        "Index_Market_data",
+        "Market_data",
+        "gmData_history"
+    ],
+    "bob": [
+        "Price_Volume_Data/submain",
+        "gmData_history"
+    ],
+    "eob": [
+        "Price_Volume_Data/submain",
+        "gmData_history"
+    ],
+    "end_date": [
+        "ACCA",
+        "accounts_payable_turnover_days",
+        "accounts_payable_turnover_rate",
+        "account_receivable_turnover_days",
+        "account_receivable_turnover_rate",
+        "adjusted_profit_to_total_profit",
+        "administration_expense_ttm",
+        "admin_expense_rate",
+        "asset_impairment_loss_ttm",
+        "capital_reserve_fund_per_share",
+        "cashflow_per_share_ttm",
+        "cash_and_equivalents_per_share",
+        "cash_rate_of_sales",
+        "cash_to_current_liability",
+        "cfo_to_ev",
+        "circulating_market_cap",
+        "current_asset_turnover_rate",
+        "current_ratio",
+        "debt_to_asset_ratio",
+        "debt_to_equity_ratio",
+        "debt_to_tangible_equity_ratio",
+        "DSRI",
+        "EBIT",
+        "equity_to_asset_ratio",
+        "equity_to_fixed_asset_ratio",
+        "equity_turnover_rate",
+        "financial_expense_rate",
+        "financial_expense_ttm",
+        "financing_cash_growth_rate",
+        "fixed_assets_turnover_rate",
+        "fixed_asset_ratio",
+        "goods_sale_and_service_render_cash_ttm",
+        "goods_service_cash_to_operating_revenue_ttm",
+        "gross_income_ratio",
+        "Index_Market_data",
+        "intangible_asset_ratio",
+        "interest_carry_current_liability",
+        "interest_free_current_liability",
+        "inventory_turnover_days",
+        "inventory_turnover_rate",
+        "invest_income_associates_to_total_profit",
+        "long_debt_to_asset_ratio",
+        "long_debt_to_working_capital_ratio",
+        "long_term_debt_to_asset_ratio",
+        "LVGI",
+        "market_cap",
+        "Market_data",
+        "MLEV",
+        "net_asset_growth_rate",
+        "net_debt",
+        "net_finance_cash_flow_ttm",
+        "net_interest_expense",
+        "net_invest_cash_flow_ttm",
+        "net_non_operating_income_to_total_profit",
+        "net_operate_cashflow_growth_rate",
+        "net_operate_cash_flow_per_share",
+        "net_operate_cash_flow_to_asset",
+        "net_operate_cash_flow_to_net_debt",
+        "net_operate_cash_flow_to_operate_income",
+        "net_operate_cash_flow_to_total_current_liability",
+        "net_operate_cash_flow_to_total_liability",
+        "net_operate_cash_flow_ttm",
+        "net_operating_cash_flow_coverage",
+        "net_profit_growth_rate",
+        "net_profit_ratio",
+        "net_profit_to_total_operate_revenue_ttm",
+        "net_profit_ttm",
+        "net_working_capital",
+        "non_current_asset_ratio",
+        "non_operating_net_profit_ttm",
+        "non_recurring_gain_loss",
+        "np_parent_company_owners_growth_rate",
+        "np_parent_company_owners_ttm",
+        "OperateNetIncome",
+        "OperatingCycle",
+        "operating_cost_to_operating_revenue_ratio",
+        "operating_cost_ttm",
+        "operating_profit_growth_rate",
+        "operating_profit_ratio",
+        "operating_profit_to_operating_revenue",
+        "operating_profit_to_total_profit",
+        "operating_profit_ttm",
+        "operating_revenue_growth_rate",
+        "operating_revenue_per_share",
+        "operating_revenue_ttm",
+        "operating_tax_to_operating_revenue_ratio_ttm",
+        "profit_margin_ttm",
+        "quick_ratio",
+        "retained_earnings",
+        "retained_earnings_per_share",
+        "retained_profit_per_share",
+        "ROAEBITTTM",
+        "roa_ttm",
+        "roa_ttm_8y",
+        "roe_ttm",
+        "roe_ttm_8y",
+        "sale_expense_to_operating_revenue",
+        "sale_expense_ttm",
+        "SGI",
+        "super_quick_ratio",
+        "surplus_reserve_fund_per_share",
+        "total_asset_growth_rate",
+        "total_asset_turnover_rate",
+        "total_operating_cost_ttm",
+        "total_operating_revenue_per_share",
+        "total_operating_revenue_per_share_ttm",
+        "total_operating_revenue_ttm",
+        "total_profit_growth_rate",
+        "total_profit_to_cost_ratio",
+        "total_profit_ttm",
+        "value_change_profit_ttm",
+        "trading_derivative_indicator",
+        "deriv_finance_indicator",
+        "balance_sheet"
+    ],
+    "MANANETR": [
+        "ACCA",
+        "cash_rate_of_sales",
+        "cfo_to_ev",
+        "net_operate_cashflow_growth_rate",
+        "net_operate_cash_flow_to_operate_income",
+        "net_operate_cash_flow_to_total_current_liability",
+        "net_operate_cash_flow_to_total_liability",
+        "net_operate_cash_flow_ttm",
+        "net_operating_cash_flow_coverage"
+    ],
+    "NETPROFIT": [
+        "ACCA",
+        "adjusted_profit_to_total_profit",
+        "EBIT",
+        "net_profit_growth_rate",
+        "net_profit_ratio",
+        "net_profit_to_total_operate_revenue_ttm",
+        "net_profit_ttm",
+        "roa_ttm",
+        "roa_ttm_8y",
+        "roe_ttm",
+        "roe_ttm_8y"
+    ],
+    "TOTASSET": [
+        "ACCA",
+        "debt_to_asset_ratio",
+        "equity_to_asset_ratio",
+        "fixed_asset_ratio",
+        "intangible_asset_ratio",
+        "long_debt_to_asset_ratio",
+        "long_term_debt_to_asset_ratio",
+        "net_operate_cash_flow_to_asset",
+        "non_current_asset_ratio",
+        "ROAEBITTTM",
+        "roa_ttm",
+        "roa_ttm_8y",
+        "total_asset_growth_rate",
+        "total_asset_turnover_rate",
+        "balance_sheet"
+    ],
+    "pub_date": [
+        "ACCA",
+        "accounts_payable_turnover_days",
+        "accounts_payable_turnover_rate",
+        "account_receivable_turnover_days",
+        "account_receivable_turnover_rate",
+        "adjusted_profit_to_total_profit",
+        "administration_expense_ttm",
+        "admin_expense_rate",
+        "asset_impairment_loss_ttm",
+        "capital_reserve_fund_per_share",
+        "cashflow_per_share_ttm",
+        "cash_and_equivalents_per_share",
+        "cash_rate_of_sales",
+        "cash_to_current_liability",
+        "cfo_to_ev",
+        "circulating_market_cap",
+        "current_asset_turnover_rate",
+        "current_ratio",
+        "debt_to_asset_ratio",
+        "debt_to_equity_ratio",
+        "debt_to_tangible_equity_ratio",
+        "DSRI",
+        "EBIT",
+        "equity_to_asset_ratio",
+        "equity_to_fixed_asset_ratio",
+        "equity_turnover_rate",
+        "financial_expense_rate",
+        "financial_expense_ttm",
+        "financing_cash_growth_rate",
+        "fixed_assets_turnover_rate",
+        "fixed_asset_ratio",
+        "goods_sale_and_service_render_cash_ttm",
+        "goods_service_cash_to_operating_revenue_ttm",
+        "gross_income_ratio",
+        "Index_Market_data",
+        "intangible_asset_ratio",
+        "interest_carry_current_liability",
+        "interest_free_current_liability",
+        "inventory_turnover_days",
+        "inventory_turnover_rate",
+        "invest_income_associates_to_total_profit",
+        "long_debt_to_asset_ratio",
+        "long_debt_to_working_capital_ratio",
+        "long_term_debt_to_asset_ratio",
+        "LVGI",
+        "market_cap",
+        "Market_data",
+        "MLEV",
+        "net_asset_growth_rate",
+        "net_debt",
+        "net_finance_cash_flow_ttm",
+        "net_interest_expense",
+        "net_invest_cash_flow_ttm",
+        "net_non_operating_income_to_total_profit",
+        "net_operate_cashflow_growth_rate",
+        "net_operate_cash_flow_per_share",
+        "net_operate_cash_flow_to_asset",
+        "net_operate_cash_flow_to_net_debt",
+        "net_operate_cash_flow_to_operate_income",
+        "net_operate_cash_flow_to_total_current_liability",
+        "net_operate_cash_flow_to_total_liability",
+        "net_operate_cash_flow_ttm",
+        "net_operating_cash_flow_coverage",
+        "net_profit_growth_rate",
+        "net_profit_ratio",
+        "net_profit_to_total_operate_revenue_ttm",
+        "net_profit_ttm",
+        "net_working_capital",
+        "non_current_asset_ratio",
+        "non_operating_net_profit_ttm",
+        "non_recurring_gain_loss",
+        "np_parent_company_owners_growth_rate",
+        "np_parent_company_owners_ttm",
+        "OperateNetIncome",
+        "OperatingCycle",
+        "operating_cost_to_operating_revenue_ratio",
+        "operating_cost_ttm",
+        "operating_profit_growth_rate",
+        "operating_profit_ratio",
+        "operating_profit_to_operating_revenue",
+        "operating_profit_to_total_profit",
+        "operating_profit_ttm",
+        "operating_revenue_growth_rate",
+        "operating_revenue_per_share",
+        "operating_revenue_ttm",
+        "operating_tax_to_operating_revenue_ratio_ttm",
+        "profit_margin_ttm",
+        "quick_ratio",
+        "retained_earnings",
+        "retained_earnings_per_share",
+        "retained_profit_per_share",
+        "ROAEBITTTM",
+        "roa_ttm",
+        "roa_ttm_8y",
+        "roe_ttm",
+        "roe_ttm_8y",
+        "sale_expense_to_operating_revenue",
+        "sale_expense_ttm",
+        "SGI",
+        "super_quick_ratio",
+        "surplus_reserve_fund_per_share",
+        "total_asset_growth_rate",
+        "total_asset_turnover_rate",
+        "total_operating_cost_ttm",
+        "total_operating_revenue_per_share",
+        "total_operating_revenue_per_share_ttm",
+        "total_operating_revenue_ttm",
+        "total_profit_growth_rate",
+        "total_profit_to_cost_ratio",
+        "total_profit_ttm",
+        "value_change_profit_ttm",
+        "fundamentals_balance",
+        "fundamentals_cashflow",
+        "fundamentals_income",
+        "share_change",
+        "trading_derivative_indicator",
+        "deriv_finance_indicator",
+        "balance_sheet"
+    ],
+    "ACCPAYRT": [
+        "accounts_payable_turnover_days",
+        "deriv_finance_indicator"
+    ],
+    "BIZCOST": [
+        "accounts_payable_turnover_rate",
+        "gross_income_ratio",
+        "inventory_turnover_rate",
+        "operating_cost_to_operating_revenue_ratio",
+        "operating_cost_ttm",
+        "total_profit_to_cost_ratio"
+    ],
+    "ACCOPAYA": [
+        "accounts_payable_turnover_rate",
+        "interest_free_current_liability",
+        "balance_sheet"
+    ],
+    "NOTESPAYA": [
+        "accounts_payable_turnover_rate",
+        "interest_free_current_liability",
+        "balance_sheet"
+    ],
+    "PREP": [
+        "accounts_payable_turnover_rate",
+        "balance_sheet"
+    ],
+    "ACCRECGTURNRT": [
+        "account_receivable_turnover_days",
+        "deriv_finance_indicator"
+    ],
+    "BIZINCO": [
+        "account_receivable_turnover_rate",
+        "cash_rate_of_sales",
+        "current_asset_turnover_rate",
+        "DSRI",
+        "equity_turnover_rate",
+        "fixed_assets_turnover_rate",
+        "goods_service_cash_to_operating_revenue_ttm",
+        "gross_income_ratio",
+        "net_profit_ratio",
+        "operating_cost_to_operating_revenue_ratio",
+        "operating_profit_ratio",
+        "operating_revenue_growth_rate",
+        "operating_revenue_ttm",
+        "operating_tax_to_operating_revenue_ratio_ttm",
+        "profit_margin_ttm",
+        "SGI",
+        "total_asset_turnover_rate"
+    ],
+    "ACCORECE": [
+        "account_receivable_turnover_rate",
+        "DSRI",
+        "super_quick_ratio",
+        "balance_sheet"
+    ],
+    "NOTESRECE": [
+        "account_receivable_turnover_rate",
+        "super_quick_ratio",
+        "balance_sheet"
+    ],
+    "ADVAPAYM": [
+        "account_receivable_turnover_rate",
+        "interest_free_current_liability",
+        "balance_sheet"
+    ],
+    "NPCUT": [
+        "adjusted_profit_to_total_profit",
+        "non_recurring_gain_loss",
+        "deriv_finance_indicator"
+    ],
+    "MANAEXPE": [
+        "administration_expense_ttm",
+        "admin_expense_rate",
+        "total_profit_to_cost_ratio"
+    ],
+    "year": [
+        "administration_expense_ttm",
+        "asset_impairment_loss_ttm",
+        "circulating_market_cap",
+        "EBIT",
+        "financial_expense_ttm",
+        "goods_sale_and_service_render_cash_ttm",
+        "interest_free_current_liability",
+        "market_cap",
+        "net_debt",
+        "net_finance_cash_flow_ttm",
+        "net_interest_expense",
+        "net_invest_cash_flow_ttm",
+        "net_operate_cash_flow_ttm",
+        "net_profit_ttm",
+        "non_operating_net_profit_ttm",
+        "np_parent_company_owners_ttm",
+        "OperateNetIncome",
+        "operating_cost_ttm",
+        "operating_profit_ttm",
+        "operating_revenue_ttm",
+        "retained_earnings",
+        "sale_expense_ttm",
+        "total_operating_cost_ttm",
+        "total_operating_revenue_ttm",
+        "total_profit_ttm",
+        "value_change_profit_ttm"
+    ],
+    "BIZTOTINCO": [
+        "admin_expense_rate",
+        "financial_expense_rate",
+        "net_operate_cash_flow_to_operate_income",
+        "net_profit_to_total_operate_revenue_ttm",
+        "operating_profit_to_operating_revenue",
+        "sale_expense_to_operating_revenue",
+        "total_operating_revenue_per_share_ttm",
+        "total_operating_revenue_ttm"
+    ],
+    "ASSEIMPALOSS": [
+        "asset_impairment_loss_ttm"
+    ],
+    "CRPS": [
+        "capital_reserve_fund_per_share",
+        "deriv_finance_indicator"
+    ],
+    "NCFPS": [
+        "cashflow_per_share_ttm",
+        "deriv_finance_indicator"
+    ],
+    "TOTAL_SHARE": [
+        "cash_and_equivalents_per_share",
+        "total_operating_revenue_per_share_ttm",
+        "trading_derivative_indicator"
+    ],
+    "FINALCASHBALA": [
+        "cash_and_equivalents_per_share",
+        "cash_to_current_liability",
+        "net_debt"
+    ],
+    "TOTALCURRLIAB": [
+        "cash_to_current_liability",
+        "current_ratio",
+        "interest_carry_current_liability",
+        "long_debt_to_working_capital_ratio",
+        "net_operate_cash_flow_to_total_current_liability",
+        "net_working_capital",
+        "quick_ratio",
+        "super_quick_ratio",
+        "balance_sheet"
+    ],
+    "TOTMKTCAP": [
+        "cfo_to_ev",
+        "market_cap",
+        "MLEV",
+        "trading_derivative_indicator"
+    ],
+    "NEGOTIABLEMV": [
+        "circulating_market_cap",
+        "trading_derivative_indicator"
+    ],
+    "TOTCURRASSET": [
+        "current_asset_turnover_rate",
+        "current_ratio",
+        "long_debt_to_working_capital_ratio",
+        "net_working_capital",
+        "quick_ratio",
+        "balance_sheet"
+    ],
+    "TOTLIAB": [
+        "debt_to_asset_ratio",
+        "debt_to_equity_ratio",
+        "debt_to_tangible_equity_ratio",
+        "net_operate_cash_flow_to_total_liability",
+        "balance_sheet"
+    ],
+    "PARESHARRIGH": [
+        "debt_to_equity_ratio",
+        "balance_sheet"
+    ],
+    "TOTLIABSHAREQUI": [
+        "debt_to_tangible_equity_ratio",
+        "balance_sheet"
+    ],
+    "INTAASSET": [
+        "debt_to_tangible_equity_ratio",
+        "intangible_asset_ratio",
+        "balance_sheet"
+    ],
+    "GOODWILL": [
+        "debt_to_tangible_equity_ratio",
+        "intangible_asset_ratio",
+        "balance_sheet"
+    ],
+    "FINEXPE": [
+        "EBIT",
+        "financial_expense_rate",
+        "financial_expense_ttm",
+        "total_profit_to_cost_ratio"
+    ],
+    "INCOTAXEXPE": [
+        "EBIT"
+    ],
+    "RIGHAGGR": [
+        "equity_to_asset_ratio",
+        "equity_to_fixed_asset_ratio",
+        "equity_turnover_rate",
+        "net_asset_growth_rate",
+        "roe_ttm",
+        "roe_ttm_8y",
+        "balance_sheet"
+    ],
+    "FIXEDASSEIMMO": [
+        "equity_to_fixed_asset_ratio",
+        "fixed_assets_turnover_rate",
+        "fixed_asset_ratio",
+        "balance_sheet"
+    ],
+    "ENGIMATE": [
+        "equity_to_fixed_asset_ratio",
+        "fixed_assets_turnover_rate",
+        "fixed_asset_ratio",
+        "balance_sheet"
+    ],
+    "CONSPROG": [
+        "equity_to_fixed_asset_ratio",
+        "fixed_assets_turnover_rate",
+        "fixed_asset_ratio",
+        "balance_sheet"
+    ],
+    "FINNETCFLOW": [
+        "financing_cash_growth_rate",
+        "net_finance_cash_flow_ttm"
+    ],
+    "LABORGETCASH": [
+        "goods_sale_and_service_render_cash_ttm",
+        "goods_service_cash_to_operating_revenue_ttm"
+    ],
+    "DEVEEXPE": [
+        "intangible_asset_ratio",
+        "balance_sheet"
+    ],
+    "NONINTCURLIABS": [
+        "interest_carry_current_liability",
+        "deriv_finance_indicator"
+    ],
+    "TAXESPAYA": [
+        "interest_free_current_liability",
+        "balance_sheet"
+    ],
+    "INTEPAYA": [
+        "interest_free_current_liability",
+        "balance_sheet"
+    ],
+    "OTHERPAY": [
+        "interest_free_current_liability",
+        "balance_sheet"
+    ],
+    "OTHERCURRELIABI": [
+        "interest_free_current_liability",
+        "balance_sheet"
+    ],
+    "INVTURNRT": [
+        "inventory_turnover_days",
+        "deriv_finance_indicator"
+    ],
+    "INVE": [
+        "inventory_turnover_rate",
+        "quick_ratio",
+        "balance_sheet"
+    ],
+    "ASSOINVEPROF": [
+        "invest_income_associates_to_total_profit"
+    ],
+    "TOTPROFIT": [
+        "invest_income_associates_to_total_profit",
+        "net_non_operating_income_to_total_profit",
+        "OperateNetIncome",
+        "operating_profit_to_total_profit",
+        "ROAEBITTTM",
+        "total_profit_growth_rate",
+        "total_profit_to_cost_ratio",
+        "total_profit_ttm"
+    ],
+    "LONGBORR": [
+        "long_debt_to_asset_ratio",
+        "balance_sheet"
+    ],
+    "TOTALNONCLIAB": [
+        "long_debt_to_working_capital_ratio",
+        "long_term_debt_to_asset_ratio",
+        "MLEV",
+        "balance_sheet"
+    ],
+    "ASSLIABRT": [
+        "LVGI",
+        "deriv_finance_indicator"
+    ],
+    "FLOW_SHARE": [
+        "Market_data",
+        "trading_derivative_indicator"
+    ],
+    "index_close": [
+        "Market_data"
+    ],
+    "TDEBT": [
+        "net_debt",
+        "deriv_finance_indicator"
+    ],
+    "INTEEXPE": [
+        "net_interest_expense",
+        "ROAEBITTTM"
+    ],
+    "INTEINCO": [
+        "net_interest_expense"
+    ],
+    "INVNETCASHFLOW": [
+        "net_invest_cash_flow_ttm"
+    ],
+    "NONOREVE": [
+        "net_non_operating_income_to_total_profit",
+        "non_operating_net_profit_ttm"
+    ],
+    "NONOEXPE": [
+        "net_non_operating_income_to_total_profit",
+        "non_operating_net_profit_ttm"
+    ],
+    "OPNCFPS": [
+        "net_operate_cash_flow_per_share",
+        "deriv_finance_indicator"
+    ],
+    "BIZNETCFLOW": [
+        "net_operate_cash_flow_to_asset",
+        "net_operate_cash_flow_to_net_debt"
+    ],
+    "NDEBT": [
+        "net_operate_cash_flow_to_net_debt",
+        "deriv_finance_indicator"
+    ],
+    "BIZTOTCOST": [
+        "net_operate_cash_flow_to_operate_income",
+        "total_operating_cost_ttm"
+    ],
+    "PARENETP": [
+        "net_operating_cash_flow_coverage",
+        "non_recurring_gain_loss",
+        "np_parent_company_owners_growth_rate",
+        "np_parent_company_owners_ttm"
+    ],
+    "TOTALNONCASSETS": [
+        "non_current_asset_ratio",
+        "balance_sheet"
+    ],
+    "OPANITOTP": [
+        "OperateNetIncome",
+        "deriv_finance_indicator"
+    ],
+    "ACCRECGTURNDAYS": [
+        "OperatingCycle",
+        "deriv_finance_indicator"
+    ],
+    "INVTURNDAYS": [
+        "OperatingCycle",
+        "deriv_finance_indicator"
+    ],
+    "PERPROFIT": [
+        "operating_profit_growth_rate",
+        "operating_profit_ratio",
+        "operating_profit_to_operating_revenue",
+        "operating_profit_ttm",
+        "profit_margin_ttm"
+    ],
+    "NOPI": [
+        "operating_profit_to_total_profit",
+        "deriv_finance_indicator"
+    ],
+    "OPREVPS": [
+        "operating_revenue_per_share",
+        "deriv_finance_indicator"
+    ],
+    "BIZTAX": [
+        "operating_tax_to_operating_revenue_ratio_ttm"
+    ],
+    "RESE": [
+        "retained_earnings",
+        "balance_sheet"
+    ],
+    "UNDIPROF": [
+        "retained_earnings",
+        "balance_sheet"
+    ],
+    "REPS": [
+        "retained_earnings_per_share",
+        "deriv_finance_indicator"
+    ],
+    "UPPS": [
+        "retained_profit_per_share",
+        "deriv_finance_indicator"
+    ],
+    "SALESEXPE": [
+        "sale_expense_to_operating_revenue",
+        "sale_expense_ttm",
+        "total_profit_to_cost_ratio"
+    ],
+    "CURFDS": [
+        "super_quick_ratio",
+        "balance_sheet"
+    ],
+    "TRADFINASSET": [
+        "super_quick_ratio",
+        "balance_sheet"
+    ],
+    "OTHERRECE": [
+        "super_quick_ratio",
+        "balance_sheet"
+    ],
+    "SRPS": [
+        "surplus_reserve_fund_per_share",
+        "deriv_finance_indicator"
+    ],
+    "TOPREVPS": [
+        "total_operating_revenue_per_share",
+        "deriv_finance_indicator"
+    ],
+    "NVALCHGIT": [
+        "value_change_profit_ttm",
+        "deriv_finance_indicator"
+    ],
+    "rpt_date": [
+        "fundamentals_balance",
+        "fundamentals_cashflow",
+        "fundamentals_income"
+    ],
+    "trd_seat_fee": [
+        "fundamentals_balance"
+    ],
+    "ph_plge_ln": [
+        "fundamentals_balance"
+    ],
+    "aval_sale_fin": [
+        "fundamentals_balance"
+    ],
+    "dpst_cb": [
+        "fundamentals_balance"
+    ],
+    "bal_clr": [
+        "fundamentals_balance"
+    ],
+    "oth_rcv": [
+        "fundamentals_balance"
+    ],
+    "ncur_ast_one_y": [
+        "fundamentals_balance"
+    ],
+    "adv_acct": [
+        "fundamentals_balance"
+    ],
+    "liab_hold_for_sale": [
+        "fundamentals_balance"
+    ],
+    "lt_rcv": [
+        "fundamentals_balance"
+    ],
+    "rcv_lt_hi_rin_rsv": [
+        "fundamentals_balance"
+    ],
+    "lt_ln": [
+        "fundamentals_balance"
+    ],
+    "int_pay": [
+        "fundamentals_balance"
+    ],
+    "oth_pay": [
+        "fundamentals_balance"
+    ],
+    "indem_pay": [
+        "fundamentals_balance"
+    ],
+    "min_sheqy": [
+        "fundamentals_balance"
+    ],
+    "oth_ast": [
+        "fundamentals_balance"
+    ],
+    "fix_ast_dlpl": [
+        "fundamentals_balance"
+    ],
+    "data_type": [
+        "fundamentals_balance",
+        "fundamentals_cashflow",
+        "fundamentals_income"
+    ],
+    "li_liab_rsv": [
+        "fundamentals_balance"
+    ],
+    "ret_prof": [
+        "fundamentals_balance"
+    ],
+    "inter_pay": [
+        "fundamentals_balance"
+    ],
+    "const_matl": [
+        "fundamentals_balance"
+    ],
+    "cur_liab_oth_item": [
+        "fundamentals_balance"
+    ],
+    "oth_ncur_ast": [
+        "fundamentals_balance"
+    ],
+    "acct_pay": [
+        "fundamentals_balance"
+    ],
+    "bnd_pay_pbd": [
+        "fundamentals_balance"
+    ],
+    "bnd_pay": [
+        "fundamentals_balance"
+    ],
+    "cust_cred_dpst": [
+        "fundamentals_balance"
+    ],
+    "fin_out": [
+        "fundamentals_balance"
+    ],
+    "ncur_ast_oth_item": [
+        "fundamentals_balance"
+    ],
+    "term_dpst": [
+        "fundamentals_balance"
+    ],
+    "invt": [
+        "fundamentals_balance"
+    ],
+    "acct_rcv": [
+        "fundamentals_balance"
+    ],
+    "fair_val_oth_inc_ncur": [
+        "fundamentals_balance"
+    ],
+    "ind_acct_liab": [
+        "fundamentals_balance"
+    ],
+    "oth_ncur_fin_ast": [
+        "fundamentals_balance"
+    ],
+    "cptl_bio_ast": [
+        "fundamentals_balance"
+    ],
+    "spcl_rsv": [
+        "fundamentals_balance"
+    ],
+    "deriv_fin_ast": [
+        "fundamentals_balance"
+    ],
+    "cur_ast_oth_item": [
+        "fundamentals_balance"
+    ],
+    "dvd_rcv": [
+        "fundamentals_balance"
+    ],
+    "bnd_pay_pfd": [
+        "fundamentals_balance"
+    ],
+    "note_pay": [
+        "fundamentals_balance"
+    ],
+    "ln_fm_ob": [
+        "fundamentals_balance"
+    ],
+    "oth_eqy_pfd": [
+        "fundamentals_balance"
+    ],
+    "stlf_pay": [
+        "fundamentals_balance"
+    ],
+    "agy_secu_trd": [
+        "fundamentals_balance"
+    ],
+    "fee_pay": [
+        "fundamentals_balance"
+    ],
+    "rfd_cap_guar_dpst": [
+        "fundamentals_balance"
+    ],
+    "inv_prop": [
+        "fundamentals_balance"
+    ],
+    "cust_rsv": [
+        "fundamentals_balance"
+    ],
+    "mny_cptl": [
+        "fundamentals_balance"
+    ],
+    "oth_eqy_inv": [
+        "fundamentals_balance"
+    ],
+    "dvd_pay": [
+        "fundamentals_balance"
+    ],
+    "trd_fin_liab": [
+        "fundamentals_balance"
+    ],
+    "int_rcv": [
+        "fundamentals_balance"
+    ],
+    "fair_val_fin_liab": [
+        "fundamentals_balance"
+    ],
+    "un_prem_rsv": [
+        "fundamentals_balance"
+    ],
+    "oth_comp_inc": [
+        "fundamentals_balance"
+    ],
+    "intg_ast": [
+        "fundamentals_balance"
+    ],
+    "rin_acct_pay": [
+        "fundamentals_balance"
+    ],
+    "in_contr_rsv": [
+        "fundamentals_balance"
+    ],
+    "note_rcv": [
+        "fundamentals_balance"
+    ],
+    "lt_eqy_inv": [
+        "fundamentals_balance"
+    ],
+    "lt_ppay_exp": [
+        "fundamentals_balance"
+    ],
+    "ind_acct_ast": [
+        "fundamentals_balance"
+    ],
+    "rcv_clm_rin_rsv": [
+        "fundamentals_balance"
+    ],
+    "acct_rcv_inv": [
+        "fundamentals_balance"
+    ],
+    "rin_acct_rcv": [
+        "fundamentals_balance"
+    ],
+    "treas_shr": [
+        "fundamentals_balance"
+    ],
+    "agy_secu_uw": [
+        "fundamentals_balance"
+    ],
+    "emp_comp_pay": [
+        "fundamentals_balance"
+    ],
+    "trd_fin_ast": [
+        "fundamentals_balance"
+    ],
+    "rcv_un_prem_rin_rsv": [
+        "fundamentals_balance"
+    ],
+    "ttl_cur_ast": [
+        "fundamentals_balance"
+    ],
+    "note_acct_rcv": [
+        "fundamentals_balance"
+    ],
+    "ppay": [
+        "fundamentals_balance"
+    ],
+    "tax_pay": [
+        "fundamentals_balance"
+    ],
+    "ttl_oth_pay": [
+        "fundamentals_balance"
+    ],
+    "pm": [
+        "fundamentals_balance"
+    ],
+    "in_prem_rcv_adv": [
+        "fundamentals_balance"
+    ],
+    "in_prem_rcv": [
+        "fundamentals_balance"
+    ],
+    "leas_liab": [
+        "fundamentals_balance"
+    ],
+    "note_acct_pay": [
+        "fundamentals_balance"
+    ],
+    "rcv_li_rin_rsv": [
+        "fundamentals_balance"
+    ],
+    "const_prog": [
+        "fundamentals_balance"
+    ],
+    "oth_eqy": [
+        "fundamentals_balance"
+    ],
+    "dfr_inc": [
+        "fundamentals_balance"
+    ],
+    "pur_resell_fin": [
+        "fundamentals_balance"
+    ],
+    "spcl_pay": [
+        "fundamentals_balance"
+    ],
+    "est_liab": [
+        "fundamentals_balance"
+    ],
+    "est_cur_liab": [
+        "fundamentals_balance"
+    ],
+    "oth_cur_ast": [
+        "fundamentals_balance"
+    ],
+    "acct_rcv_adv": [
+        "fundamentals_balance"
+    ],
+    "ttl_liab": [
+        "fundamentals_balance"
+    ],
+    "fix_ast": [
+        "fundamentals_balance"
+    ],
+    "ttl_ncur_liab": [
+        "fundamentals_balance"
+    ],
+    "loan_adv": [
+        "fundamentals_balance"
+    ],
+    "oth_eqy_oth": [
+        "fundamentals_balance"
+    ],
+    "contr_ast": [
+        "fundamentals_balance"
+    ],
+    "cust_bnk_dpst_fin": [
+        "fundamentals_balance"
+    ],
+    "ph_dvd_pay": [
+        "fundamentals_balance",
+        "fundamentals_cashflow"
+    ],
+    "ttl_liab_eqy": [
+        "fundamentals_balance"
+    ],
+    "ast_oth_item": [
+        "fundamentals_balance"
+    ],
+    "acct_rcv_fin": [
+        "fundamentals_balance"
+    ],
+    "ttl_eqy": [
+        "fundamentals_balance"
+    ],
+    "rpt_type": [
+        "fundamentals_balance",
+        "fundamentals_cashflow",
+        "fundamentals_income"
+    ],
+    "clm_rin_rsv": [
+        "fundamentals_balance"
+    ],
+    "oth_cur_liab": [
+        "fundamentals_balance"
+    ],
+    "dfr_tax_ast": [
+        "fundamentals_balance"
+    ],
+    "rfd_dpst": [
+        "fundamentals_balance"
+    ],
+    "htm_inv": [
+        "fundamentals_balance"
+    ],
+    "sht_bnd_pay": [
+        "fundamentals_balance"
+    ],
+    "gw": [
+        "fundamentals_balance"
+    ],
+    "lt_hi_liab_rsv": [
+        "fundamentals_balance"
+    ],
+    "lt_pay": [
+        "fundamentals_balance"
+    ],
+    "oth_eqy_pbd": [
+        "fundamentals_balance"
+    ],
+    "hold_for_sale": [
+        "fundamentals_balance"
+    ],
+    "sugg_dvd": [
+        "fundamentals_balance"
+    ],
+    "rin_rsv_rcv": [
+        "fundamentals_balance"
+    ],
+    "rsv_ord_rsk": [
+        "fundamentals_balance"
+    ],
+    "cash_bal_cb": [
+        "fundamentals_balance"
+    ],
+    "ttl_cur_liab": [
+        "fundamentals_balance"
+    ],
+    "paid_in_cptl": [
+        "fundamentals_balance"
+    ],
+    "ncur_liab_one_y": [
+        "fundamentals_balance"
+    ],
+    "lt_emp_comp_pay": [
+        "fundamentals_balance"
+    ],
+    "liab_oth_item": [
+        "fundamentals_balance"
+    ],
+    "deriv_fin_liab": [
+        "fundamentals_balance"
+    ],
+    "dpst_ob": [
+        "fundamentals_balance"
+    ],
+    "dpst_cb_note_pay": [
+        "fundamentals_balance"
+    ],
+    "cptl_rsv": [
+        "fundamentals_balance"
+    ],
+    "ttl_oth_rcv": [
+        "fundamentals_balance"
+    ],
+    "ttl_ncur_ast": [
+        "fundamentals_balance"
+    ],
+    "dpst_ob_fin_inst": [
+        "fundamentals_balance"
+    ],
+    "sht_ln": [
+        "fundamentals_balance"
+    ],
+    "sell_repo_ast": [
+        "fundamentals_balance"
+    ],
+    "ln_to_ob": [
+        "fundamentals_balance"
+    ],
+    "ttl_eqy_pcom": [
+        "fundamentals_balance"
+    ],
+    "oth_cred_inv": [
+        "fundamentals_balance"
+    ],
+    "oth_liab": [
+        "fundamentals_balance"
+    ],
+    "cred_inv": [
+        "fundamentals_balance"
+    ],
+    "oth_ncur_liab": [
+        "fundamentals_balance"
+    ],
+    "cust_dpst": [
+        "fundamentals_balance"
+    ],
+    "eqy_pcom_oth_item": [
+        "fundamentals_balance"
+    ],
+    "ncur_liab_oth_item": [
+        "fundamentals_balance"
+    ],
+    "contr_liab": [
+        "fundamentals_balance"
+    ],
+    "ph_dpst_inv": [
+        "fundamentals_balance"
+    ],
+    "oil_gas_ast": [
+        "fundamentals_balance"
+    ],
+    "dev_exp": [
+        "fundamentals_balance"
+    ],
+    "sur_rsv": [
+        "fundamentals_balance"
+    ],
+    "cust_bnk_dpst": [
+        "fundamentals_balance"
+    ],
+    "amor_cos_fin_ast_ncur": [
+        "fundamentals_balance"
+    ],
+    "brw_cb": [
+        "fundamentals_balance"
+    ],
+    "trd_risk_rsv": [
+        "fundamentals_balance"
+    ],
+    "dfr_tax_liab": [
+        "fundamentals_balance"
+    ],
+    "sheqy_oth_item": [
+        "fundamentals_balance"
+    ],
+    "fair_val_fin_ast": [
+        "fundamentals_balance"
+    ],
+    "rig_ast": [
+        "fundamentals_balance"
+    ],
+    "ttl_ast": [
+        "fundamentals_balance"
+    ],
+    "net_cash_pay_sell_repo": [
+        "fundamentals_cashflow"
+    ],
+    "net_decr_trd_liab": [
+        "fundamentals_cashflow"
+    ],
+    "net_cash_rcv_sell_repo": [
+        "fundamentals_cashflow"
+    ],
+    "net_incr_plge_ln": [
+        "fundamentals_cashflow"
+    ],
+    "net_decr_dpst_ob": [
+        "fundamentals_cashflow"
+    ],
+    "cptl_bnd_expr_one_y": [
+        "fundamentals_cashflow"
+    ],
+    "accr_prvs_oth_impa": [
+        "fundamentals_cashflow"
+    ],
+    "depr_oga_cba": [
+        "fundamentals_cashflow"
+    ],
+    "net_cash_rcv_trd": [
+        "fundamentals_cashflow"
+    ],
+    "net_decr_ln_cptl": [
+        "fundamentals_cashflow"
+    ],
+    "add_cash_pled_dpst": [
+        "fundamentals_cashflow"
+    ],
+    "invt_decr": [
+        "fundamentals_cashflow"
+    ],
+    "cash_rcv_oth_fin": [
+        "fundamentals_cashflow"
+    ],
+    "cash_rcv_dspl_sub_oth": [
+        "fundamentals_cashflow"
+    ],
+    "cash_pay_emp": [
+        "fundamentals_cashflow"
+    ],
+    "cash_cash_eq_bgn": [
+        "fundamentals_cashflow"
+    ],
+    "cf_out_inv": [
+        "fundamentals_cashflow"
+    ],
+    "cash_rcv_bnd_iss": [
+        "fundamentals_cashflow"
+    ],
+    "cash_out_dspl_sub_oth": [
+        "fundamentals_cashflow"
+    ],
+    "cash_cash_eq_end": [
+        "fundamentals_cashflow"
+    ],
+    "amort_lt_exp_ppay": [
+        "fundamentals_cashflow"
+    ],
+    "net_decr_sell_repo": [
+        "fundamentals_cashflow"
+    ],
+    "net_decrdpst_cb_ob": [
+        "fundamentals_cashflow"
+    ],
+    "fin_exp": [
+        "fundamentals_cashflow"
+    ],
+    "defr_fix_prop": [
+        "fundamentals_cashflow"
+    ],
+    "cash_rpay_brw": [
+        "fundamentals_cashflow"
+    ],
+    "net_decr_ln_fm": [
+        "fundamentals_cashflow"
+    ],
+    "net_incr_ln_adv_cust": [
+        "fundamentals_cashflow"
+    ],
+    "cash_pay_oth_fin": [
+        "fundamentals_cashflow"
+    ],
+    "cash_rcv_dspl_debt": [
+        "fundamentals_cashflow"
+    ],
+    "cash_pay_oth_inv": [
+        "fundamentals_cashflow"
+    ],
+    "sub_pay_dvd_prof": [
+        "fundamentals_cashflow"
+    ],
+    "cash_rcv_int_fee": [
+        "fundamentals_cashflow"
+    ],
+    "cash_rcv_oth_oper": [
+        "fundamentals_cashflow"
+    ],
+    "accr_unearn_prem_rsv": [
+        "fundamentals_cashflow"
+    ],
+    "tax_rbt_rcv": [
+        "fundamentals_cashflow"
+    ],
+    "net_cf_oper": [
+        "fundamentals_cashflow"
+    ],
+    "cash_pay_int_fee": [
+        "fundamentals_cashflow"
+    ],
+    "accr_prvs_ln_impa": [
+        "fundamentals_cashflow"
+    ],
+    "net_incr_ob_fin_inst": [
+        "fundamentals_cashflow"
+    ],
+    "cash_rcv_pur_resell": [
+        "fundamentals_cashflow"
+    ],
+    "cf_in_inv": [
+        "fundamentals_cashflow"
+    ],
+    "cash_eq_bgn": [
+        "fundamentals_cashflow"
+    ],
+    "dfr_tax_ast_decr": [
+        "fundamentals_cashflow"
+    ],
+    "cash_pay_dvd_int": [
+        "fundamentals_cashflow"
+    ],
+    "canc_loan_rcv": [
+        "fundamentals_cashflow"
+    ],
+    "amor_intg_ast_lt_exp": [
+        "fundamentals_cashflow"
+    ],
+    "net_cash_agy_secu_uw": [
+        "fundamentals_cashflow"
+    ],
+    "accr_prem_rsv": [
+        "fundamentals_cashflow"
+    ],
+    "net_decr_dspl_trd_fin": [
+        "fundamentals_cashflow"
+    ],
+    "net_prof": [
+        "fundamentals_cashflow",
+        "fundamentals_income"
+    ],
+    "net_decr_ob_fin_inst": [
+        "fundamentals_cashflow"
+    ],
+    "net_incr_dspl_trd_fin": [
+        "fundamentals_cashflow"
+    ],
+    "net_incr_brw_cb": [
+        "fundamentals_cashflow"
+    ],
+    "cash_rcv_orig_in": [
+        "fundamentals_cashflow"
+    ],
+    "cash_pay_inv": [
+        "fundamentals_cashflow"
+    ],
+    "amort_intg_ast": [
+        "fundamentals_cashflow"
+    ],
+    "cash_pay_oth_oper": [
+        "fundamentals_cashflow"
+    ],
+    "net_cert_dpst": [
+        "fundamentals_cashflow"
+    ],
+    "fv_chg_loss": [
+        "fundamentals_cashflow"
+    ],
+    "cash_pay_bnd_int": [
+        "fundamentals_cashflow"
+    ],
+    "net_incr_dpst_ob": [
+        "fundamentals_cashflow"
+    ],
+    "dfr_tax": [
+        "fundamentals_cashflow"
+    ],
+    "ast_impr": [
+        "fundamentals_cashflow"
+    ],
+    "net_cash_agy_secu_trd": [
+        "fundamentals_cashflow"
+    ],
+    "net_dect_pur_resell": [
+        "fundamentals_cashflow"
+    ],
+    "cash_rcv_int": [
+        "fundamentals_cashflow"
+    ],
+    "net_incr_cust_dpst": [
+        "fundamentals_cashflow"
+    ],
+    "cf_out_fin": [
+        "fundamentals_cashflow"
+    ],
+    "net_incr_cust_dpst_ob": [
+        "fundamentals_cashflow"
+    ],
+    "cash_rcv_cptl": [
+        "fundamentals_cashflow"
+    ],
+    "pur_fix_intg_ast": [
+        "fundamentals_cashflow"
+    ],
+    "net_incr_trd_liab": [
+        "fundamentals_cashflow"
+    ],
+    "cash_rcv_oth_inv": [
+        "fundamentals_cashflow"
+    ],
+    "oth": [
+        "fundamentals_cashflow"
+    ],
+    "net_cash_pay_trd": [
+        "fundamentals_cashflow"
+    ],
+    "net_incr_ln_fm": [
+        "fundamentals_cashflow"
+    ],
+    "net_decr_lnto_pur_resell": [
+        "fundamentals_cashflow"
+    ],
+    "net_decr_trd_fin": [
+        "fundamentals_cashflow"
+    ],
+    "fin_ls_fix_ast": [
+        "fundamentals_cashflow"
+    ],
+    "net_incr_lnto_pur_resell": [
+        "fundamentals_cashflow"
+    ],
+    "net_incr_ph_plge_ln": [
+        "fundamentals_cashflow"
+    ],
+    "issu_cert_dpst": [
+        "fundamentals_cashflow"
+    ],
+    "cash_rcv_dvd_prof": [
+        "fundamentals_cashflow"
+    ],
+    "net_cf_inv": [
+        "fundamentals_cashflow"
+    ],
+    "cash_pur_gds_svc": [
+        "fundamentals_cashflow"
+    ],
+    "cash_eq_end": [
+        "fundamentals_cashflow"
+    ],
+    "net_cash_rcv_rin_biz": [
+        "fundamentals_cashflow"
+    ],
+    "inv_inc_rcv": [
+        "fundamentals_cashflow"
+    ],
+    "net_incr_ph_dpst_inv": [
+        "fundamentals_cashflow"
+    ],
+    "inv_loss": [
+        "fundamentals_cashflow"
+    ],
+    "net_incr_ln_to": [
+        "fundamentals_cashflow"
+    ],
+    "efct_er_chg_cash": [
+        "fundamentals_cashflow"
+    ],
+    "net_decr_repo": [
+        "fundamentals_cashflow"
+    ],
+    "cash_pay_int": [
+        "fundamentals_cashflow"
+    ],
+    "net_pay_pur_resell": [
+        "fundamentals_cashflow"
+    ],
+    "cf_in_fin_oth": [
+        "fundamentals_cashflow"
+    ],
+    "cash_pay_indem_orig": [
+        "fundamentals_cashflow"
+    ],
+    "cf_in_fin": [
+        "fundamentals_cashflow"
+    ],
+    "brw_rcv": [
+        "fundamentals_cashflow"
+    ],
+    "cash_rcv_fee": [
+        "fundamentals_cashflow"
+    ],
+    "net_incr_lnfm_sell_repo": [
+        "fundamentals_cashflow"
+    ],
+    "decr_rcv_oper": [
+        "fundamentals_cashflow"
+    ],
+    "net_cash_pay_rin_biz": [
+        "fundamentals_cashflow"
+    ],
+    "sub_rcv_ms_inv": [
+        "fundamentals_cashflow"
+    ],
+    "cred_impr_loss": [
+        "fundamentals_cashflow",
+        "fundamentals_income"
+    ],
+    "net_decr_lnfm_sell_repo": [
+        "fundamentals_cashflow"
+    ],
+    "net_incr_cb": [
+        "fundamentals_cashflow"
+    ],
+    "dspl_ast_loss": [
+        "fundamentals_cashflow"
+    ],
+    "est_liab_add": [
+        "fundamentals_cashflow"
+    ],
+    "net_incr_repo": [
+        "fundamentals_cashflow"
+    ],
+    "cash_bgn": [
+        "fundamentals_cashflow"
+    ],
+    "cash_rcv_sale": [
+        "fundamentals_cashflow"
+    ],
+    "dfa": [
+        "fundamentals_cashflow"
+    ],
+    "net_incr_ln_fm_oth": [
+        "fundamentals_cashflow"
+    ],
+    "net_decr_ph_dpst_inv": [
+        "fundamentals_cashflow"
+    ],
+    "cash_rcv_dspl_ast": [
+        "fundamentals_cashflow"
+    ],
+    "cash_pay_fee": [
+        "fundamentals_cashflow"
+    ],
+    "dr_cnv_cptl": [
+        "fundamentals_cashflow"
+    ],
+    "amort_dfr_inc": [
+        "fundamentals_cashflow"
+    ],
+    "cash_pay_tax": [
+        "fundamentals_cashflow"
+    ],
+    "incr_pay_oper": [
+        "fundamentals_cashflow"
+    ],
+    "dfr_tax_liab_incr": [
+        "fundamentals_cashflow"
+    ],
+    "net_incr_cash_eq": [
+        "fundamentals_cashflow"
+    ],
+    "net_incr_sell_repo": [
+        "fundamentals_cashflow"
+    ],
+    "net_incr_trd_fin": [
+        "fundamentals_cashflow"
+    ],
+    "net_decr_agy_secu_pay": [
+        "fundamentals_cashflow"
+    ],
+    "depr_inv_prop": [
+        "fundamentals_cashflow"
+    ],
+    "net_decr_brw_cb": [
+        "fundamentals_cashflow"
+    ],
+    "cash_rcv_sale_inv": [
+        "fundamentals_cashflow"
+    ],
+    "net_cf_fin": [
+        "fundamentals_cashflow"
+    ],
+    "cf_in_oper": [
+        "fundamentals_cashflow"
+    ],
+    "fair_val_chg_loss": [
+        "fundamentals_cashflow"
+    ],
+    "exchg_loss": [
+        "fundamentals_cashflow"
+    ],
+    "cf_out_oper": [
+        "fundamentals_cashflow"
+    ],
+    "net_decr_cb": [
+        "fundamentals_cashflow"
+    ],
+    "cash_pay_bnd_int_iss": [
+        "fundamentals_cashflow"
+    ],
+    "cash_pay_fin_leas": [
+        "fundamentals_cashflow"
+    ],
+    "cash_end": [
+        "fundamentals_cashflow"
+    ],
+    "dest_incr": [
+        "fundamentals_cashflow"
+    ],
+    "net_cash_get_sub": [
+        "fundamentals_cashflow"
+    ],
+    "net_incr_dpst_cb_ob": [
+        "fundamentals_cashflow"
+    ],
+    "loan_decr": [
+        "fundamentals_cashflow"
+    ],
+    "net_incr_pur_resell": [
+        "fundamentals_cashflow"
+    ],
+    "net_decr_issu_cert_dpst": [
+        "fundamentals_cashflow"
+    ],
+    "amod_fin_asst_end": [
+        "fundamentals_income"
+    ],
+    "net_prof_other": [
+        "fundamentals_income"
+    ],
+    "inc_fee_comm": [
+        "fundamentals_income"
+    ],
+    "exp_fin": [
+        "fundamentals_income"
+    ],
+    "cost_oper": [
+        "fundamentals_income"
+    ],
+    "inc_other": [
+        "fundamentals_income"
+    ],
+    "exp_noper": [
+        "fundamentals_income"
+    ],
+    "net_inc_uw": [
+        "fundamentals_income"
+    ],
+    "inc_oper": [
+        "fundamentals_income"
+    ],
+    "ttl_comp_inc_pcom": [
+        "fundamentals_income"
+    ],
+    "exp_fee_comm": [
+        "fundamentals_income"
+    ],
+    "end_net_prof": [
+        "fundamentals_income"
+    ],
+    "net_inc_secu_agy": [
+        "fundamentals_income"
+    ],
+    "net_loss_ncur_ast": [
+        "fundamentals_income"
+    ],
+    "other_comp_inc": [
+        "fundamentals_income"
+    ],
+    "ttl_prof": [
+        "fundamentals_income"
+    ],
+    "other_comp_inc_pcom": [
+        "fundamentals_income"
+    ],
+    "cur_trans_diff": [
+        "fundamentals_income"
+    ],
+    "comp_pay": [
+        "fundamentals_income"
+    ],
+    "cash_flow_hedging_pl": [
+        "fundamentals_income"
+    ],
+    "oper_prof_other": [
+        "fundamentals_income"
+    ],
+    "inc_int": [
+        "fundamentals_income"
+    ],
+    "inc_ast_dspl": [
+        "fundamentals_income"
+    ],
+    "unear_prem_rsv": [
+        "fundamentals_income"
+    ],
+    "inc_tax": [
+        "fundamentals_income"
+    ],
+    "inc_fv_chg": [
+        "fundamentals_income"
+    ],
+    "exp_ph_dvd": [
+        "fundamentals_income"
+    ],
+    "ttl_cost_oper": [
+        "fundamentals_income"
+    ],
+    "exp_oper": [
+        "fundamentals_income"
+    ],
+    "net_prof_pcom": [
+        "fundamentals_income"
+    ],
+    "oper_prof": [
+        "fundamentals_income"
+    ],
+    "inc_oper_balance": [
+        "fundamentals_income"
+    ],
+    "oper_net_prof": [
+        "fundamentals_income"
+    ],
+    "exp_oper_adm": [
+        "fundamentals_income"
+    ],
+    "ttl_prof_balance": [
+        "fundamentals_income"
+    ],
+    "afs_fv_chg_pl": [
+        "fundamentals_income"
+    ],
+    "rfd_prem": [
+        "fundamentals_income"
+    ],
+    "inc_in_biz": [
+        "fundamentals_income"
+    ],
+    "eps_base": [
+        "fundamentals_income"
+    ],
+    "exp_int": [
+        "fundamentals_income"
+    ],
+    "exp_rd": [
+        "fundamentals_income"
+    ],
+    "oper_exp_balance": [
+        "fundamentals_income"
+    ],
+    "biz_tax_sur": [
+        "fundamentals_income"
+    ],
+    "ast_impr_loss": [
+        "fundamentals_income"
+    ],
+    "min_int_inc": [
+        "fundamentals_income"
+    ],
+    "oper_prof_balance": [
+        "fundamentals_income"
+    ],
+    "exp_oper_other": [
+        "fundamentals_income"
+    ],
+    "net_inc_int": [
+        "fundamentals_income"
+    ],
+    "inc_rin_prem": [
+        "fundamentals_income"
+    ],
+    "net_pay_comp": [
+        "fundamentals_income"
+    ],
+    "inc_inv": [
+        "fundamentals_income"
+    ],
+    "inc_noper": [
+        "fundamentals_income"
+    ],
+    "other_comp_inc_min": [
+        "fundamentals_income"
+    ],
+    "ttl_inc_oper_other": [
+        "fundamentals_income"
+    ],
+    "ttl_comp_inc_min": [
+        "fundamentals_income"
+    ],
+    "eps_dil": [
+        "fundamentals_income"
+    ],
+    "exp_sell": [
+        "fundamentals_income"
+    ],
+    "exp_rin": [
+        "fundamentals_income"
+    ],
+    "in_prem_earn": [
+        "fundamentals_income"
+    ],
+    "draw_insur_liab": [
+        "fundamentals_income"
+    ],
+    "other_oper_cost": [
+        "fundamentals_income"
+    ],
+    "ttl_cost_oper_other": [
+        "fundamentals_income"
+    ],
+    "int_fee": [
+        "fundamentals_income"
+    ],
+    "inv_inv_jv_p": [
+        "fundamentals_income"
+    ],
+    "inc_fx": [
+        "fundamentals_income"
+    ],
+    "amor_insur_liab": [
+        "fundamentals_income"
+    ],
+    "net_inc_cust_ast_mgmt": [
+        "fundamentals_income"
+    ],
+    "gain_ncur_ast": [
+        "fundamentals_income"
+    ],
+    "rin_prem_cede": [
+        "fundamentals_income"
+    ],
+    "inc_other_oper": [
+        "fundamentals_income"
+    ],
+    "ttl_comp_inc": [
+        "fundamentals_income"
+    ],
+    "exp_adm": [
+        "fundamentals_income"
+    ],
+    "prof_pre_merge": [
+        "fundamentals_income"
+    ],
+    "net_rsv_in_contr": [
+        "fundamentals_income"
+    ],
+    "net_inc_fee_comm": [
+        "fundamentals_income"
+    ],
+    "rin_clm_pay": [
+        "fundamentals_income"
+    ],
+    "ttl_inc_oper": [
+        "fundamentals_income"
+    ],
+    "company_name": [
+        "share_change"
+    ],
+    "chg_date": [
+        "share_change"
+    ],
+    "chg_reason": [
+        "share_change"
+    ],
+    "chg_event": [
+        "share_change"
+    ],
+    "share_total": [
+        "share_change"
+    ],
+    "share_circ": [
+        "share_change"
+    ],
+    "share_ttl_unl": [
+        "share_change"
+    ],
+    "share_a_unl": [
+        "share_change"
+    ],
+    "share_list_date": [
+        "share_change"
+    ],
+    "share_total_nlf": [
+        "share_change"
+    ],
+    "share_prom": [
+        "share_change"
+    ],
+    "share_prom_state": [
+        "share_change"
+    ],
+    "share_state": [
+        "share_change"
+    ],
+    "share_state_lp": [
+        "share_change"
+    ],
+    "share_prom_soc": [
+        "share_change"
+    ],
+    "share_dc_lp": [
+        "share_change"
+    ],
+    "share_os_lp": [
+        "share_change"
+    ],
+    "share_prom_other": [
+        "share_change"
+    ],
+    "share_rs": [
+        "share_change"
+    ],
+    "share_rs_state": [
+        "share_change"
+    ],
+    "share_rs_dc_lp": [
+        "share_change"
+    ],
+    "share_rs_state_lp": [
+        "share_change"
+    ],
+    "share_rs_soc_lp": [
+        "share_change"
+    ],
+    "share_rs_os_lp": [
+        "share_change"
+    ],
+    "share_emp_nlf": [
+        "share_change"
+    ],
+    "share_pfd_nlf": [
+        "share_change"
+    ],
+    "share_oth_nlf": [
+        "share_change"
+    ],
+    "share_b_unl": [
+        "share_change"
+    ],
+    "share_h_unl": [
+        "share_change"
+    ],
+    "share_oth_unl": [
+        "share_change"
+    ],
+    "share_ttl_ltd": [
+        "share_change"
+    ],
+    "share_gen_ltd": [
+        "share_change"
+    ],
+    "share_state_ltd": [
+        "share_change"
+    ],
+    "share_state_lp_ltd": [
+        "share_change"
+    ],
+    "share_oth_dc_ltd": [
+        "share_change"
+    ],
+    "share_nst_dc_lp_ltd": [
+        "share_change"
+    ],
+    "share_dc_np_ltd": [
+        "share_change"
+    ],
+    "share_forn_ltd": [
+        "share_change"
+    ],
+    "share_os_lp_ltd": [
+        "share_change"
+    ],
+    "share_os_np_ltd": [
+        "share_change"
+    ],
+    "share_lk_ltd": [
+        "share_change"
+    ],
+    "share_gm_ltd": [
+        "share_change"
+    ],
+    "share_plc_lp_ltd": [
+        "share_change"
+    ],
+    "share_plc_si_ltd": [
+        "share_change"
+    ],
+    "share_plc_lp_gen_ltd": [
+        "share_change"
+    ],
+    "share_plc_fnd_ltd": [
+        "share_change"
+    ],
+    "share_a_ltd": [
+        "share_change"
+    ],
+    "share_b_ltd": [
+        "share_change"
+    ],
+    "share_h_ltd": [
+        "share_change"
+    ],
+    "share_oth_ltd": [
+        "share_change"
+    ],
+    "frequency": [
+        "gmData_history"
+    ],
+    "turn_rate": [
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "is_st": [
+        "gmData_bench_price",
+        "future_daily"
+    ],
+    "PSTTM": [
+        "trading_derivative_indicator"
+    ],
+    "DY": [
+        "trading_derivative_indicator"
+    ],
+    "TCLOSE": [
+        "trading_derivative_indicator"
+    ],
+    "PELFY": [
+        "trading_derivative_indicator"
+    ],
+    "EVPS": [
+        "trading_derivative_indicator"
+    ],
+    "PSLFY": [
+        "trading_derivative_indicator"
+    ],
+    "PELFYNPAAEI": [
+        "trading_derivative_indicator"
+    ],
+    "TURNRATE": [
+        "trading_derivative_indicator"
+    ],
+    "PEMRQNPAAEI": [
+        "trading_derivative_indicator"
+    ],
+    "PETTM": [
+        "trading_derivative_indicator"
+    ],
+    "PEMRQ": [
+        "trading_derivative_indicator"
+    ],
+    "PETTMNPAAEI": [
+        "trading_derivative_indicator"
+    ],
+    "PCTTM": [
+        "trading_derivative_indicator"
+    ],
+    "LYDY": [
+        "trading_derivative_indicator"
+    ],
+    "PSMRQ": [
+        "trading_derivative_indicator"
+    ],
+    "PCLFY": [
+        "trading_derivative_indicator"
+    ],
+    "CASHCONVCYCLE": [
+        "deriv_finance_indicator"
+    ],
+    "NPTONOCONMS": [
+        "deriv_finance_indicator"
+    ],
+    "COMPDEPRT": [
+        "deriv_finance_indicator"
+    ],
+    "CAPEXTODEPANDAMOR": [
+        "deriv_finance_indicator"
+    ],
+    "CAPIMORTCONMS": [
+        "deriv_finance_indicator"
+    ],
+    "EQUTOFA": [
+        "deriv_finance_indicator"
+    ],
+    "OPNCFTONDABT": [
+        "deriv_finance_indicator"
+    ],
+    "SCASHREVTOOPIRT": [
+        "deriv_finance_indicator"
+    ],
+    "ROEBYMINNPORNPCUT": [
+        "deriv_finance_indicator"
+    ],
+    "NPTOAVGTA": [
+        "deriv_finance_indicator"
+    ],
+    "EQUCONMS": [
+        "deriv_finance_indicator"
+    ],
+    "PROTOTCRT": [
+        "deriv_finance_indicator"
+    ],
+    "ROTA": [
+        "deriv_finance_indicator"
+    ],
+    "ROEDILUTED": [
+        "deriv_finance_indicator"
+    ],
+    "TRIEXP": [
+        "deriv_finance_indicator"
+    ],
+    "ROAAANNUAL": [
+        "deriv_finance_indicator"
+    ],
+    "EQUTURNRTCONMS": [
+        "deriv_finance_indicator"
+    ],
+    "QUICKRT": [
+        "deriv_finance_indicator"
+    ],
+    "FATURNRT": [
+        "deriv_finance_indicator"
+    ],
+    "OPNCFTOCAPEX": [
+        "deriv_finance_indicator"
+    ],
+    "OPPROTOTCRT": [
+        "deriv_finance_indicator"
+    ],
+    "SHTLIABTOTLIABRT": [
+        "deriv_finance_indicator"
+    ],
+    "EQUTOICCONMS": [
+        "deriv_finance_indicator"
+    ],
+    "TDEBTTOICCONMS": [
+        "deriv_finance_indicator"
+    ],
+    "SCOSTRT": [
+        "deriv_finance_indicator"
+    ],
+    "FAPRORT": [
+        "deriv_finance_indicator"
+    ],
+    "INCOTAXTOTP": [
+        "deriv_finance_indicator"
+    ],
+    "TDEBTTOFART": [
+        "deriv_finance_indicator"
+    ],
+    "NPGRT": [
+        "deriv_finance_indicator"
+    ],
+    "OPCYCLE": [
+        "deriv_finance_indicator"
+    ],
+    "LOANLOSSRESTOTLOANRT": [
+        "deriv_finance_indicator"
+    ],
+    "LTMASSRT": [
+        "deriv_finance_indicator"
+    ],
+    "TDTOEBITDA": [
+        "deriv_finance_indicator"
+    ],
+    "NAPS": [
+        "deriv_finance_indicator"
+    ],
+    "NVALCHGITOTP": [
+        "deriv_finance_indicator"
+    ],
+    "EPSDILUTEDNEWP": [
+        "deriv_finance_indicator"
+    ],
+    "OPNCFTONPCONMS": [
+        "deriv_finance_indicator"
+    ],
+    "TAAVG": [
+        "deriv_finance_indicator"
+    ],
+    "TRIEXPTOTOPI": [
+        "deriv_finance_indicator"
+    ],
+    "TANGASSTOTA": [
+        "deriv_finance_indicator"
+    ],
+    "NFART": [
+        "deriv_finance_indicator"
+    ],
+    "OPPRORT": [
+        "deriv_finance_indicator"
+    ],
+    "SHTDEBT": [
+        "deriv_finance_indicator"
+    ],
+    "ROEANNUAL": [
+        "deriv_finance_indicator"
+    ],
+    "OPNCFTONP": [
+        "deriv_finance_indicator"
+    ],
+    "CAPPRORT": [
+        "deriv_finance_indicator"
+    ],
+    "OPNCFTOTNCF": [
+        "deriv_finance_indicator"
+    ],
+    "TCAP": [
+        "deriv_finance_indicator"
+    ],
+    "OPANCFTOOPNI": [
+        "deriv_finance_indicator"
+    ],
+    "CURASSTURNRT": [
+        "deriv_finance_indicator"
+    ],
+    "CASHOPINDEX": [
+        "deriv_finance_indicator"
+    ],
+    "TDEBTTOIC": [
+        "deriv_finance_indicator"
+    ],
+    "NONINTNONCURLIAB": [
+        "deriv_finance_indicator"
+    ],
+    "DPS": [
+        "deriv_finance_indicator"
+    ],
+    "OPREVTOCURASS": [
+        "deriv_finance_indicator"
+    ],
+    "LTMDEBT": [
+        "deriv_finance_indicator"
+    ],
+    "ROEDILUTEDCUT": [
+        "deriv_finance_indicator"
+    ],
+    "EQUTOIC": [
+        "deriv_finance_indicator"
+    ],
+    "OPNCFTODEPANDAMOR": [
+        "deriv_finance_indicator"
+    ],
+    "INTEXPCONCAPINT": [
+        "deriv_finance_indicator"
+    ],
+    "INVTOCURASSRT": [
+        "deriv_finance_indicator"
+    ],
+    "EQUTOTLIAB": [
+        "deriv_finance_indicator"
+    ],
+    "OPNCFTOSI": [
+        "deriv_finance_indicator"
+    ],
+    "EPSDILUTED": [
+        "deriv_finance_indicator"
+    ],
+    "TC": [
+        "deriv_finance_indicator"
+    ],
+    "OPNCFTOTA": [
+        "deriv_finance_indicator"
+    ],
+    "OPPTOTP": [
+        "deriv_finance_indicator"
+    ],
+    "ROEAVG": [
+        "deriv_finance_indicator"
+    ],
+    "NTANGASSTOTLIAB": [
+        "deriv_finance_indicator"
+    ],
+    "CONSVATQUICKRT": [
+        "deriv_finance_indicator"
+    ],
+    "NTANGA": [
+        "deriv_finance_indicator"
+    ],
+    "TAGRT": [
+        "deriv_finance_indicator"
+    ],
+    "TOTIC": [
+        "deriv_finance_indicator"
+    ],
+    "OPNCFTOLTMLIAB": [
+        "deriv_finance_indicator"
+    ],
+    "SNPMARGINCONMS": [
+        "deriv_finance_indicator"
+    ],
+    "CURLIABTOLTMLIABRT": [
+        "deriv_finance_indicator"
+    ],
+    "NAPSADJ": [
+        "deriv_finance_indicator"
+    ],
+    "TATURNDAYS": [
+        "deriv_finance_indicator"
+    ],
+    "OPGPMARGIN": [
+        "deriv_finance_indicator"
+    ],
+    "OPEXPRT": [
+        "deriv_finance_indicator"
+    ],
+    "ACCPAYTDAYS": [
+        "deriv_finance_indicator"
+    ],
+    "LTMLIABTOTA": [
+        "deriv_finance_indicator"
+    ],
+    "NPCONMSTOAVGTA": [
+        "deriv_finance_indicator"
+    ],
+    "TATURNRT": [
+        "deriv_finance_indicator"
+    ],
+    "OPNCFSHTINVETOSHTDEBT": [
+        "deriv_finance_indicator"
+    ],
+    "EBITDAPS": [
+        "deriv_finance_indicator"
+    ],
+    "WORKCAP": [
+        "deriv_finance_indicator"
+    ],
+    "MGTEXPRT": [
+        "deriv_finance_indicator"
+    ],
+    "OPNCFTOTLIAB": [
+        "deriv_finance_indicator"
+    ],
+    "CASHRT": [
+        "deriv_finance_indicator"
+    ],
+    "FATURNDAYS": [
+        "deriv_finance_indicator"
+    ],
+    "NPTOTP": [
+        "deriv_finance_indicator"
+    ],
+    "LTMLIABTOTACONMS": [
+        "deriv_finance_indicator"
+    ],
+    "NNONOPITOTP": [
+        "deriv_finance_indicator"
+    ],
+    "OPCAPTOTART": [
+        "deriv_finance_indicator"
+    ],
+    "EQURT": [
+        "deriv_finance_indicator"
+    ],
+    "ROAANNUAL": [
+        "deriv_finance_indicator"
+    ],
+    "OPNCFTOOPTI": [
+        "deriv_finance_indicator"
+    ],
+    "TPTOEBIT": [
+        "deriv_finance_indicator"
+    ],
+    "EM": [
+        "deriv_finance_indicator"
+    ],
+    "EBITSCOVER": [
+        "deriv_finance_indicator"
+    ],
+    "OPNCFTOTDEBT": [
+        "deriv_finance_indicator"
+    ],
+    "EMCONMS": [
+        "deriv_finance_indicator"
+    ],
+    "LTMLIABTOOPCAP": [
+        "deriv_finance_indicator"
+    ],
+    "OPNCFTOSHTDEBT": [
+        "deriv_finance_indicator"
+    ],
+    "INTEXPCUTCAPINT": [
+        "deriv_finance_indicator"
+    ],
+    "EBITTOTOPI": [
+        "deriv_finance_indicator"
+    ],
+    "EBITDATOTDEBT": [
+        "deriv_finance_indicator"
+    ],
+    "NPCUTTONP": [
+        "deriv_finance_indicator"
+    ],
+    "NAPSNEWP": [
+        "deriv_finance_indicator"
+    ],
+    "CURASSTURNDAYS": [
+        "deriv_finance_indicator"
+    ],
+    "LTMDEBTTOWORKCAP": [
+        "deriv_finance_indicator"
+    ],
+    "EPSDILUTEDOP": [
+        "deriv_finance_indicator"
+    ],
+    "NITOCURASS": [
+        "deriv_finance_indicator"
+    ],
+    "NTANGASSTONDEBT": [
+        "deriv_finance_indicator"
+    ],
+    "OPICFTOTICF": [
+        "deriv_finance_indicator"
+    ],
+    "EQUTOTDEBT": [
+        "deriv_finance_indicator"
+    ],
+    "OPNCFTOOPPRO": [
+        "deriv_finance_indicator"
+    ],
+    "LIQDVALUERT": [
+        "deriv_finance_indicator"
+    ],
+    "NOPCAPTURNRT": [
+        "deriv_finance_indicator"
+    ],
+    "INTCASHREVRT": [
+        "deriv_finance_indicator"
+    ],
+    "NTANGASSTOTDEBT": [
+        "deriv_finance_indicator"
+    ],
+    "EBITMARGIN": [
+        "deriv_finance_indicator"
+    ],
+    "NPCONMSTOTP": [
+        "deriv_finance_indicator"
+    ],
+    "EBITDASCOVER": [
+        "deriv_finance_indicator"
+    ],
+    "OPNCFTOINTEXP": [
+        "deriv_finance_indicator"
+    ],
+    "ROEAVGCUT": [
+        "deriv_finance_indicator"
+    ],
+    "EPSDILUTEDCUT": [
+        "deriv_finance_indicator"
+    ],
+    "ACCDEPRT": [
+        "deriv_finance_indicator"
+    ],
+    "LTMLIABTOEQU": [
+        "deriv_finance_indicator"
+    ],
+    "FINLEXPRT": [
+        "deriv_finance_indicator"
+    ],
+    "TRIEXPRT": [
+        "deriv_finance_indicator"
+    ],
+    "EQUTURNRT": [
+        "deriv_finance_indicator"
+    ],
+    "CURRENTRT": [
+        "deriv_finance_indicator"
+    ],
+    "TCEXPRT": [
+        "deriv_finance_indicator"
+    ],
+    "SGPMARGIN": [
+        "deriv_finance_indicator"
+    ],
+    "FAPROPORTION": [
+        "deriv_finance_indicator"
+    ],
+    "NDEBTTOEQU": [
+        "deriv_finance_indicator"
+    ],
+    "EBITDAMARGIN": [
+        "deriv_finance_indicator"
+    ],
+    "ACCUDEPR": [
+        "balance_sheet"
+    ],
+    "LOGPREPEXPE": [
+        "balance_sheet"
+    ],
+    "DEPOSIT": [
+        "balance_sheet"
+    ],
+    "SETTRESEDEPO": [
+        "balance_sheet"
+    ],
+    "PURCRESAASSET": [
+        "balance_sheet"
+    ],
+    "SMERGERNONCASSE": [
+        "balance_sheet"
+    ],
+    "EXPECURRLIAB": [
+        "balance_sheet"
+    ],
+    "SUNEVENRIGHAGGR": [
+        "balance_sheet"
+    ],
+    "CAPISURP": [
+        "balance_sheet"
+    ],
+    "EQUIINVE": [
+        "balance_sheet"
+    ],
+    "DOMETICKSETT": [
+        "balance_sheet"
+    ],
+    "SFORMATTOTASSET": [
+        "balance_sheet"
+    ],
+    "SFORMATCURRASSE": [
+        "balance_sheet"
+    ],
+    "FIXEDASSENET": [
+        "balance_sheet"
+    ],
+    "TOPAYCASHDIVI": [
+        "balance_sheet"
+    ],
+    "OCL": [
+        "balance_sheet"
+    ],
+    "ACCHELDFORS": [
+        "balance_sheet"
+    ],
+    "HYDRASSET": [
+        "balance_sheet"
+    ],
+    "GENERISKRESE": [
+        "balance_sheet"
+    ],
+    "REINRECE": [
+        "balance_sheet"
+    ],
+    "HOLDINVEDUE": [
+        "balance_sheet"
+    ],
+    "FDSBORR": [
+        "balance_sheet"
+    ],
+    "ACTIUNDESECU": [
+        "balance_sheet"
+    ],
+    "COMASSE": [
+        "balance_sheet"
+    ],
+    "LCOPEWORKERSAL": [
+        "balance_sheet"
+    ],
+    "INTERECE": [
+        "balance_sheet"
+    ],
+    "SPECPAYA": [
+        "balance_sheet"
+    ],
+    "LONGRECE": [
+        "balance_sheet"
+    ],
+    "SUNEVENNONCASSE": [
+        "balance_sheet"
+    ],
+    "UNREINVELOSS": [
+        "balance_sheet"
+    ],
+    "DERIFINAASSET": [
+        "balance_sheet"
+    ],
+    "DEFETAXASSET": [
+        "balance_sheet"
+    ],
+    "DEFEINCOTAXLIAB": [
+        "balance_sheet"
+    ],
+    "COPEWITHREINRECE": [
+        "balance_sheet"
+    ],
+    "BDSPAYA": [
+        "balance_sheet"
+    ],
+    "SFORMATTOTLIAB": [
+        "balance_sheet"
+    ],
+    "SMERGERCURRELIABI": [
+        "balance_sheet"
+    ],
+    "SPECRESE": [
+        "balance_sheet"
+    ],
+    "COPEWORKERSAL": [
+        "balance_sheet"
+    ],
+    "SUNEVENTOTASSET": [
+        "balance_sheet"
+    ],
+    "LENDANDLOAN": [
+        "balance_sheet"
+    ],
+    "SFORMATCURRELIABI": [
+        "balance_sheet"
+    ],
+    "UNSEG": [
+        "balance_sheet"
+    ],
+    "TRADSHARTRAD": [
+        "balance_sheet"
+    ],
+    "OTHERFEEPAYA": [
+        "balance_sheet"
+    ],
+    "SMERGERPARESHARRIGH": [
+        "balance_sheet"
+    ],
+    "INSUCONTRESE": [
+        "balance_sheet"
+    ],
+    "SUNEVENNONCLIAB": [
+        "balance_sheet"
+    ],
+    "DERILIAB": [
+        "balance_sheet"
+    ],
+    "TREASTK": [
+        "balance_sheet"
+    ],
+    "DIVIPAYA": [
+        "balance_sheet"
+    ],
+    "SMERGERNONCLIAB": [
+        "balance_sheet"
+    ],
+    "SELLREPASSE": [
+        "balance_sheet"
+    ],
+    "SUNEVENASSETLIABEUQI": [
+        "balance_sheet"
+    ],
+    "SFORMATNONCASSE": [
+        "balance_sheet"
+    ],
+    "SUNEVENTOTLIABSHAREQUI": [
+        "balance_sheet"
+    ],
+    "EXPOTAXREBARECE": [
+        "balance_sheet"
+    ],
+    "PREST": [
+        "balance_sheet"
+    ],
+    "SUNEVENCURRASSE": [
+        "balance_sheet"
+    ],
+    "PRODASSE": [
+        "balance_sheet"
+    ],
+    "SUNEVENTOTLIAB": [
+        "balance_sheet"
+    ],
+    "PAIDINCAPI": [
+        "balance_sheet"
+    ],
+    "CENBANKBORR": [
+        "balance_sheet"
+    ],
+    "INTETICKSETT": [
+        "balance_sheet"
+    ],
+    "SFORMATTOTLIABSHAREQUI": [
+        "balance_sheet"
+    ],
+    "WARLIABRESE": [
+        "balance_sheet"
+    ],
+    "PERBOND": [
+        "balance_sheet"
+    ],
+    "BDSPAYAPERBOND": [
+        "balance_sheet"
+    ],
+    "SFORMATRIGHAGGR": [
+        "balance_sheet"
+    ],
+    "INTELPAY": [
+        "balance_sheet"
+    ],
+    "SUNEVENPARESHARRIGH": [
+        "balance_sheet"
+    ],
+    "PREMRECE": [
+        "balance_sheet"
+    ],
+    "TRADFINLIAB": [
+        "balance_sheet"
+    ],
+    "EXPINONCURRASSET": [
+        "balance_sheet"
+    ],
+    "REINCONTRESE": [
+        "balance_sheet"
+    ],
+    "SMERGERTOTLIAB": [
+        "balance_sheet"
+    ],
+    "SMERGERRIGHAGGR": [
+        "balance_sheet"
+    ],
+    "SUBSRECE": [
+        "balance_sheet"
+    ],
+    "ACCREXPE": [
+        "balance_sheet"
+    ],
+    "SFORMATPARESHARRIGH": [
+        "balance_sheet"
+    ],
+    "SMERGERCURRASSE": [
+        "balance_sheet"
+    ],
+    "OTHERCURRASSE": [
+        "balance_sheet"
+    ],
+    "BDSPAYAPREST": [
+        "balance_sheet"
+    ],
+    "INTELRECE": [
+        "balance_sheet"
+    ],
+    "MINYSHARRIGH": [
+        "balance_sheet"
+    ],
+    "AVAISELLASSE": [
+        "balance_sheet"
+    ],
+    "FIXEDASSEIMPA": [
+        "balance_sheet"
+    ],
+    "SUNEVENCURRELIABI": [
+        "balance_sheet"
+    ],
+    "OTHERNONCLIABI": [
+        "balance_sheet"
+    ],
+    "EXPENONCLIAB": [
+        "balance_sheet"
+    ],
+    "LONGPAYA": [
+        "balance_sheet"
+    ],
+    "OTHERLONGINVE": [
+        "balance_sheet"
+    ],
+    "CURTRANDIFF": [
+        "balance_sheet"
+    ],
+    "SFORMATNONCLIAB": [
+        "balance_sheet"
+    ],
+    "SHORTTERMBORR": [
+        "balance_sheet"
+    ],
+    "OTHEQUIN": [
+        "balance_sheet"
+    ],
+    "ACTITRADSECU": [
+        "balance_sheet"
+    ],
+    "MARGRECE": [
+        "balance_sheet"
+    ],
+    "OTHERNONCASSE": [
+        "balance_sheet"
+    ],
+    "PLAC": [
+        "balance_sheet"
+    ],
+    "LONGDEFEINCO": [
+        "balance_sheet"
+    ],
+    "DEFEREVE": [
+        "balance_sheet"
+    ],
+    "MARGREQU": [
+        "balance_sheet"
+    ],
+    "PREPEXPE": [
+        "balance_sheet"
+    ],
+    "DUENONCLIAB": [
+        "balance_sheet"
+    ],
+    "DIVIDRECE": [
+        "balance_sheet"
+    ],
+    "FIXEDASSECLEA": [
+        "balance_sheet"
+    ],
+    "FIXEDASSENETW": [
+        "balance_sheet"
+    ],
+    "LIABHELDFORS": [
+        "balance_sheet"
+    ],
+    "COPEPOUN": [
+        "balance_sheet"
+    ],
+    "SMERGERTOTLIABSHAREQUI": [
+        "balance_sheet"
+    ],
+    "INVEPROP": [
+        "balance_sheet"
+    ],
+    "SMERGERTOTASSET": [
+        "balance_sheet"
+    ],
+    "SHORTTERMBDSPAYA": [
+        "balance_sheet"
+    ]
+}

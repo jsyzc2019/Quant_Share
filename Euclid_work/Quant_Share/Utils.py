@@ -29,7 +29,9 @@ __all__ = ['readPkl', 'savePkl', 'save_data_h5',  # files operation
            # Consts
            'stock_info', 'stockList', 'stockNumList', 'bench_info', 'tradeDate_info', 'tradeDateList', 'quarter_begin', 'quarter_end',
            'futures_list', 'dataBase_root_path', 'dataBase_root_path_future', 'dataBase_root_path_gmStockFactor',
+           # decorator
            'time_decorator', 'lazyproperty']
+
 
 def time_decorator(func):
     @wraps(func)

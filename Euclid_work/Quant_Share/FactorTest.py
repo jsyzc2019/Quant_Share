@@ -7,7 +7,7 @@ import pandas as pd
 import scipy.stats as st
 
 from .BackTest import DataPrepare, reindex
-from .Euclid_get_data import get_data
+from .EuclidGetData import get_data
 
 
 class FactorTest(DataPrepare):
@@ -33,3 +33,6 @@ class FactorTest(DataPrepare):
         IR = (rankIC.mean())/rankIC.std()
 
         return rankIC, IR
+
+
+
