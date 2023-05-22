@@ -5,7 +5,7 @@
 # @File    : deriv_finance_indicator.py
 """
 
-from base_package import *
+from .base_package import *
 
 
 def deriv_finance_indicator(begin, end, **kwargs):

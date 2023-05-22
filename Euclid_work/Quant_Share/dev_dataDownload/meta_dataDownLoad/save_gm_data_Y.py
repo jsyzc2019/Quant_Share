@@ -4,7 +4,7 @@
 # @Author  : Euclid-Jie
 # @File    : save_gm_data_Y.py
 """
-from base_package import *
+from .base_package import *
 
 
 def save_gm_data_Y(df, date_column_name, tableName, dataBase_root_path=dataBase_root_path_gmStockFactor, reWrite=False):

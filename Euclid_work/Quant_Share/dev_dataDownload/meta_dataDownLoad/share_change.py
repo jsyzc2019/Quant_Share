@@ -4,7 +4,7 @@
 # @Author  : Euclid-Jie
 # @File    : share_change.py
 """
-from base_package import *
+from .base_package import *
 
 
 def share_change(begin, end, **kwargs):

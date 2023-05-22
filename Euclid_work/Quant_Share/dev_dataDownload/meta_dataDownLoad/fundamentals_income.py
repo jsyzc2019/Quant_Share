@@ -4,7 +4,7 @@
 # @Author  : Euclid-Jie
 # @File    : fundamentals_income.py
 """
-from base_package import *
+from .base_package import *
 
 
 def fundamentals_income(begin, end, **kwargs):

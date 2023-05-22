@@ -4,7 +4,7 @@
 # @Author  : Euclid-Jie
 # @File    : trading_derivative_indicator.py
 """
-from base_package import *
+from .base_package import *
 
 
 def trading_derivative_indicator(begin, end, **kwargs):

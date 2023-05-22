@@ -7,5 +7,4 @@ from .fundamentals_balance import fundamentals_balance
 from .fundamentals_income import fundamentals_income
 from .fundamentals_cashflow import fundamentals_cashflow
 from .trading_derivative_indicator import trading_derivative_indicator
-from .base_package import symbolList
 from .AutoEmail import AutoEmail

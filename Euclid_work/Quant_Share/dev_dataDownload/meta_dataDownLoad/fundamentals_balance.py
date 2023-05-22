@@ -4,7 +4,7 @@
 # @Author  : Euclid-Jie
 # @File    : fundamentals_balance.py
 """
-from base_package import *
+from .base_package import *
 
 
 def fundamentals_balance(begin, end, **kwargs):

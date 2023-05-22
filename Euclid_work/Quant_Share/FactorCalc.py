@@ -142,5 +142,19 @@ class SizeFactor(FactorBase):
         df = df.apply(self._calc_MIDCAP, axis=1, raw=True)
         return df
 
+class DividendYield(FactorBase):
+
+    def __init__(self, beginDate: str = None, endDate: str = None):
+        endDate = endDate if endDate else date.today().strftime("%Y%m%d")
+        super().__init__(beginDate, endDate)
+
+
+class Liquidity(FactorBase):
+
+    def __init__(self, beginDate:str=None, endDate:str=None):
+        endDate = endDate if endDate else date.today().strftime("%Y%m%d")
+        super().__init__(beginDate, endDate)
+        pass
+
 
 

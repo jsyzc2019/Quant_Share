@@ -1,0 +1,26 @@
+{
+    "SHCOMP_daily": {
+    "assets": "emData",
+    "description": "",
+    "date_column": "tradeDate",
+    "ticker_column": "codes"
+  },
+    "Shanghai_scale_index_daily": {
+    "assets": "emData",
+    "description": "",
+    "date_column": "tradeDate",
+    "ticker_column": "codes"
+  },
+    "SHCOMP_financial": {
+    "assets": "emData",
+    "description": "",
+    "date_column": "tradeDate",
+    "ticker_column": "codes"
+  },
+    "Shanghai_scale_index_financial": {
+    "assets": "emData",
+    "description": "",
+    "date_column": "tradeDate",
+    "ticker_column": "codes"
+  }
+}

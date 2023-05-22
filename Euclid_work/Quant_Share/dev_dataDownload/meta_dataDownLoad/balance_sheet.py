@@ -4,7 +4,7 @@
 # @Author  : Euclid-Jie
 # @File    : balance_sheet.py
 """
-from base_package import *
+from .base_package import *
 
 
 def balance_sheet(begin, end, **kwargs):

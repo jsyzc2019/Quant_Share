@@ -222,9 +222,11 @@ with open(os.path.join(current_dir, 'dev_files/gmStockFactor_tableInfo.json'), '
     gmStockFactor = json.load(f)  # 此时a是一个字典对象
 with open(os.path.join(current_dir, 'dev_files/gmStockData_tableInfo.json'), 'r') as f:
     gmStockData = json.load(f)  # 此时a是一个字典对象
+with open(os.path.join(current_dir, 'dev_files/emData_tableInfo.json'), 'r') as f:
+    emData = json.load(f)  # 此时a是一个字典对象
 
 tableInfo = {}
-for table in ['InfoTable', 'gmStock', 'dataYesStock', 'gmFuture', 'gmStockFactor', 'gmStockData']:
+for table in ['InfoTable', 'gmStock', 'dataYesStock', 'gmFuture', 'gmStockFactor', 'gmStockData', 'emData']:
     _table = eval(table)
     for key, value in _table.items():
         _table[key]['tableSource'] = table
