@@ -4,6 +4,7 @@ import datetime as dt
 import pandas as pd
 import numpy as np
 import warnings
+
 warnings.filterwarnings('ignore')
 from tqdm import tqdm
 from Euclid_work.Quant_Share import stockList, tradeDateList, dataBase_root_path_EMdata, patList, format_date
@@ -13,10 +14,11 @@ from Euclid_work.Quant_Share import get_table_info
 import os
 from datetime import date
 
-stock_ind = ["CLOSE","OPEN","HIGH",'LOW','PRECLOSE','AVERAGE', 'CHANGE',
-              'PCTCHANGE','VOLUME','HIGHLIMIT','AMOUNT',
-              'TURN','LOWLIMIT','AMPLITUDE','TNUM','TAFACTOR',
-              'FRONTTAFACTOR','ISSTSTOCK','ISXSTSTOCK']
+stock_ind = ["CLOSE", "OPEN", "HIGH", 'LOW', 'PRECLOSE', 'AVERAGE', 'CHANGE',
+             'PCTCHANGE', 'VOLUME', 'HIGHLIMIT', 'AMOUNT',
+             'TURN', 'LOWLIMIT', 'AMPLITUDE', 'TNUM', 'TAFACTOR',
+             'FRONTTAFACTOR', 'ISSTSTOCK', 'ISXSTSTOCK']
+
 
 def mainCallback(quantdata):
     """
@@ -26,13 +28,13 @@ def mainCallback(quantdata):
     :return:
     """
     print("mainCallback", str(quantdata))
-    #登录掉线或者 登陆数达到上线（即登录被踢下线） 这时所有的服务都会停止
+    # 登录掉线或者 登陆数达到上线（即登录被踢下线） 这时所有的服务都会停止
     if str(quantdata.ErrorCode) == "10001011" or str(quantdata.ErrorCode) == "10001009":
         print("Your account is disconnect. You can force login automatically here if you need.")
-    #行情登录验证失败（每次连接行情服务器时需要登录验证）或者行情流量验证失败时，会取消所有订阅，用户需根据具体情况处理
+    # 行情登录验证失败（每次连接行情服务器时需要登录验证）或者行情流量验证失败时，会取消所有订阅，用户需根据具体情况处理
     elif str(quantdata.ErrorCode) == "10001021" or str(quantdata.ErrorCode) == "10001022":
         print("Your all csq subscribe have stopped.")
-    #行情服务器断线自动重连连续6次失败（1分钟左右）不过重连尝试还会继续进行直到成功为止，遇到这种情况需要确认两边的网络状况
+    # 行情服务器断线自动重连连续6次失败（1分钟左右）不过重连尝试还会继续进行直到成功为止，遇到这种情况需要确认两边的网络状况
     elif str(quantdata.ErrorCode) == "10002009":
         print("Your all csq subscribe have stopped, reconnect 6 times fail.")
     # 行情订阅遇到一些错误(这些错误会导致重连，错误原因通过日志输出，统一转换成EQERR_QUOTE_RECONNECT在这里通知)，正自动重连并重新订阅,可以做个监控
@@ -49,9 +51,11 @@ def mainCallback(quantdata):
         print("Your all cnq subscribe have stopped.")
     else:
         pass
-def stock_daily(date_to_store:list,
-                codes:list[str]=stockList,
-                indicators:list[str]=stock_ind,
+
+
+def stock_daily(date_to_store: list,
+                codes: list[str] = stockList,
+                indicators: list[str] = stock_ind,
                 **kwargs):
     with tqdm(patList(date_to_store, 30)) as t:
         final = pd.DataFrame()
@@ -81,7 +85,8 @@ def stock_daily(date_to_store:list,
                 continue
     return final
 
-def filt_codes(codes:str or list[str], **kwargs):
+
+def filt_codes(codes: str or list[str], **kwargs):
     data = c.cec(codes, "ReturnType=0")
     if (data.ErrorCode != 0):
         print("request cec Error, ", data.ErrorMsg)
@@ -91,7 +96,8 @@ def filt_codes(codes:str or list[str], **kwargs):
             if value[2]: res.append(value[-1])
     return res
 
-def collate(data:c.EmQuantData, index_name='tradeDate', columns_name='codes', **kwargs):
+
+def collate(data: c.EmQuantData, index_name='tradeDate', columns_name='codes', **kwargs):
     final = pd.DataFrame()
     for i, ind in enumerate(data.Indicators):
         df = pd.DataFrame(
@@ -109,14 +115,15 @@ def collate(data:c.EmQuantData, index_name='tradeDate', columns_name='codes', **
     final = pd.concat([final, res], ignore_index=True)
     return final
 
-def stock_daily_update(**kwargs):
 
+def stock_daily_update(**kwargs):
     pass
 
 
 SHCOMP_codes = "000001.SH,000002.SH,000003.SH,000004.SH,000005.SH,000006.SH,000007.SH,000008.SH,000017.SH,000020.SH,000090.SH,000688.SH,000688HKD00.SH,000688HKD01.SH,000688USD00.SH,000688USD01.SH,000688USD07.SH,000688USD08.SH,930928.CSI,H20928.CSI,N20928.CSI"
 
 Shanghai_scale_index_codes = "000009.SH,000010.SH,000016.SH,000043.SH,000044.SH,000045.SH,000046.SH,000047.SH,000155.SH,H00009.SH,H00010.SH,H00016.SH,H00043.SH,H00044.SH,H00045.SH,H00046.SH,H00047.SH,H00132.SH,H00133.SH,H00155.SH,N00009.SH,N00010.SH,N00016.SH,N00043.SH,N00044.SH,N00045.SH,N00046.SH,N00047.SH,N00132.SH,N00133.SH"
+
 
 def index_daily(codes, start="2015-01-01", end="2023-05-21", **kwargs):
     # 2023-05-21 21:29:19
@@ -132,9 +139,10 @@ def index_daily(codes, start="2015-01-01", end="2023-05-21", **kwargs):
         df = collate(data)
         return df
 
+
 def index_valuation(codes, start="2015-01-01", end="2023-05-21", **kwargs):
-    # 2023-05-21 21:29:19
-    # 指数 总市值 流通市值 市盈率PE(TTM) 市盈率PE（最新年报） 市盈率PE中位值（TTM） 市盈率PE中位值（最新年报） 市净率PB中位值（MRQ） 市净率PB中位值（最新年报） 市净率PB中位值（最新公告） 市现率PCF(TTM) 市销率PS(TTM) 自由流通市值 股息率 市净率PB(最新年报) 市净率PB(MRQ) 股息率_TTM 股债性价比(差值)_序列 股债性价比(比值)_序列
+    # 2023-05-21 21:29:19 指数 总市值 流通市值 市盈率PE(TTM) 市盈率PE（最新年报） 市盈率PE中位值（TTM） 市盈率PE中位值（最新年报） 市净率PB中位值（MRQ） 市净率PB中位值（最新年报） 市净率PB中位值（最新公告） 市现率PCF(TTM) 市销率PS(TTM) 自由流通市值 股息率 市净率PB(
+    # 最新年报) 市净率PB(MRQ) 股息率_TTM 股债性价比(差值)_序列 股债性价比(比值)_序列
     index_valuation_indicators = "MV,LIQMV,PETTM,PELYR,PEMIDTTM,PEMIDLYR,PBMIDMRQ,PBMIDLYR,PBMIDLF,PCFTTM,PSTTM,FREELIQMV,DIVIDENDYIELD,PBLYR,PBMRQ,DIVIDENDYIELDTTM,ERPMINUSM,ERPDIVIDEM"
     data = c.csd(
         codes, index_valuation_indicators, start, end,
@@ -145,6 +153,7 @@ def index_valuation(codes, start="2015-01-01", end="2023-05-21", **kwargs):
     else:
         df = collate(data)
         return df
+
 
 def index_financial(codes, start="2015-01-01", end="2023-05-21", **kwargs):
     # 2023-05-21 21:29:19
@@ -160,7 +169,8 @@ def index_financial(codes, start="2015-01-01", end="2023-05-21", **kwargs):
         df = collate(data)
         return df
 
-def update_daily(codes, tableName:str):
+
+def update_daily(codes, tableName: str):
     global Trade
     out = get_table_info(tableName)
     file_name_list = out['file_name_list']
@@ -169,7 +179,7 @@ def update_daily(codes, tableName:str):
     abs_file_path = os.path.join(tableFolder, newest_file)
     old_data = pd.read_hdf(abs_file_path)
     old_day = format_date(old_data.tradeDate.max())
-    old_day_off_1 = Trade[np.where(Trade == old_day)[0]+1][0]
+    old_day_off_1 = Trade[np.where(Trade == old_day)[0] + 1][0]
     new_day = format_date(date.today().strftime('%Y-%m-%d'))
     if old_day_off_1 < new_day:
         new_data = index_daily(codes=codes,
@@ -183,8 +193,6 @@ def update_daily(codes, tableName:str):
             print(f"{tableName}更新失败")
     else:
         print(f"{tableName}无需更新")
-
-
 
 
 if __name__ == '__main__':
@@ -212,6 +220,3 @@ if __name__ == '__main__':
     # update_daily(codes=SHCOMP_codes, tableName='SHCOMP_daily')
 
     # update_daily(codes=Shanghai_scale_index_codes, tableName='Shanghai_scale_index_daily')
-
-
-

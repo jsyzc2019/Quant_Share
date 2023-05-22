@@ -8,3 +8,5 @@ from .fundamentals_income import fundamentals_income
 from .fundamentals_cashflow import fundamentals_cashflow
 from .trading_derivative_indicator import trading_derivative_indicator
 from .AutoEmail import AutoEmail
+from .future_daily import future_daily
+from .continuous_contracts import continuous_contracts

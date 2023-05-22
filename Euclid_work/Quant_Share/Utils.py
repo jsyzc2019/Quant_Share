@@ -117,7 +117,7 @@ futures_list = ['AG', 'AL', 'AU', 'A', 'BB', 'BU', 'B', 'CF', 'CS', 'CU', 'C', '
 bench_info = pd.read_hdf('{}/bench_info.h5'.format(dataBase_root_path))
 tradeDate_info = pd.read_hdf("{}/tradeDate_info.h5".format(dataBase_root_path))
 #  = sorted(list(set(tradeDate_info['tradeDate']))[1:])
-tradeDateList = tradeDate_info['tradeDate'].dropna().unique()
+tradeDateList = tradeDate_info['tradeDate'].dropna().to_list()
 quarter_begin = ['0101', '0401', '0701', '1001']
 quarter_end = ['0331', '0630', '0930', '1231']
 
