@@ -6,6 +6,7 @@
 """
 
 from .base_package import *
+from .save_gm_data_Y import save_gm_data_Y
 
 
 def deriv_finance_indicator(begin, end, **kwargs):
@@ -41,9 +42,9 @@ def deriv_finance_indicator(begin, end, **kwargs):
     return outData
 
 
-if __name__ == '__main__':
-    deriv_finance_indicator_info = pd.read_excel(r'E:\Euclid\Quant_Share\Euclid_work\Quant_Share\dev_files\deriv_finance_indicator.xlsx')
+def deriv_finance_indicator_update(upDateBegin, endDate='20231231'):
+    deriv_finance_indicator_info = pd.read_excel(os.path.join(dev_files_dir, 'deriv_finance_indicator.xlsx'))
     deriv_finance_indicator_fields = deriv_finance_indicator_info['列名'].to_list()
-    data = deriv_finance_indicator(begin='20150101', end='20231231', symbol=symbolList,
+    data = deriv_finance_indicator(begin=upDateBegin, end=endDate, symbol=symbolList,
                                    deriv_finance_indicator_fields=deriv_finance_indicator_fields)
     save_gm_data_Y(data, 'pub_date', 'deriv_finance_indicator', reWrite=True)

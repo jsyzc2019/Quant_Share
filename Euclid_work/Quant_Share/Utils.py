@@ -195,7 +195,7 @@ def save_data_h5(toSaveData, name, subPath='dataFile', reWrite=False):
     :param toSaveData:
     :param name:
     :param subPath: The path to store the file will be 'cwd/subPath/name.h5', default 'dataFile'
-    :param reWrite: if Ture, will rewrite file, default False
+    :param reWrite: if Ture, will rewrite or update file, default False
     :return:
     """
     # format confirm
@@ -210,7 +210,15 @@ def save_data_h5(toSaveData, name, subPath='dataFile', reWrite=False):
         fullPath = name
     if isinstance(toSaveData, pd.DataFrame):
         if reWrite:
-            toSaveData.to_hdf(fullPath, 'a', 'w')
+            if os.path.exists(fullPath):
+                existsData = pd.read_hdf(fullPath)
+                allData = pd.concat([existsData, toSaveData]).drop_duplicates()
+                if len(allData) > len(existsData):
+                    print("{} has Updated!".format(fullPath))
+                else:
+                    print("{} has none Updated!".format(fullPath))
+                toSaveData.to_hdf(fullPath, 'a', 'w')
+
         else:
             if os.path.exists(fullPath):
                 raise FileExistsError("{} has Existed!".format(fullPath))
@@ -220,17 +228,17 @@ def save_data_h5(toSaveData, name, subPath='dataFile', reWrite=False):
         # pd.DataFrame(toSaveData).to_hdf(name,'a','w')
 
 
-def get_tradeDate(date, lag=0):
+def get_tradeDate(InputDate, lag=0):
     """
     Returns the date related to date based on the setting of n
     if n = 0, will return the future the nearest trade date, if date is trade date, will return itself
     if n = -1, will return the backward the nearest trade date, if date is trade date, will return itself
     else will returns information from the delay n days (calendar, tradeDate_fore and tradeDate_back）
-    :param date:
+    :param InputDate:
     :param lag: default 0
     :return:
     """
-    date = format_date(date)
+    date = format_date(InputDate)
     if lag == 0:
         return tradeDate_info.loc[date]['tradeDate_fore']
     elif lag == -1:
@@ -293,13 +301,13 @@ def is_tradeDate(date: int or str or datetime.datetime):
 
 def format_date(date):
     if isinstance(date, datetime.datetime):
-        return date
+        return pd.to_datetime(date.date())
     elif isinstance(date, int):
         date = pd.to_datetime(date, format='%Y%m%d')
         return date
     elif isinstance(date, str):
         date = pd.to_datetime(date)
-        return date
+        return pd.to_datetime(date.date())
     else:
         raise TypeError("date should be str or int!")
 

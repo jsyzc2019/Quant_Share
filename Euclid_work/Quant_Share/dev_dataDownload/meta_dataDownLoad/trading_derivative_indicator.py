@@ -5,6 +5,7 @@
 # @File    : trading_derivative_indicator.py
 """
 from .base_package import *
+from .save_gm_data_Q import save_gm_data_Q
 
 
 def trading_derivative_indicator(begin, end, **kwargs):
@@ -40,14 +41,10 @@ def trading_derivative_indicator(begin, end, **kwargs):
     return outData
 
 
-if __name__ == '__main__':
-    trading_derivative_indicator_info = pd.read_excel(r'E:\Euclid\Quant_Share\Euclid_work\Quant_Share\dev_files\trading_derivative_indicator.xlsx')
+def trading_derivative_indicator_update(upDateBegin, endDate='20231231'):
+    trading_derivative_indicator_info = pd.read_excel(os.path.join(dev_files_dir, 'trading_derivative_indicator.xlsx'))
     trading_derivative_indicator_fields = trading_derivative_indicator_info['列名'].to_list()
+    data = trading_derivative_indicator(begin=upDateBegin, end=endDate, symbol=symbolList,
+                                        trading_derivative_indicator_fields=trading_derivative_indicator_fields)
 
-    for year in range(2023, 2024):
-        begin = "{}0101".format(year)
-        end = "{}1231".format(year)
-        data = trading_derivative_indicator(begin=begin, end=end, symbol=symbolList,
-                                            trading_derivative_indicator_fields=trading_derivative_indicator_fields)
-
-        save_gm_dataQ(data, 'pub_date', 'trading_derivative_indicator', reWrite=True)
+    save_gm_data_Q(data, 'pub_date', 'trading_derivative_indicator', reWrite=True)

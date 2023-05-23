@@ -1,9 +1,15 @@
 import pandas as pd
 import os
 from gm.api import *
-from Euclid_work.Quant_Share import format_date, patList, save_data_h5, dataBase_root_path_gmStockFactor, stock_info
+from Euclid_work.Quant_Share import format_date, patList, save_data_h5, dataBase_root_path_gmStockFactor, stock_info, get_tradeDates
 from tqdm import tqdm
 import time
+
+# 路径识别
+current_dir = os.path.abspath(os.path.dirname(__file__))
+parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
+grand_dir = os.path.abspath(os.path.join(parent_dir, os.pardir))
+dev_files_dir = os.path.join(grand_dir, 'dev_files')
 
 # Gm登录
 current_dir = os.path.abspath(os.path.dirname(__file__))

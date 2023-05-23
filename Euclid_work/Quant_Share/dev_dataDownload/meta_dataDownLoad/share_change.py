@@ -5,6 +5,7 @@
 # @File    : share_change.py
 """
 from .base_package import *
+from .save_gm_data_Y import save_gm_data_Y
 
 
 def share_change(begin, end, **kwargs):
@@ -17,12 +18,15 @@ def share_change(begin, end, **kwargs):
     symbol = kwargs['symbol']
 
     outData = pd.DataFrame()
-    for symbol_i in tqdm(symbol):
-        tmpData = stk_get_share_change(symbol=symbol_i, start_date=begin, end_date=end)
-        outData = pd.concat([outData, tmpData], ignore_index=True)
+    with tqdm(symbol) as t:
+        t.set_description(("begin:{} -- end:{}".format(begin, end)))
+        for symbol_i in t:
+            tmpData = stk_get_share_change(symbol=symbol_i, start_date=begin, end_date=end)
+            outData = pd.concat([outData, tmpData], ignore_index=True)
+            t.set_postfix({"状态": "已成功获取{}条数据".format(len(tmpData))})
     return outData
 
 
-if __name__ == '__main__':
-    data = share_change(begin='20150101', end='20231231', symbol=symbolList)
+def share_change_update(upDateBegin, endDate='20231231'):
+    data = share_change(begin=upDateBegin, end=endDate, symbol=symbolList)
     save_gm_data_Y(data, 'pub_date', 'share_change', reWrite=True)

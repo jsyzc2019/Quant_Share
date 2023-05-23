@@ -6,6 +6,7 @@
 """
 
 from .base_package import *
+from .save_gm_data_Y import save_gm_data_Y
 
 
 def future_daily(**kwargs):
@@ -35,9 +36,7 @@ def future_daily(**kwargs):
     return outData
 
 
-if __name__ == '__main__':
-    begin = format_date('20150101')
-    end = format_date('20231231')
-    tradeDateArr = [i for i in tradeDateList if begin <= i <= end]
-    data = future_daily(tradeDateArr=tradeDateArr)
+def future_daily_update(upDateBegin, endDate='20231231'):
+    tradeDateList = get_tradeDates(upDateBegin, endDate)
+    data = future_daily(tradeDateArr=tradeDateList)
     save_gm_data_Y(data, 'trade_date', 'future_daily', reWrite=True)

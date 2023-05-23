@@ -5,6 +5,7 @@
 # @File    : balance_sheet.py
 """
 from .base_package import *
+from .save_gm_data_Y import *
 
 
 def balance_sheet(begin, end, **kwargs):
@@ -40,9 +41,9 @@ def balance_sheet(begin, end, **kwargs):
     return outData
 
 
-if __name__ == '__main__':
-    balance_sheet_info = pd.read_excel(r'E:\Euclid\Quant_Share\Euclid_work\Quant_Share\dev_files\balance_sheet.xlsx')
+def balance_sheet_update(upDateBegin, endDate='20231231'):
+    balance_sheet_info = pd.read_excel(os.path.join(dev_files_dir, 'balance_sheet.xlsx'))
     balance_sheet_fields = balance_sheet_info['列名'].to_list()
-    data = balance_sheet(begin='20150101', end='20231231', symbol=symbolList,
+    data = balance_sheet(begin=upDateBegin, end=endDate, symbol=symbolList,
                          balance_sheet_fields=balance_sheet_fields)
     save_gm_data_Y(data, 'pub_date', 'balance_sheet', reWrite=True)

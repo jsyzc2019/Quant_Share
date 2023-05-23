@@ -8,6 +8,8 @@ from .base_package import *
 
 
 def save_gm_data_Y(df, date_column_name, tableName, dataBase_root_path=dataBase_root_path_gmStockFactor, reWrite=False):
+    if len(df) == 0:
+        raise ValueError("data for save is null!")
     print("数据将存储在: {}/{}".format(dataBase_root_path, tableName))
     df["year"] = df[date_column_name].apply(lambda x: format_date(x).year)
     for yeari in range(df["year"].min(), df["year"].max() + 1):
