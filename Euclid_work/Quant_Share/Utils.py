@@ -183,7 +183,7 @@ def info_lag(data, n_lag):
     :param n_lag:
     :return:
     """
-    new_index = [get_tradeDate(x, n_lag)['tradeDate_fore'] for x in data.index]
+    new_index = [get_tradeDate(x, n_lag) for x in data.index]
     out = data.copy()
     out.index = new_index
     return out
