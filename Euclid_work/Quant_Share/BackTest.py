@@ -33,7 +33,7 @@ class DataPrepare:
         self.Score = None
 
         # tradeDate init
-        self.tradeDateBase = tradeDate_info.loc[format_date(beginDate):format(endDate)]
+        self.tradeDateBase = tradeDate_info.loc[format_date(beginDate):format_date(endDate)]
 
     def get_bench_info(self):
         # bench nav
@@ -103,6 +103,11 @@ class simpleBT:
             rtn_before_trade[pd.isnull(rtn_before_trade)] = 0
             rtn_after_trade[pd.isnull(rtn_after_trade)] = 0
 
+        # back test init
+        Score.dropna(axis=0, how='all', inplace=True)
+        start_dt = Score.index[0]
+        self.tickerData['Rtn'] = self.tickerData['Rtn'].loc[start_dt:]
+
         # init position, index is code, columns is tradeDate
         temp_pos = pd.Series(data=np.zeros(len(self.tickerData['Rtn'].columns)), index=self.tickerData['Rtn'].columns)
         pos_out = pd.DataFrame(np.zeros(self.tickerData['Rtn'].shape), index=self.tickerData['Rtn'].index, columns=self.tickerData['Rtn'].columns)
@@ -111,9 +116,6 @@ class simpleBT:
         daily_rtn = fee.copy()
         turnover = fee.copy()
 
-        # back test init
-        Score.dropna(axis=0, how='all', inplace=True)
-        start_dt = Score.index[0]
         for date in tqdm(self.tickerData['Rtn'].index.to_list()):
             # the rtn date should >= start date
             if date < start_dt:
