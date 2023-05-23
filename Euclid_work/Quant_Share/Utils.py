@@ -26,7 +26,7 @@ dataBase_root_path_EMdata = r"E:\Share\EMData"
 
 __all__ = ['readPkl', 'savePkl', 'save_data_h5',  # files operation
            'get_tradeDate', 'format_date', 'format_stockCode', 'reindex', 'data2score', 'info_lag',
-           'format_futures', 'printJson', 'extend_date_span', 'patList',
+           'format_futures', 'printJson', 'extend_date_span', 'patList', 'is_tradeDate', 'get_tradeDates',
            # Consts
            'stock_info', 'stockList', 'stockNumList', 'bench_info', 'tradeDate_info', 'tradeDateList', 'quarter_begin', 'quarter_end',
            'futures_list', 'dataBase_root_path', 'dataBase_root_path_future', 'dataBase_root_path_gmStockFactor',
@@ -116,7 +116,6 @@ futures_list = ['AG', 'AL', 'AU', 'A', 'BB', 'BU', 'B', 'CF', 'CS', 'CU', 'C', '
 
 bench_info = pd.read_hdf('{}/bench_info.h5'.format(dataBase_root_path))
 tradeDate_info = pd.read_hdf("{}/tradeDate_info.h5".format(dataBase_root_path))
-#  = sorted(list(set(tradeDate_info['tradeDate']))[1:])
 tradeDateList = tradeDate_info['tradeDate'].dropna().to_list()
 quarter_begin = ['0101', '0401', '0701', '1001']
 quarter_end = ['0331', '0630', '0930', '1231']
@@ -221,24 +220,75 @@ def save_data_h5(toSaveData, name, subPath='dataFile', reWrite=False):
         # pd.DataFrame(toSaveData).to_hdf(name,'a','w')
 
 
-def get_tradeDate(date, n=0):
+def get_tradeDate(date, lag=0):
     """
     Returns the date related to date based on the setting of n
     if n = 0, will return the future the nearest trade date, if date is trade date, will return itself
     if n = -1, will return the backward the nearest trade date, if date is trade date, will return itself
     else will returns information from the delay n days (calendar, tradeDate_fore and tradeDate_back）
     :param date:
-    :param n: default 0
+    :param lag: default 0
     :return:
     """
     date = format_date(date)
-    if n == 0:
+    if lag == 0:
         return tradeDate_info.loc[date]['tradeDate_fore']
-    elif n == -1:
+    elif lag == -1:
         return tradeDate_info.loc[date]['tradeDate_back']
     else:
-        index = tradeDate_info.index.to_list().index(date) + n
-        return tradeDate_info.iloc[index]
+        res, index = binary_search(tradeDateList, date)
+        if res:
+            return tradeDateList[index + lag]
+        else:
+            # print("{} is not tradeDate".format(date))
+            return tradeDateList[index + lag]
+
+
+def get_tradeDates(begin, end=None, n: int = None):
+    """
+    获取指定时间段内的交易日列表
+    :param begin:
+    :param end:
+    :param n:
+    :return:
+    """
+    begin = format_date(begin)
+    _, index_begin = binary_search(tradeDateList, begin)
+    if end:
+        end = format_date(end)
+        res, index_end = binary_search(tradeDateList, end)
+        if not res:
+            index_end += 1
+        return tradeDateList[index_begin:index_end+1]
+    else:
+        if n:
+            return tradeDateList[index_begin:index_begin + n + 1]
+        else:
+            raise AttributeError("u should input end or n!")
+
+
+def binary_search(arr: list, target):
+    low = 0
+    high = len(arr) - 1
+
+    while low <= high:
+        mid = (low + high) // 2
+
+        if arr[mid] == target:
+            return True, mid
+        elif arr[mid] < target:
+            low = mid + 1
+        else:
+            high = mid - 1
+
+    return False, low
+
+
+def is_tradeDate(date: int or str or datetime.datetime):
+    if format_date(date) in tradeDateList:
+        return True
+    else:
+        return False
 
 
 def format_date(date):
