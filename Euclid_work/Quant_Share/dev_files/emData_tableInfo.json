@@ -1,26 +1,56 @@
 {
     "SHCOMP_daily": {
-    "assets": "emData",
-    "description": "",
-    "date_column": "tradeDate",
-    "ticker_column": "codes"
-  },
+        "assets": "emData",
+        "description": "",
+        "date_column": "tradeDate",
+        "ticker_column": "codes"
+    },
     "Shanghai_scale_index_daily": {
-    "assets": "emData",
-    "description": "",
-    "date_column": "tradeDate",
-    "ticker_column": "codes"
-  },
+        "assets": "emData",
+        "description": "",
+        "date_column": "tradeDate",
+        "ticker_column": "codes"
+    },
     "SHCOMP_financial": {
-    "assets": "emData",
-    "description": "",
-    "date_column": "tradeDate",
-    "ticker_column": "codes"
-  },
+        "assets": "emData",
+        "description": "",
+        "date_column": "tradeDate",
+        "ticker_column": "codes"
+    },
     "Shanghai_scale_index_financial": {
-    "assets": "emData",
-    "description": "",
-    "date_column": "tradeDate",
-    "ticker_column": "codes"
-  }
+        "assets": "emData",
+        "description": "",
+        "date_column": "tradeDate",
+        "ticker_column": "codes"
+    },
+    "Shanghai_strategic_index_daily": {
+        "assets": "emData",
+        "description": "",
+        "date_column": "tradeDate",
+        "ticker_column": "codes"
+    },
+    "Shanghai_style_index_daily": {
+        "assets": "emData",
+        "description": "",
+        "date_column": "tradeDate",
+        "ticker_column": "codes"
+    },
+    "Shanghai_strategic_index_financial": {
+        "assets": "emData",
+        "description": "",
+        "date_column": "tradeDate",
+        "ticker_column": "codes"
+    },
+    "Shanghai_style_index_financial": {
+        "assets": "emData",
+        "description": "",
+        "date_column": "tradeDate",
+        "ticker_column": "codes"
+    },
+    "stock_daily": {
+        "assets": "emData",
+        "description": "",
+        "date_column": "tradeDate",
+        "ticker_column": "codes"
+    }
 }

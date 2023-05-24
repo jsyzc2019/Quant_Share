@@ -262,6 +262,7 @@ def selectFields(data, tableName, begin, end, fields: list = None, ticker: list 
     outData = data.copy()
     date_column = tableInfo[tableName]['date_column']
     ticker_column = tableInfo[tableName]['ticker_column']
+    outData[date_column] = pd.to_datetime(outData[date_column])
     # date filter
     if ticker_column != '':
         outData.sort_values(by=[date_column, ticker_column], ascending=[1, 1], inplace=True)
