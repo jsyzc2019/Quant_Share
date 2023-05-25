@@ -28,7 +28,8 @@ __all__ = ['readPkl', 'savePkl', 'save_data_h5',  # files operation
            'get_tradeDate', 'format_date', 'format_stockCode', 'reindex', 'data2score', 'info_lag',
            'format_futures', 'printJson', 'extend_date_span', 'patList', 'is_tradeDate', 'get_tradeDates',
            # Consts
-           'stock_info', 'stockList', 'stockNumList', 'bench_info', 'tradeDate_info', 'tradeDateList', 'quarter_begin', 'quarter_end',
+           'stock_info', 'stockList', 'stockNumList', 'bench_info', 'tradeDate_info', 'tradeDateList', 'quarter_begin',
+           'quarter_end',
            'futures_list', 'dataBase_root_path', 'dataBase_root_path_future', 'dataBase_root_path_gmStockFactor',
            'dataBase_root_path_EMdata',
            # decorator
@@ -43,7 +44,9 @@ def time_decorator(func):
         end = datetime.now()
         print(f'“{func.__name__}” run time: {end - start}.')
         return result
+
     return timer
+
 
 class lazyproperty:
     def __init__(self, func):
@@ -56,6 +59,7 @@ class lazyproperty:
             value = self.func(instance)
             setattr(instance, self.func.__name__, value)
             return value
+
 
 def patList(InList: list, pat: int):
     return [InList[i: i + pat] for i in range(0, len(InList), pat)]
@@ -110,9 +114,12 @@ def format_futures(file_name):
 stock_info = pd.read_hdf('{}/stock_info.h5'.format(dataBase_root_path))
 stockList = [format_stockCode(code) for code in stock_info['symbol']]  # 000001.SZ
 stockNumList = list(set(stock_info.sec_id))  # 000001
-futures_list = ['AG', 'AL', 'AU', 'A', 'BB', 'BU', 'B', 'CF', 'CS', 'CU', 'C', 'FB', 'FG', 'HC', 'IC', 'IF', 'IH', 'I', 'JD', 'JM', 'JR', 'J', 'LR', 'L', 'MA', 'M', 'NI', 'OI',
-                'PB', 'PM', 'PP', 'P', 'RB', 'RI', 'RM', 'RS', 'RU', 'SF', 'SM', 'SN', 'SR', 'TA', 'TF', 'T', 'V', 'WH', 'Y', 'ZC', 'ZN', 'PG',
-                'EB', 'AP', 'LU', 'SA', 'TS', 'CY', 'IM', 'PF', 'PK', 'CJ', 'UR', 'NR', 'SS', 'FU', 'EG', 'LH', 'SP', 'RR', 'SC', 'WR', 'BC']
+futures_list = ['AG', 'AL', 'AU', 'A', 'BB', 'BU', 'B', 'CF', 'CS', 'CU', 'C', 'FB', 'FG', 'HC', 'IC', 'IF', 'IH', 'I',
+                'JD', 'JM', 'JR', 'J', 'LR', 'L', 'MA', 'M', 'NI', 'OI',
+                'PB', 'PM', 'PP', 'P', 'RB', 'RI', 'RM', 'RS', 'RU', 'SF', 'SM', 'SN', 'SR', 'TA', 'TF', 'T', 'V', 'WH',
+                'Y', 'ZC', 'ZN', 'PG',
+                'EB', 'AP', 'LU', 'SA', 'TS', 'CY', 'IM', 'PF', 'PK', 'CJ', 'UR', 'NR', 'SS', 'FU', 'EG', 'LH', 'SP',
+                'RR', 'SC', 'WR', 'BC']
 
 bench_info = pd.read_hdf('{}/bench_info.h5'.format(dataBase_root_path))
 tradeDate_info = pd.read_hdf("{}/tradeDate_info.h5".format(dataBase_root_path))
@@ -218,6 +225,9 @@ def save_data_h5(toSaveData, name, subPath='dataFile', reWrite=False):
                 else:
                     print("{} has none Updated!".format(fullPath))
                 toSaveData.to_hdf(fullPath, 'a', 'w')
+            else:
+                print("{} has been created!".format(fullPath))
+                toSaveData.to_hdf(fullPath, 'a', 'w')
 
         else:
             if os.path.exists(fullPath):
@@ -267,7 +277,7 @@ def get_tradeDates(begin, end=None, n: int = None):
         res, index_end = binary_search(tradeDateList, end)
         if not res:
             index_end += 1
-        return tradeDateList[index_begin:index_end+1]
+        return tradeDateList[index_begin:index_end + 1]
     else:
         if n:
             return tradeDateList[index_begin:index_begin + n + 1]
