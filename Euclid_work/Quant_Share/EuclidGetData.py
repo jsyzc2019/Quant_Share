@@ -34,6 +34,40 @@ def run_thread_pool_sub(target, args, max_work_count):
         res = [t.submit(target, i) for i in args]
         return res
 
+def isdate(datestr):
+    from time import strptime
+    chinesenum = {'一': '1', '二': '2', '三': '3', '四': '4',
+                  '五': '5', '六': '6', '七': '7', '八': '8', '九': '9', '零': '0', '十': '10'}
+    strdate = ''
+    for i in range(len(datestr)):
+        temp = datestr[i]
+        if temp in chinesenum:
+            if temp == '十':
+                if datestr[i+1] not in chinesenum:
+                    strdate += chinesenum[temp]
+                elif datestr[i-1] in chinesenum:
+                    continue
+                else:
+                    strdate += '1'
+            else:
+                strdate += chinesenum[temp]
+        else:
+            strdate += temp
+
+    pattern = ('%Y年%m月%d日',
+               '%Y-%m-%d',
+               '%y年%m月%d日',
+               '%y-%m-%d',
+               '%Y/%m/%d'
+               )
+    for i in pattern:
+        try:
+            ret = strptime(strdate, i)
+            if ret:
+                return True
+        except:
+            continue
+    return False
 
 def load_file(toLoadList):
     load_data = pd.DataFrame()
@@ -42,8 +76,11 @@ def load_file(toLoadList):
         res = future.result()
         if len(res) > 0:
             # 拼接数据
-            if isinstance(res.index[0], datetime) or pd.to_datetime(res.index[0]).year >= 2015:
-                res = res.reset_index()
+            try:
+                if isinstance(res.index[0], datetime) or isdate(res.index[0]):
+                    res = res.reset_index()
+            except:
+                res = res.reset_index(drop=True)
             load_data = pd.concat((load_data, res), axis=0, ignore_index=True)
     return load_data
 

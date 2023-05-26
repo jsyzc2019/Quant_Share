@@ -11,9 +11,10 @@ from Euclid_work.Quant_Share import stockList, tradeDateList, dataBase_root_path
 from Euclid_work.Quant_Share import patList, save_data_h5, get_table_info
 from datetime import date
 from tqdm import tqdm
-
 from collections import OrderedDict
 import json
+
+from meta_dataDownLoad.save_gm_data_Y import save_gm_data_Y
 
 
 def mainCallback(quantdata):
@@ -176,16 +177,6 @@ def update(codes, tableName: str, func):
     else:
         print(f"{tableName}无需更新")
 
-def save_gm_data_Y(df, date_column_name, tableName, dataBase_root_path=dataBase_root_path_EMdata, reWrite=False):
-    if len(df) == 0:
-        raise ValueError("data for save is null!")
-    print("数据将存储在: {}/{}".format(dataBase_root_path, tableName))
-    df["year"] = df[date_column_name].apply(lambda x: format_date(x).year)
-    for yeari in range(df["year"].min(), df["year"].max() + 1):
-        df1 = df[df["year"] == yeari]
-        df1 = df1.drop(['year'], axis=1)
-        save_data_h5(df1, name='{}_Y{}'.format(tableName, yeari),
-                     subPath="{}/{}".format(dataBase_root_path, tableName), reWrite=reWrite)
 
 def batch_update(info, base:str, suffix:str, **kwargs):
     func = eval('_'.join([base, suffix]))
@@ -204,7 +195,7 @@ def batch_download(info, base:str, suffix:str, **kwargs):
                   end=kwargs.get('end',None)
                   )
         if df is not None:
-            save_gm_data_Y(df, 'tradeDate', tableName, dataBase_root_path=dataBase_root_path_EMdata, reWrite=True)
+            save_gm_data_Y(df, 'tradeDate', tableName, dataBase_root_path=dataBase_root_path_EMdata, reWrite=False)
             with open(emTableJson, 'r') as f:
                 jsonDict = json.load(f, object_pairs_hook=OrderedDict)
             jsonDict[tableName] = {
@@ -216,32 +207,101 @@ def batch_download(info, base:str, suffix:str, **kwargs):
             with open(emTableJson, "w") as f:
                 json.dump(jsonDict, f, indent=4, separators=(",", ": "))
 
+def future_daily(codes, start="2015-01-01", end=None, **kwargs):
+    end = end if end else date.today().strftime('%Y-%m-%d')
+    # 2023-05-21 21:29:19
+    # 指数 开盘价 收盘价 最高价 最低价 前收盘价 涨跌 涨跌幅 成交量 成交金额 换手率 振幅
+    future_daily_indicators = "OPEN,CLOSE,HIGH,LOW,PRECLOSE,AVERAGE,CHANGE,PCTCHANGE,VOLUME,AMOUNT,SPREAD,CLEAR,PRECLEAR,PCTCHANGECLEAR,CHANGECLEAR,HQOI,CHANGEOI,AMPLITUDE,MAINFORCE,UNIVOLUME,UNIAMOUNT,UNIHQOI,UNICHANGEOI,CHANGECLOSE,PCTCHANGECLOSE"
+    data = c.csd(
+        codes, future_daily_indicators, start, end,
+        "period=1,adjustflag=1,curtype=1,order=1,market=CNSESH")
+    if (data.ErrorCode != 0):
+        print("request csd Error, ", data.ErrorMsg)
+        return
+    else:
+        df = collate(data)
+        return df
 
-index_info = dict(
-    SHCOMP = "000001.SH,000002.SH,000003.SH,000004.SH,000005.SH,000006.SH,000007.SH,000008.SH,000017.SH,000020.SH,000090.SH,000688.SH,000688HKD00.SH,000688HKD01.SH,000688USD00.SH,000688USD01.SH,000688USD07.SH,000688USD08.SH,930928.CSI,H20928.CSI,N20928.CSI",
-    Shanghai_scale_index = "000009.SH,000010.SH,000016.SH,000043.SH,000044.SH,000045.SH,000046.SH,000047.SH,000155.SH,H00009.SH,H00010.SH,H00016.SH,H00043.SH,H00044.SH,H00045.SH,H00046.SH,H00047.SH,H00132.SH,H00133.SH,H00155.SH,N00009.SH,N00010.SH,N00016.SH,N00043.SH,N00044.SH,N00045.SH,N00046.SH,N00047.SH,N00132.SH,N00133.SH",
-    Shanghai_strategic_index = "950050.SH,950076.SH,950077.SH,950078.SH,950094.SH,950095.SH,950098.SH,950099.SH,950100.SH,950218.SH,950218CNY01.SH,H40050.SH,H40094.SH,H40095.SH,H40098.SH,H40099.SH,H40100.SH,H50040.SH,H50041.SH,H50045.SH,H50046.SH,H50047.SH,H50050.SH,H50051.SH,H50057.SH,H50058.SH,H50061.SH",
-    Shanghai_style_index = "000028.SH,000029.SH,000030.SH,000031.SH,000057.SH,000058.SH,000059.SH,000060.SH,000117.SH,000118.SH,000119.SH,000120.SH",
-)
+def load_json(path:str):
+    with open(path, 'r') as fp:
+        return json.load(fp, object_pairs_hook=OrderedDict)
+
+def check_status(data):
+    if (data.ErrorCode != 0):
+        print(data.ErrorMsg)
+        return False
+    else:
+        return True
+
+def CTR_index_download(indexcode='000300.SH',
+                       EndDate="2023-05-25",
+                       offset:int = 0,
+                       **kwargs):
+    # 2023-05-26 17:19:11
+    # 该表主要提供指定日期的指数成分股代码及权重等信息 参数: 指数代码 截止日期 字段: 指数代码 成分代码 交易日期 成分名称 收盘价 涨跌幅 指数权重 指数贡献点 流通市值 总市值 流通股本 总股本
+    if offset == 0:
+        datelst = [EndDate]
+    else:
+        offset_day = c.getdate(EndDate, offset, "Market=CNSESH")
+        offset_day = offset_day.Data[0]
+        datelst = c.tradedates(offset_day, EndDate, "period=1,order=1,market=CNSESH")
+        datelst = datelst.Data
+
+    res = pd.DataFrame()
+    for _date in tqdm(datelst):
+        data = c.ctr("INDEXCOMPOSITION",
+                     "INDEXCODE,SECUCODE,TRADEDATE,NAME,CLOSE,PCTCHANGE,WEIGHT,CONTRIBUTEPT,SHRMARKETVALUE,MV,TOTALTRADABLE,SHARETOTAL",
+                     f"IndexCode={indexcode},EndDate={_date}")
+
+        if check_status(data):
+            tmp = pd.DataFrame(data.Data, index=data.Indicators)
+            tmp = tmp.T
+            res = pd.concat([res, tmp], axis=0, ignore_index=True)
+    if len(res) > 0:
+        tableName = indexcode.replace('.','')
+        current_dir = os.path.abspath(os.path.dirname(__file__))
+        emTableJson = os.path.join(current_dir, '../dev_files/emData_tableInfo.json')
+        rewrite = kwargs.get('rewrite', True)
+        save_gm_data_Y(res, 'TRADEDATE', tableName, dataBase_root_path=dataBase_root_path_EMdata, reWrite=rewrite)
+        with open(emTableJson, 'r') as f:
+            jsonDict = json.load(f, object_pairs_hook=OrderedDict)
+        jsonDict[tableName] = {
+            "assets": "emData",
+            "description": "",
+            "date_column": "TRADEDATE",
+            "ticker_column": "SECUCODE"
+        }
+        with open(emTableJson, "w") as f:
+            json.dump(jsonDict, f, indent=4, separators=(",", ": "))
+
 
 stock_info = dict(
 
 )
 
 new_info = dict(
-    stock = stockList
+    # stock = stockList
 )
+
 
 if __name__ == '__main__':
     loginResult = c.start('ForceLogin=1', '', mainCallback)
+    future_info = load_json('codes_info/future_info.json')
+    index_info = load_json('codes_info/index_info.json')
 
-    batch_download(new_info, 'stock', 'daily', start='2023-04-01')
-
+    # DOWNLOAD
+    # batch_download(new_info, 'stock', 'daily', start='2023-04-01')
     # batch_download(new_info, 'index', 'daily')
     # batch_download(new_info, 'index', 'financial')
+    # batch_download(future_info, 'future', 'daily', start='2018-01-01', end='2022-12-31')
 
+    # UPDATE
     # batch_update(index_info, 'index', 'daily')
     # batch_update(index_info, 'index', 'financial')
+
+    CTR_index_download(indexcode='000300.SH', EndDate="2023-05-25", offset=-90)
+
+    c.stop()
 
 
 
