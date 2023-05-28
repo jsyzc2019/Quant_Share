@@ -14,6 +14,7 @@ import numpy as np
 import pandas as pd
 from gm.api import *
 from functools import reduce, wraps
+from time import strptime
 
 dataBase_root_path = r'E:\Share\Stk_Data\dataFile'
 dataBase_root_path_future = r"E:\Share\Fut_Data"
@@ -27,6 +28,7 @@ dataBase_root_path_EMdata = r"E:\Share\EMData"
 __all__ = ['readPkl', 'savePkl', 'save_data_h5',  # files operation
            'get_tradeDate', 'format_date', 'format_stockCode', 'reindex', 'data2score', 'info_lag',
            'format_futures', 'printJson', 'extend_date_span', 'patList', 'is_tradeDate', 'get_tradeDates',
+           'isdate',
            # Consts
            'stock_info', 'stockList', 'stockNumList', 'bench_info', 'tradeDate_info', 'tradeDateList', 'quarter_begin',
            'quarter_end',
@@ -352,3 +354,39 @@ def extend_date_span(begin, end, freq):
         return begin, end
     else:
         raise AttributeError("frq should be M, Q or Y!")
+
+def isdate(datestr):
+    datestr = str(datestr)
+    chinesenum = {'一': '1', '二': '2', '三': '3', '四': '4',
+                  '五': '5', '六': '6', '七': '7', '八': '8', '九': '9', '零': '0', '十': '10'}
+    strdate = ''
+    for i in range(len(datestr)):
+        temp = datestr[i]
+        if temp in chinesenum:
+            if temp == '十':
+                if datestr[i+1] not in chinesenum:
+                    strdate += chinesenum[temp]
+                elif datestr[i-1] in chinesenum:
+                    continue
+                else:
+                    strdate += '1'
+            else:
+                strdate += chinesenum[temp]
+        else:
+            strdate += temp
+
+    pattern = ('%Y年%m月%d日',
+               '%Y-%m-%d',
+               '%y年%m月%d日',
+               '%y-%m-%d',
+               '%Y/%m/%d',
+               '%Y%m%d'
+               )
+    for i in pattern:
+        try:
+            ret = strptime(strdate, i)
+            if ret:
+                return True
+        except:
+            continue
+    return False

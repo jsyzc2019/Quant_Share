@@ -88,5 +88,11 @@
         "description": "",
         "date_column": "TRADEDATE",
         "ticker_column": "SECUCODE"
+    },
+    "Stock_A_daily": {
+        "assets": "emData",
+        "description": "",
+        "date_column": "NTRADEDAY",
+        "ticker_column": "codes"
     }
 }

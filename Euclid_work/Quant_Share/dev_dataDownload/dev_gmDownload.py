@@ -1,5 +1,5 @@
 from Euclid_work.Quant_Share import get_tradeDate, get_table_info
-from meta_dataDownLoad import *
+from meta_gm_dataDownLoad import *
 from datetime import datetime
 
 # 根据数据表最后写入的时间做增量更新
