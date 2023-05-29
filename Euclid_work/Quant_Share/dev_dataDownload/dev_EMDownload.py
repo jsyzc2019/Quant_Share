@@ -1,7 +1,12 @@
 
-from meta_EM_dataDownLoad import c, load_json, collate, check_status, pd, tqdm, date, mainCallback
+from meta_EM_dataDownLoad import c, load_json, collate, check_status, log
 from meta_EM_dataDownLoad import batch_download, batch_update, update, Save_and_Log
-from meta_EM_dataDownLoad import CTR_index_download
+from meta_EM_dataDownLoad import index_daily, index_financial
+# from meta_EM_dataDownLoad import CTR_index_download
+from tqdm import tqdm
+import pandas as pd
+from datetime import date
+import json
 
 def REITS(
         codes:list[str],
@@ -45,11 +50,18 @@ def stock_daily_css(
 
 
 if __name__ == '__main__':
-    loginResult = c.start('ForceLogin=1', '', mainCallback)
+    # loginResult = c.start('ForceLogin=1', '', mainCallback)
+    log()
 
     future_info = load_json('meta_EM_dataDownLoad/codes_info/future_info.json')
-    index_info = load_json('meta_EM_dataDownLoad/codes_info/index_info.json')
     stock_info = load_json('meta_EM_dataDownLoad/codes_info/stock.json')
+
+    # for name in index_info.keys():
+        # index_info[name]['tableName'] = ["_".join([name, f.split('_')[-1]]) for f in index_info[name]['func']]
+        # index_info[name]['func'] = list(map(eval, index_info[name]['func']))
+
+    # with open('meta_EM_dataDownLoad/codes_info/index_info.json', 'w') as fp:
+    #     json.dump(index_info, fp, indent=2, separators=(",", ": "))
 
     # DOWNLOAD
     # batch_download(new_info, 'stock', 'daily', start='2023-04-01')
@@ -65,10 +77,6 @@ if __name__ == '__main__':
     #         offset=0,
     #         tableName="_".join([key, 'daily'])
     #     )
-
-    # UPDATE
-    # batch_update(index_info, 'index', 'daily')
-    # batch_update(index_info, 'index', 'financial')
 
     # CTR_index_download(indexcode='000300.SH', EndDate="2023-05-25", offset=-90)
 

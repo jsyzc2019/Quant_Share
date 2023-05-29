@@ -36,4 +36,6 @@ def mainCallback(quantdata):
     else:
         pass
 
-# loginResult = c.start('ForceLogin=1', '', mainCallback)
+def log(handle:str='ForceLogin=1', options='', callback=mainCallback):
+    loginResult = c.start(handle, options, callback)
+    return loginResult

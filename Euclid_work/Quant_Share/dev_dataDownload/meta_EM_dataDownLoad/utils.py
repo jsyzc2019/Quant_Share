@@ -66,11 +66,17 @@ def update(codes, tableName: str, func):
     else:
         print(f"{tableName}无需更新")
 
-def batch_update(info, base:str, suffix:str, **kwargs):
-    func = eval('_'.join([base, suffix]))
-    for name, codes in info.items():
-        tableName = '_'.join([name, suffix])
-        update(codes, tableName=tableName, func=func)
+# def batch_update(info, base:str, suffix:str, **kwargs):
+#     func = eval('_'.join([base, suffix]))
+#     for name, codes in info.items():
+#         tableName = '_'.join([name, suffix])
+#         update(codes, tableName=tableName, func=func)
+
+def batch_update(infos, **kwargs):
+    for name, info in infos.items():
+        codes = info["codes"]
+        for func, tableName in zip(info["func"], info["tableName"]):
+            update(codes, tableName=tableName, func=func)
 
 def batch_download(info, base:str, suffix:str, **kwargs):
     func = eval('_'.join([base, suffix]))
