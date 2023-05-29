@@ -355,7 +355,7 @@ def extend_date_span(begin, end, freq):
     else:
         raise AttributeError("frq should be M, Q or Y!")
 
-def isdate(datestr):
+def isdate(datestr, **kwargs):
     datestr = str(datestr)
     chinesenum = {'一': '1', '二': '2', '三': '3', '四': '4',
                   '五': '5', '六': '6', '七': '7', '八': '8', '九': '9', '零': '0', '十': '10'}
@@ -381,7 +381,7 @@ def isdate(datestr):
                '%y-%m-%d',
                '%Y/%m/%d',
                '%Y%m%d'
-               )
+               ) + kwargs.get('pattern', ())
     for i in pattern:
         try:
             ret = strptime(strdate, i)
