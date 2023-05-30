@@ -1,4 +1,3 @@
-
 from .Utils import lazyproperty, time_decorator, stockList
 from .BackTest import DataPrepare, reindex, info_lag, simpleBT, data2score
 from .EuclidGetData import get_data
@@ -12,13 +11,15 @@ from scipy.stats.mstats import winsorize
 from datetime import date
 # from dask import dataframe as dd
 import warnings
+
 warnings.filterwarnings('ignore')
 
-class FactorBase():
-    def __init__(self, beginDate:str=None, endDate:str=None, **kwargs) -> None:
+
+class FactorBase:
+    def __init__(self, beginDate: str = None, endDate: str = None, **kwargs) -> None:
         self.beginDate = beginDate
         self.endDate = endDate if endDate else date.today().strftime("%Y%m%d")
-        for k,v in kwargs.items():
+        for k, v in kwargs.items():
             setattr(self, k, v)
 
     @staticmethod
@@ -44,14 +45,14 @@ class FactorBase():
             else:
                 return params
 
-    def align_data(self, data_lst:list[pd.DataFrame]=[], *args):
+    def align_data(self, data_lst: list[pd.DataFrame] = [], *args):
         # data_lst = [df.set_index(on) for df in data_lst if on in df.columns]
         data_lst = list(chain(data_lst, args))
         dims = 1 if any(len(df.shape) == 1 or 1 in df.shape for df in data_lst) else 2
         if len(data_lst) > 2:
-            mut_date_range = sorted(reduce(lambda x,y: x.intersection(y), (df.index for df in data_lst)))
+            mut_date_range = sorted(reduce(lambda x, y: x.intersection(y), (df.index for df in data_lst)))
             if dims == 2:
-                mut_codes = sorted(reduce(lambda x,y: x.intersection(y), (df.columns for df in data_lst)))
+                mut_codes = sorted(reduce(lambda x, y: x.intersection(y), (df.columns for df in data_lst)))
                 data_lst = [df.loc[mut_date_range, mut_codes] for df in data_lst]
             elif dims == 1:
                 data_lst = [df.loc[mut_date_range, :] for df in data_lst]
@@ -128,18 +129,19 @@ class FactorBase():
         dc.get_Tushare_data()
         return dc
 
-    def BackTest(self, data:pd.DataFrame, DataClass=None):
+    def BackTest(self, data: pd.DataFrame, DataClass=None):
         if not DataClass: DataClass = self.DataClass
         data_reindex = reindex(data)
         score = info_lag(data2score(data_reindex), n_lag=1)
         # group beck test
         BTClass = simpleBT(DataClass.TICKER, DataClass.BENCH)
         fig, outMetrics, group_res = BTClass.groupBT(score)
-        fig.show() # 绘图
-        print(outMetrics) # 输出指标
+        fig.show()  # 绘图
+        print(outMetrics)  # 输出指标
+
 
 class SizeFactor(FactorBase):
-    def __init__(self, beginDate:str=None, endDate:str=None):
+    def __init__(self, beginDate: str = None, endDate: str = None):
         endDate = endDate if endDate else date.today().strftime("%Y%m%d")
         super().__init__(beginDate, endDate)
 
@@ -147,10 +149,10 @@ class SizeFactor(FactorBase):
     def LNCAP(self, fill=False) -> pd.DataFrame:
         return np.log(self.marketValue) if not fill else np.log(self.marketValue).fillna(method='ffill')
 
-    def _calc_MIDCAP(self, x:pd.Series or np.ndarray) -> pd.DataFrame:
+    def _calc_MIDCAP(self, x: pd.Series or np.ndarray) -> pd.DataFrame:
         if isinstance(x, pd.Series):
             x = x.values
-        y = x**3
+        y = x ** 3
         beta, alpha, _ = self.regress(y, x, intercept=True, weight=1, verbose=True)
         y_hat = alpha + beta * x
         resid = y - y_hat
@@ -164,6 +166,7 @@ class SizeFactor(FactorBase):
         df = df.apply(self._calc_MIDCAP, axis=1, raw=True)
         return df
 
+
 class DividendYield(FactorBase):
 
     def __init__(self, beginDate: str = None, endDate: str = None):
@@ -171,37 +174,36 @@ class DividendYield(FactorBase):
         super().__init__(beginDate, endDate)
 
 
-
-
 class Liquidity(FactorBase):
 
-    def __init__(self, beginDate:str=None, endDate:str=None):
+    def __init__(self, beginDate: str = None, endDate: str = None):
         endDate = endDate if endDate else date.today().strftime("%Y%m%d")
         super().__init__(beginDate, endDate)
         pass
-    def _calc_Liquidity(self, series, days:int):
+
+    def _calc_Liquidity(self, series, days: int):
         freq = len(series) // days
-        res = np.log(np.nansum(series)/freq)
+        res = np.log(np.nansum(series) / freq)
         return -1e10 if np.isinf(res) else res
+
     @lazyproperty
     def STOM(self, window=21):
         df = self.turnoverRate
-        df = df.rolling(window=window, axis=0).apply(self._calc_Liquidity, args=(21,),raw=True)
+        df = df.rolling(window=window, axis=0).apply(self._calc_Liquidity, args=(21,), raw=True)
         return df
+
     @lazyproperty
     def STOQ(self, window=63):
         df = self.turnoverRate
-        df = df.rolling(window=window, axis=0).apply(self._calc_Liquidity, args=(21,),raw=True)
+        df = df.rolling(window=window, axis=0).apply(self._calc_Liquidity, args=(21,), raw=True)
         return df
+
     @lazyproperty
     def STOA(self, window=252):
         df = self.turnoverRate
-        df = df.rolling(window=window, axis=0).apply(self._calc_Liquidity, args=(21,),raw=True)
+        df = df.rolling(window=window, axis=0).apply(self._calc_Liquidity, args=(21,), raw=True)
         return df
 
     @lazyproperty
     def Liquidity(self):
-        return 0.35 * self.STOM + 0.35 * self.STOQ + 0.3 *self.STOA
-
-
-
+        return 0.35 * self.STOM + 0.35 * self.STOQ + 0.3 * self.STOA

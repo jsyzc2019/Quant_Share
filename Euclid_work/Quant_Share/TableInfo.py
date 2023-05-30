@@ -3,6 +3,7 @@
 # @Time    : 2023/4/20 14:59
 # @Author  : Euclid-Jie
 # @File    : TableInfo.py
+# @desc    : assets用于指派不同的get_data逻辑, 如果不指定date_column, ticker_column说明该表不支持date索引, ticker索引
 """
 import json
 import os

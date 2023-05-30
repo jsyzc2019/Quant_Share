@@ -37,7 +37,6 @@ def run_thread_pool_sub(target, args, max_work_count):
 
 
 def load_file(toLoadList):
-
     load_data = pd.DataFrame()
     res = run_thread_pool_sub(pd.read_hdf, toLoadList, max_work_count=10)
     for future in as_completed(res):
@@ -96,7 +95,7 @@ def get_data_stock(tableName, begin, end, fields, ticker):
     if not os.path.exists(tabelFoldPath):
         try:
             data = pd.read_hdf(tabelFoldPath + '.h5')
-            return data
+            return selectFields(data, tableName, begin, end, fields, ticker)
         except FileNotFoundError:
             print("{} no exits!".format(tableName))
 
@@ -182,7 +181,7 @@ def get_data_gmStockData(tableName, begin, end, fields, ticker):
     if not os.path.exists(tabelFoldPath):
         try:
             data = pd.read_hdf(tabelFoldPath + '.h5')
-            return data
+            return selectFields(data, tableName, begin, end, fields, ticker)
         except FileNotFoundError:
             print("{} no exits!".format(tableName))
 
@@ -219,13 +218,14 @@ def get_data_gmStockData(tableName, begin, end, fields, ticker):
         return selectFields(load_data, tableName, begin, end, fields, ticker)
     else:
         raise KeyError("请检查{}, 文件不符合{}_Y*_Q*组织形式".format(tabelFoldPath, tableName))
+
 
 def get_data_emData(tableName, begin, end, fields, ticker):
     tabelFoldPath = os.path.join(dataBase_root_path_EMdata, tableName)
     if not os.path.exists(tabelFoldPath):
         try:
             data = pd.read_hdf(tabelFoldPath + '.h5')
-            return data
+            return selectFields(data, tableName, begin, end, fields, ticker)
         except FileNotFoundError:
             print("{} no exits!".format(tableName))
 
@@ -263,27 +263,39 @@ def get_data_emData(tableName, begin, end, fields, ticker):
     else:
         raise KeyError("请检查{}, 文件不符合{}_Y*_Q*组织形式".format(tabelFoldPath, tableName))
 
+
 def selectFields(data, tableName, begin, end, fields: list = None, ticker: list = None):
     outData = data.copy()
-    date_column = tableInfo[tableName]['date_column']
-    ticker_column = tableInfo[tableName]['ticker_column']
-    outData[date_column] = pd.to_datetime(outData[date_column])
-    # date filter
-    if ticker_column != '':
-        outData.sort_values(by=[date_column, ticker_column], ascending=[1, 1], inplace=True)
-    else:
-        outData.sort_values(by=[date_column], ascending=True, inplace=True)
-    outData.reset_index(drop=True, inplace=True)
-    if isinstance(outData[date_column][0], int):
-        dateSpan = pd.to_datetime(outData[date_column], format='%Y%m%d')
-    else:
-        dateSpan = pd.to_datetime(outData[date_column]).apply(lambda x: x.replace(tzinfo=None))
-    outData = outData.loc[(dateSpan >= format_date(begin)).values & (dateSpan <= format_date(end))]
-    # ticker filter
-    if ticker:
-        tickerSpan = outData[ticker_column].apply(lambda x: format_stockCode(x))
-        outData = outData[tickerSpan.isin([format_stockCode(x) for x in ticker])]
+    # get date_column, ticker_column
+    try:
+        date_column = tableInfo[tableName]['date_column']
+        outData[date_column] = pd.to_datetime(outData[date_column])
+    except KeyError:
+        print("{} 不支持时间筛选".format(tableName))
+        date_column = ''
+    try:
+        ticker_column = tableInfo[tableName]['ticker_column']
+    except KeyError:
+        print("{} 不支持ticker筛选".format(tableName))
+        ticker_column = ''
 
+    # data filter: date -> ticker -> fields
+    if date_column != '' and ticker_column != '':
+        outData.sort_values(by=[date_column, ticker_column], ascending=[1, 1], inplace=True)
+        outData = selectFields_dateSpan(outData, begin, end, date_column)
+        if ticker:
+            outData = selectFields_ticker(outData, ticker, ticker_column)
+    elif date_column != '':
+        outData.sort_values(by=[date_column], ascending=True, inplace=True)
+        outData = selectFields_dateSpan(outData, begin, end, date_column)
+    elif ticker_column != '':
+        outData.sort_values(by=[ticker_column], ascending=True, inplace=True)
+        if ticker:
+            outData = selectFields_ticker(outData, ticker, ticker_column)
+    else:
+        # 不进行任何筛选排序
+        pass
+    # finally data filter: fields
     if fields:
         if set(fields).issubset(outData.columns):
             outData = outData[fields]
@@ -291,6 +303,22 @@ def selectFields(data, tableName, begin, end, fields: list = None, ticker: list 
             notExitField = "\\".join(list(set(fields) - set(outData.columns)))
             raise AttributeError("{} is not exit in {}".format(notExitField, tableName))
     return outData.reset_index(drop=True)
+
+
+def selectFields_ticker(Data, ticker, ticker_column):
+    # ticker filter
+    tickerSpan = Data[ticker_column].apply(lambda x: format_stockCode(x))
+    outData = Data[tickerSpan.isin([format_stockCode(x) for x in ticker])]
+    return outData
+
+
+def selectFields_dateSpan(Data, begin, end, date_column):
+    if isinstance(Data[date_column][0], int):
+        dateSpan = pd.to_datetime(Data[date_column], format='%Y%m%d')
+    else:
+        dateSpan = pd.to_datetime(Data[date_column]).apply(lambda x: x.replace(tzinfo=None))
+    outData = Data.loc[(dateSpan >= format_date(begin)).values & (dateSpan <= format_date(end))]
+    return outData
 
 
 def get_all_file(folderPath, query='.h5'):
@@ -373,7 +401,7 @@ def get_table_info(tableName):
     return outJson
 
 
-def search_keyword(keyword: str, fuzzy=True, limit=5, update:bool=False):
+def search_keyword(keyword: str, fuzzy=True, limit=5, update: bool = False):
     '''
     :param keyword: the content you want to search for
     :param fuzzy: fuzzy matching or not
