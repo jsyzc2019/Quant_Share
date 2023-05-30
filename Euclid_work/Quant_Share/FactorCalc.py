@@ -101,6 +101,28 @@ class FactorBase():
         return df
 
     @lazyproperty
+    def closePrice(self):
+        df = get_data(
+            tableName='MktEqud',
+            ticker=stockList,
+            begin=self.beginDate,
+            end=self.endDate,
+            fields=['ticker', 'tradeDate', 'closePrice'])
+        df = df.pivot(index='tradeDate', columns='ticker', values='closePrice')
+        return df
+
+    @lazyproperty
+    def turnoverRate(self):
+        df = get_data(
+            tableName='MktEqud',
+            ticker=stockList,
+            begin=self.beginDate,
+            end=self.endDate,
+            fields=['ticker', 'tradeDate', 'turnoverRate'])
+        df = df.pivot(index='tradeDate', columns='ticker', values='turnoverRate')
+        return df
+
+    @lazyproperty
     def DataClass(self):
         dc = DataPrepare(beginDate=self.beginDate, endDate=self.endDate)
         dc.get_Tushare_data()
@@ -149,12 +171,37 @@ class DividendYield(FactorBase):
         super().__init__(beginDate, endDate)
 
 
+
+
 class Liquidity(FactorBase):
 
     def __init__(self, beginDate:str=None, endDate:str=None):
         endDate = endDate if endDate else date.today().strftime("%Y%m%d")
         super().__init__(beginDate, endDate)
         pass
+    def _calc_Liquidity(self, series, days:int):
+        freq = len(series) // days
+        res = np.log(np.nansum(series)/freq)
+        return -1e10 if np.isinf(res) else res
+    @lazyproperty
+    def STOM(self, window=21):
+        df = self.turnoverRate
+        df = df.rolling(window=window, axis=0).apply(self._calc_Liquidity, args=(21,),raw=True)
+        return df
+    @lazyproperty
+    def STOQ(self, window=63):
+        df = self.turnoverRate
+        df = df.rolling(window=window, axis=0).apply(self._calc_Liquidity, args=(21,),raw=True)
+        return df
+    @lazyproperty
+    def STOA(self, window=252):
+        df = self.turnoverRate
+        df = df.rolling(window=window, axis=0).apply(self._calc_Liquidity, args=(21,),raw=True)
+        return df
+
+    @lazyproperty
+    def Liquidity(self):
+        return 0.35 * self.STOM + 0.35 * self.STOQ + 0.3 *self.STOA
 
 
 
