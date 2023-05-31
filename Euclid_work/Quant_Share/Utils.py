@@ -9,7 +9,6 @@ import os
 import os.path
 import pickle
 from tqdm import tqdm
-from uqer import DataAPI
 import numpy as np
 import pandas as pd
 from gm.api import *
@@ -28,7 +27,7 @@ dataBase_root_path_EMdata = r"E:\Share\EMData"
 __all__ = ['readPkl', 'savePkl', 'save_data_h5',  # files operation
            'get_tradeDate', 'format_date', 'format_stockCode', 'reindex', 'data2score', 'info_lag',
            'format_futures', 'printJson', 'extend_date_span', 'patList', 'is_tradeDate', 'get_tradeDates',
-           'isdate',
+           'isdate', 'binary_search',
            # Consts
            'stock_info', 'stockList', 'stockNumList', 'bench_info', 'tradeDate_info', 'tradeDateList', 'quarter_begin',
            'quarter_end',
@@ -164,6 +163,7 @@ def reindex(data, tradeDate=True, **kwargs):
     Convert wide table to standard format, with index as pd.dt and columns as wind code
     :param tradeDate: if ture, index is trade day
     :param data:
+    :param kwargs: begin=min(data.index), end=max(data.index), fill_value=np.nan
     :return:
     """
     if not isinstance(data, pd.DataFrame):
@@ -173,10 +173,13 @@ def reindex(data, tradeDate=True, **kwargs):
     data.columns = [format_stockCode(x) for x in data.columns]
     if np.NAN in data.columns:
         data.drop(columns=np.NAN, inplace=True)
+    begin = kwargs.get('begin', data.index.min())
+    end = kwargs.get('end', data.index.max())
     if tradeDate:
-        new_index = [x for x in pd.date_range(data.index.min(), data.index.max(), freq='D') if x in tradeDateList]
+        # TODO 使用二分法优化速度
+        new_index = [x for x in pd.date_range(begin, end, freq='D') if x in tradeDateList]
     else:
-        new_index = pd.date_range(data.index.min(), data.index.max(), freq='D')
+        new_index = pd.date_range(begin, end, freq='D')
     new_columns = stockList
     # fill na
     fill_value = np.nan

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-# @Time    : 2023/4/9 16:17
+# @Time    : 2023/5/30 22:04
 # @Author  : Euclid-Jie
-# @File    : BackTest.py
+# @File    : BackTest_Meng.py
+# @Desc    : 针对Meng需求, 对指标进行变动
 import math
 import numpy as np
-import pandas
 import pandas as pd
 import datetime
 import matplotlib.pyplot as plt
@@ -14,12 +14,22 @@ from .EuclidGetData import get_data
 
 
 class DataPrepare:
-    def __init__(self, beginDate: str, endDate: str = None):
+    def __init__(self, beginDate: str, endDate: str = None, bench: str = None):
+        """
+
+        :param beginDate:
+        :param endDate:
+        :param bench:  可选'300', '905', '852', 默认沪深300
+        """
         # param init
         self.beginDate = beginDate
         self.endDate = endDate
         if not self.endDate:
             self.endDate = datetime.date.today().strftime("%Y%m%d")
+        if not bench:
+            self.bench_code = '000300'
+        else:
+            self.bench_code = bench.zfill(6)
 
         # consts init
         self.TICKER = {}  # store ticker's data
@@ -28,29 +38,22 @@ class DataPrepare:
         # Score init
         self.Score = None
 
-        # tradeDate init
-        self.tradeDateBase = tradeDate_info.loc[format_date(beginDate):format_date(endDate)]
-
     def get_bench_info(self):
         # bench nav
-        bench_price_df = get_data('MktIdx', begin=self.beginDate, end=self.endDate, ticker=['000300'])
+        bench_price_df = get_data('MktIdx', begin=self.beginDate, end=self.endDate, ticker=[self.bench_code])
         bench_price_df['tradeDate'] = pd.to_datetime(bench_price_df['tradeDate'])
         bench_price_df = bench_price_df.sort_values('tradeDate', ascending=True)
         bench_price_df.set_index('tradeDate', inplace=True)
         self.BENCH['pct_chg'] = bench_price_df['CHGPct']
-        # TODO bench con code
-        # self.BENCH['con_code']
+        # TODO bench con code, 在此基础上完成股票池筛选, 沪深300, ZZ500, ZZ1000
+        con_code = get_data('mIdxCloseWeight', ticker=self.bench_code).pivot(index='effDate', columns='consTickerSymbol', values='weight')
+        con_code.columns = [format_stockCode(i) for i in con_code.columns]
+        self.BENCH['con_code'] = con_code.reindex(columns=stockList)
 
     def get_price_data(self):
         price_df = get_data('MktEqud', begin=self.beginDate, end=self.endDate)
         for coli in ['openPrice', 'closePrice', 'turnoverRate', 'isOpen', 'vwap', 'negMarketValue', 'chgPct', 'isOpen']:
             self.TICKER[coli] = reindex(price_df.pivot(index='tradeDate', columns='ticker', values=coli))
-
-    def get_score_data(self):
-        # HKshszHold chg_pct
-        HKHold = get_data('HKshszHold', begin=self.beginDate, end=self.endDate)
-        HKHoldPct = HKHold.pivot(index='endDate', columns='ticker', values='partyPct')
-        self.Score = reindex(HKHoldPct.pct_change(periods=1, axis=0))
 
     def get_limit_data(self):
         # suspend_type
@@ -68,15 +71,17 @@ class DataPrepare:
         print(">>> Waiting for Data prepare ...")
         self.get_bench_info()
         self.get_price_data()
-        self.get_score_data()
         self.calc_score()
         self.get_limit_data()
 
 
 class simpleBT:
-    def __init__(self, tickerData: dict, benchData: dict):
+    def __init__(self, tickerData: dict, benchData: dict, negValueAdjust: bool = True):
         self.benchData = benchData
         self.tickerData = tickerData
+        self.negValueAdjust = negValueAdjust
+        # init negValues
+        self.negMarketValue = self.tickerData['negMarketValue'].fillna(method='ffill', axis=0)
 
     def backTest(self, Score, fee_rate=0.0008, group=1, dealPrice='close', plot=False):
         # format confirm
@@ -93,8 +98,8 @@ class simpleBT:
             rtn_before_trade = self.tickerData['Rtn']
             rtn_after_trade = pd.DataFrame(np.zeros(rtn_before_trade.shape), index=self.tickerData['Rtn'].index, columns=self.tickerData['Rtn'].columns)
         else:
-            rtn_before_trade = self.tickerData[dealPrice] / self.tickerData['closePrice'].shift(axis=0) - 1
-            rtn_after_trade = self.tickerData['closePrice'] / self.tickerData[dealPrice] - 1
+            rtn_before_trade = (self.tickerData[dealPrice] - self.tickerData['closePrice'].shift(axis=0)) / self.tickerData['closePrice'].shift(axis=0)
+            rtn_after_trade = (self.tickerData['closePrice'] - self.tickerData[dealPrice]) / self.tickerData[dealPrice]
 
             rtn_before_trade[pd.isnull(rtn_before_trade)] = 0
             rtn_after_trade[pd.isnull(rtn_after_trade)] = 0
@@ -129,10 +134,19 @@ class simpleBT:
                 temp_pos.fillna(0, inplace=True)
 
                 # calc target position
+                tmpScore = Score.loc[date].copy()
+                ## adjust by bench con
+                _, idx = binary_search(self.benchData['con_code'].index, format_date(date))
+                con_tag = self.benchData['con_code'].iloc[idx - 1] > 0
+                tmpScore[~con_tag] = np.nan
                 try:
-                    this_pos = self.getGroupTargPost(Score=Score.loc[date], group=group)
+                    this_pos = self.getGroupTargPost(Score=tmpScore, group=group)
                 except ValueError:
                     this_pos = temp_pos
+                if self.negValueAdjust:
+                    # adjust by negValue
+                    this_pos = (self.negMarketValue.loc[date] * this_pos).fillna(value=0)
+                    this_pos = this_pos / np.sum(this_pos)
 
                 # calc for buy and sell
                 diff = this_pos - temp_pos
@@ -276,11 +290,14 @@ class simpleBT:
         # plot
         fig, axis = plt.subplots()
         for group in range(5):
-            alpha_nav = group_res['{}'.format(group + 1)][2]
+            # alpha_nav = group_res['{}'.format(group + 1)][2]
+            nav = group_res['{}'.format(group + 1)][0]
             # print(alpha_nav[-1])
-            alpha_nav.plot()  # 组合净值
-        axis.set_title("Group alpha_nav")
-        axis.legend(["Group_{}".format(i) for i in [1, 2, 3, 4, 5]])
+            (nav - 1).plot()  # 组合净值
+        axis.set_title("Group nav")
+        bench_nav = group_res['4'][0] * group_res['4'][2] - 1
+        bench_nav.plot()  # bench
+        axis.legend(["Group_{}".format(i) for i in [1, 2, 3, 4, 5]] + ['bench_nav'])
 
         # calc metrics
         outMetrics = pd.DataFrame()

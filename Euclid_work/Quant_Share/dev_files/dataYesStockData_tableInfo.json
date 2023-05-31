@@ -11,6 +11,12 @@
         "date_column": "tradeDate",
         "ticker_column": "ticker"
     },
+    "mIdxCloseWeight": {
+        "assets": "stock",
+        "description": "指数月度权重",
+        "date_column": "effDate",
+        "ticker_column": "ticker"
+    },
     "MktIdx": {
         "assets": "stock",
         "description": "指数日行情",
