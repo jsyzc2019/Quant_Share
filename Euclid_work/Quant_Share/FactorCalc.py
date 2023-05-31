@@ -24,6 +24,14 @@ class FactorBase:
 
     @staticmethod
     def regress(y, X, intercept: bool = True, weight: int = 1, verbose: bool = True):
+        '''
+        :param y: 因变量
+        :param X: 自变量
+        :param intercept: 是否有截距
+        :param weight: 权重
+        :param verbose: 是否返回残差
+        :return:
+        '''
 
         if len(X.shape) == 1: X = X.reshape((-1, 1))
         if intercept:
@@ -46,7 +54,12 @@ class FactorBase:
                 return params
 
     def align_data(self, data_lst: list[pd.DataFrame] = [], *args):
-        # data_lst = [df.set_index(on) for df in data_lst if on in df.columns]
+        '''
+        基于index和columns进行表格的对齐
+        :param data_lst: 以列表形式传入需要对齐的表格
+        :param args: 可以传入单个表格
+        :return:
+        '''
         data_lst = list(chain(data_lst, args))
         dims = 1 if any(len(df.shape) == 1 or 1 in df.shape for df in data_lst) else 2
         if len(data_lst) > 2:
@@ -72,6 +85,13 @@ class FactorBase:
             mode: str = 'mad',
             **kwargs
     ):
+        '''
+        :param series:
+        :param n:
+        :param mode:
+        :param kwargs:
+        :return:
+        '''
         if mode == 'mad':
             median = np.nanmedian(series)
             mad = np.nanmedian(np.abs(series - median))
@@ -80,11 +100,15 @@ class FactorBase:
             min_range = median - n * mad_e
             return np.clip(series, min_range, max_range)
         elif mode == 'tile':
-            # not done
+
             return winsorize(np.arange(8), limits=kwargs.get('limits', [0.1, 0.1]), nan_policy='omit')
 
     @staticmethod
     def nomalize_zscore(series):
+        '''
+        :param series:
+        :return:
+        '''
         mu = np.nanmean(series)
         sigma = np.nanstd(series)
         norm = (series - mu) / sigma
@@ -130,6 +154,11 @@ class FactorBase:
         return dc
 
     def BackTest(self, data: pd.DataFrame, DataClass=None):
+        '''
+        :param data:
+        :param DataClass:
+        :return:
+        '''
         if not DataClass: DataClass = self.DataClass
         data_reindex = reindex(data)
         score = info_lag(data2score(data_reindex), n_lag=1)

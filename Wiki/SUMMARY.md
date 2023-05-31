@@ -3,6 +3,7 @@
 * [Introduction](README.md)
 * [快速使用](快速使用.md)
 * [函数及常量](函数及常量.md)
+* [因子计算](BARRA因子.md)
 
 - [已支持的表](已支持的表.md)
   - [balance_sheet](balance_sheet.md)
