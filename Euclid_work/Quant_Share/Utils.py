@@ -11,7 +11,6 @@ import pickle
 from tqdm import tqdm
 import numpy as np
 import pandas as pd
-from gm.api import *
 from functools import reduce, wraps
 from time import strptime
 

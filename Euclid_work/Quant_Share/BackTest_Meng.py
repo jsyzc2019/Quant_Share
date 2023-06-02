@@ -288,10 +288,14 @@ class simpleBT:
                 sum_here = 0
         return -min_all
 
+    @staticmethod
+    def get_nav_data_2_plot(data: pd.Series):
+        return data / data.iloc[0] - 1
+
     def groupBT(self, Score, **kwargs):
         Score.dropna(axis=0, how='all', inplace=True)
-        metric_begin = get_tradeDates(kwargs.get('metric_begin', Score.index[0]), 0)
-        plot_begin = get_tradeDates(kwargs.get('plot_begin', Score.index[0]), 0)
+        metric_begin = get_tradeDate(kwargs.get('metric_begin', Score.index[0]), 0)
+        plot_begin = get_tradeDate(kwargs.get('plot_begin', Score.index[0]), 0)
         group_res = {}
         for group in range(5):
             (nav, pos_out, alpha_nav, result) = self.backTest(Score.loc[metric_begin:], group=group + 1, dealPrice='vwap')
@@ -303,10 +307,10 @@ class simpleBT:
             # alpha_nav = group_res['{}'.format(group + 1)][2]
             nav = group_res['{}'.format(group + 1)][0]
             # print(alpha_nav[-1])
-            (nav - 1).loc[get_tradeDates(plot_begin, 0):].plot()  # 组合净值
+            self.get_nav_data_2_plot(nav.loc[plot_begin:]).plot()  # 组合净值
         axis.set_title("Group nav")
-        bench_nav = group_res['4'][0] * group_res['4'][2] - 1
-        bench_nav.loc[get_tradeDates(plot_begin, 0):].plot()  # bench
+        bench_nav = group_res['4'][0] * group_res['4'][2]
+        self.get_nav_data_2_plot(bench_nav.loc[plot_begin:]).plot()  # bench
         axis.legend(["Group_{}".format(i) for i in [1, 2, 3, 4, 5]] + ['bench_nav'])
 
         # calc metrics
