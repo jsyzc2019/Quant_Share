@@ -46,7 +46,9 @@ class DataPrepare:
         bench_price_df.set_index('tradeDate', inplace=True)
         self.BENCH['pct_chg'] = bench_price_df['CHGPct']
         # TODO bench con code, 在此基础上完成股票池筛选, 沪深300, ZZ500, ZZ1000
-        con_code = get_data('mIdxCloseWeight', ticker=self.bench_code).pivot(index='effDate', columns='consTickerSymbol', values='weight')
+        con_code = get_data('mIdxCloseWeight', ticker=self.bench_code).pivot(index='effDate',
+                                                                             columns='consTickerSymbol',
+                                                                             values='weight')
         con_code.columns = [format_stockCode(i) for i in con_code.columns]
         self.BENCH['con_code'] = con_code.reindex(columns=stockList)
 
@@ -96,9 +98,11 @@ class simpleBT:
         self.tickerData['Rtn'].fillna(0, inplace=True)
         if dealPrice == 'close':
             rtn_before_trade = self.tickerData['Rtn']
-            rtn_after_trade = pd.DataFrame(np.zeros(rtn_before_trade.shape), index=self.tickerData['Rtn'].index, columns=self.tickerData['Rtn'].columns)
+            rtn_after_trade = pd.DataFrame(np.zeros(rtn_before_trade.shape), index=self.tickerData['Rtn'].index,
+                                           columns=self.tickerData['Rtn'].columns)
         else:
-            rtn_before_trade = (self.tickerData[dealPrice] - self.tickerData['closePrice'].shift(axis=0)) / self.tickerData['closePrice'].shift(axis=0)
+            rtn_before_trade = (self.tickerData[dealPrice] - self.tickerData['closePrice'].shift(axis=0)) / \
+                               self.tickerData['closePrice'].shift(axis=0)
             rtn_after_trade = (self.tickerData['closePrice'] - self.tickerData[dealPrice]) / self.tickerData[dealPrice]
 
             rtn_before_trade[pd.isnull(rtn_before_trade)] = 0
@@ -111,7 +115,8 @@ class simpleBT:
 
         # init position, index is code, columns is tradeDate
         temp_pos = pd.Series(data=np.zeros(len(self.tickerData['Rtn'].columns)), index=self.tickerData['Rtn'].columns)
-        pos_out = pd.DataFrame(np.zeros(self.tickerData['Rtn'].shape), index=self.tickerData['Rtn'].index, columns=self.tickerData['Rtn'].columns)
+        pos_out = pd.DataFrame(np.zeros(self.tickerData['Rtn'].shape), index=self.tickerData['Rtn'].index,
+                               columns=self.tickerData['Rtn'].columns)
         # init empty fee、daily_rtn、turnover to store info, index is tradeDate
         fee = pd.Series(np.zeros(len(self.tickerData['Rtn'].index)), index=self.tickerData['Rtn'].index)
         daily_rtn = fee.copy()
@@ -160,14 +165,16 @@ class simpleBT:
                 while True:
                     if unfilled_sell > 0:
                         if (temp_sell.sum() - unfilled_sell) == 0:  # 均无法卖出, 不换仓
-                            diff = pd.Series(data=np.zeros(len(self.tickerData['Rtn'].columns)), index=self.tickerData['Rtn'].columns)
+                            diff = pd.Series(data=np.zeros(len(self.tickerData['Rtn'].columns)),
+                                             index=self.tickerData['Rtn'].columns)
                             break
                         else:
                             diff[tradable & temp_sell] = diff[temp_sell].sum() / (temp_sell.sum() - unfilled_sell)
 
                     if unfilled_buy > 0:
                         if (temp_buy.sum() - unfilled_buy) == 0:  # 均无法买入, 需要进一步考虑
-                            diff = pd.Series(data=np.zeros(len(self.tickerData['Rtn'].columns)), index=self.tickerData['Rtn'].columns)
+                            diff = pd.Series(data=np.zeros(len(self.tickerData['Rtn'].columns)),
+                                             index=self.tickerData['Rtn'].columns)
                             break
                         else:
                             diff[tradable & temp_buy] = diff[temp_buy].sum() / (temp_buy.sum() - unfilled_buy)
@@ -281,10 +288,13 @@ class simpleBT:
                 sum_here = 0
         return -min_all
 
-    def groupBT(self, Score):
+    def groupBT(self, Score, **kwargs):
+        Score.dropna(axis=0, how='all', inplace=True)
+        metric_begin = get_tradeDates(kwargs.get('metric_begin', Score.index[0]), 0)
+        plot_begin = get_tradeDates(kwargs.get('plot_begin', Score.index[0]), 0)
         group_res = {}
         for group in range(5):
-            (nav, pos_out, alpha_nav, result) = self.backTest(Score, group=group + 1, dealPrice='vwap')
+            (nav, pos_out, alpha_nav, result) = self.backTest(Score.loc[metric_begin:], group=group + 1, dealPrice='vwap')
             group_res['{}'.format(group + 1)] = (nav, pos_out, alpha_nav, result)
 
         # plot
@@ -293,10 +303,10 @@ class simpleBT:
             # alpha_nav = group_res['{}'.format(group + 1)][2]
             nav = group_res['{}'.format(group + 1)][0]
             # print(alpha_nav[-1])
-            (nav - 1).plot()  # 组合净值
+            (nav - 1).loc[get_tradeDates(plot_begin, 0):].plot()  # 组合净值
         axis.set_title("Group nav")
         bench_nav = group_res['4'][0] * group_res['4'][2] - 1
-        bench_nav.plot()  # bench
+        bench_nav.loc[get_tradeDates(plot_begin, 0):].plot()  # bench
         axis.legend(["Group_{}".format(i) for i in [1, 2, 3, 4, 5]] + ['bench_nav'])
 
         # calc metrics
