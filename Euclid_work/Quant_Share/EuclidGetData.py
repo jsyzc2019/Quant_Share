@@ -21,6 +21,7 @@ from pandas.errors import ParserError
 import warnings
 
 warnings.filterwarnings('ignore')
+__all__ = ['get_data', 'get_table_info', 'search_keyword']
 
 
 # 并行加速
@@ -38,7 +39,7 @@ def run_thread_pool_sub(target, args, max_work_count):
 
 def load_file(toLoadList):
     load_data = pd.DataFrame()
-    res = run_thread_pool_sub(pd.read_hdf, toLoadList, max_work_count=10)
+    res = run_thread_pool_sub(pd.read_hdf, toLoadList, max_work_count=20)
     for future in as_completed(res):
         res = future.result()
         if len(res) > 0:
@@ -281,15 +282,15 @@ def selectFields(data, tableName, begin, end, fields: list = None, ticker: list 
 
     # data filter: date -> ticker -> fields
     if date_column != '' and ticker_column != '':
-        outData.sort_values(by=[date_column, ticker_column], ascending=[1, 1], inplace=True)
+        # outData.sort_values(by=[date_column, ticker_column], ascending=[1, 1], inplace=True)
         outData = selectFields_dateSpan(outData, begin, end, date_column)
         if ticker:
             outData = selectFields_ticker(outData, ticker, ticker_column)
     elif date_column != '':
-        outData.sort_values(by=[date_column], ascending=True, inplace=True)
+        # outData.sort_values(by=[date_column], ascending=True, inplace=True)
         outData = selectFields_dateSpan(outData, begin, end, date_column)
     elif ticker_column != '':
-        outData.sort_values(by=[ticker_column], ascending=True, inplace=True)
+        # outData.sort_values(by=[ticker_column], ascending=True, inplace=True)
         if ticker:
             outData = selectFields_ticker(outData, ticker, ticker_column)
     else:
@@ -316,7 +317,9 @@ def selectFields_dateSpan(Data, begin, end, date_column):
     if isinstance(Data[date_column][0], int):
         dateSpan = pd.to_datetime(Data[date_column], format='%Y%m%d')
     else:
-        dateSpan = pd.to_datetime(Data[date_column]).apply(lambda x: x.replace(tzinfo=None))
+        # 提速可能会报错
+        # dateSpan = pd.to_datetime(Data[date_column]).apply(lambda x: x.replace(tzinfo=None))
+        dateSpan = pd.to_datetime(Data[date_column]).dt.tz_localize(None)
     outData = Data.loc[(dateSpan >= format_date(begin)).values & (dateSpan <= format_date(end))]
     return outData
 
