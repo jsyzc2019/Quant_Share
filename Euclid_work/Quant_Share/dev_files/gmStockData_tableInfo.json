@@ -64,5 +64,11 @@
     "description": "",
     "date_column": "trade_date",
     "ticker_column": "symbol"
+  },
+    "symbol_industry": {
+    "assets": "gmStockData",
+    "description": "",
+    "date_column": "query_date",
+    "ticker_column": "symbol"
   }
 }

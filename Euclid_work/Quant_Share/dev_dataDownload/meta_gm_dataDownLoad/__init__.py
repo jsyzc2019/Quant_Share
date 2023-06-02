@@ -9,3 +9,4 @@ from .future_daily import future_daily_update
 from .continuous_contracts import continuous_contracts_update
 from .base_package import *
 from .AutoEmail import AutoEmail
+from .symbol_industry import symbol_industry_update
