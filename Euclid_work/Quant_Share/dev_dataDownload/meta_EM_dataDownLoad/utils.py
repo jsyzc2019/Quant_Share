@@ -66,11 +66,10 @@ def update(codes, tableName: str, func):
     else:
         print(f"{tableName}无需更新")
 
-# def batch_update(info, base:str, suffix:str, **kwargs):
-#     func = eval('_'.join([base, suffix]))
-#     for name, codes in info.items():
-#         tableName = '_'.join([name, suffix])
-#         update(codes, tableName=tableName, func=func)
+def map_func(infos):
+    for name in infos.keys():
+        infos[name]['func'] = list(map(eval, infos[name]['func']))
+    return infos
 
 def batch_update(infos, **kwargs):
     for name, info in infos.items():
@@ -78,16 +77,16 @@ def batch_update(infos, **kwargs):
         for func, tableName in zip(info["func"], info["tableName"]):
             update(codes, tableName=tableName, func=func)
 
-def batch_download(info, base:str, suffix:str, **kwargs):
-    func = eval('_'.join([base, suffix]))
-    for name, codes in info.items():
-        tableName = '_'.join([name, suffix])
-        df = func(codes,
-                  start=kwargs.get('start', '2015-01-01'),
-                  end=kwargs.get('end',None)
-                  )
-        if df is not None:
-            Save_and_Log(df, tableName=tableName)
+def batch_download(infos, **kwargs):
+    for name, info in infos.items():
+        codes = info["codes"]
+        for func, tableName in zip(info["func"], info["tableName"]):
+            df = func(codes,
+                      start=kwargs.get('start', '2015-01-01'),
+                      end=kwargs.get('end',None)
+                      )
+            if df is not None:
+                Save_and_Log(df, tableName=tableName, **kwargs)
 
 def Save_and_Log(df:pd.DataFrame,
                  tableName:str,
