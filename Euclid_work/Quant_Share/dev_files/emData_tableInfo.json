@@ -47,12 +47,6 @@
         "date_column": "tradeDate",
         "ticker_column": "codes"
     },
-    "stock_daily": {
-        "assets": "emData",
-        "description": "",
-        "date_column": "tradeDate",
-        "ticker_column": "codes"
-    },
     "CSI_300_industry_index_daily": {
         "assets": "emData",
         "description": "",
@@ -92,7 +86,7 @@
     "Stock_A_daily": {
         "assets": "emData",
         "description": "",
-        "date_column": "NTRADEDAY",
+        "date_column": "tradeDate",
         "ticker_column": "codes"
     }
 }
