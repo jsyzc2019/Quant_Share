@@ -309,7 +309,7 @@ class simpleBT:
             # print(alpha_nav[-1])
             self.get_nav_data_2_plot(nav.loc[plot_begin:]).plot()  # 组合净值
         axis.set_title("Group nav")
-        bench_nav = group_res['4'][0] * group_res['4'][2]
+        bench_nav = group_res['4'][0] / group_res['4'][2]
         self.get_nav_data_2_plot(bench_nav.loc[plot_begin:]).plot()  # bench
         axis.legend(["Group_{}".format(i) for i in [1, 2, 3, 4, 5]] + ['bench_nav'])
 
