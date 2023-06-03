@@ -56,7 +56,7 @@ def update(codes, tableName: str, func):
         new_data = func(codes=codes,
                        start=old_day_off_1.strftime('%Y-%m-%d'),
                        end=new_day.strftime('%Y-%m-%d'))
-        if len(new_data) >= 1:
+        if new_data is not None and len(new_data) >= 1:
             all_data = pd.concat([old_data, new_data], axis=0)
             all_data.to_hdf(abs_file_path, 'a', 'w')
             print(f"{tableName}更新成功，最新日期{pd.to_datetime(new_data.tradeDate).max()}")
@@ -68,14 +68,14 @@ def update(codes, tableName: str, func):
 
 def map_func(infos):
     for name in infos.keys():
-        infos[name]['func'] = list(map(eval, infos[name]['func']))
+        infos[name]['func'] = list(map(lambda x:eval(x, globals(), locals()), infos[name]['func']))
     return infos
 
 def batch_update(infos, **kwargs):
     for name, info in infos.items():
         codes = info["codes"]
         for func, tableName in zip(info["func"], info["tableName"]):
-            update(codes, tableName=tableName, func=func)
+            update(codes, tableName=tableName, func=func, **kwargs)
 
 def batch_download(infos, **kwargs):
     for name, info in infos.items():

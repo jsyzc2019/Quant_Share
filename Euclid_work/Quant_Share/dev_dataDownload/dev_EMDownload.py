@@ -1,5 +1,5 @@
 
-from meta_EM_dataDownLoad import c, load_json, collate, check_status, log
+from meta_EM_dataDownLoad import c, load_json, collate, check_status, log, map_func
 from meta_EM_dataDownLoad import batch_download, batch_update, update, Save_and_Log
 from meta_EM_dataDownLoad import index_daily, index_financial, stock_daily_csd
 # from meta_EM_dataDownLoad import CTR_index_download
@@ -53,21 +53,26 @@ if __name__ == '__main__':
 
     log()
 
-    future_info = load_json('meta_EM_dataDownLoad/codes_info/future_info.json')
+    future_info = load_json('meta_EM_dataDownLoad/codes_info/future.json')
     stock_info = load_json('meta_EM_dataDownLoad/codes_info/stock.json')
+    index_info = load_json('meta_EM_dataDownLoad/codes_info/index.json')
 
-    for name in stock_info.keys():
-        stock_info[name]['func'] = list(map(eval, stock_info[name]['func']))
+    # print('index_daily' in globals())
 
-    batch_download(stock_info,
-                   start='2023-05-01',
-                   end='2023-05-30')
+    # for name in stock_info.keys():
+    #     stock_info[name]['func'] = list(map(eval, stock_info[name]['func']))
+    #
+    # batch_download(stock_info,
+    #                start='2023-05-01',
+    #                end='2023-05-30')
+
+    # print(json.dumps(map_func(index_info)))
 
     # for name in index_info.keys():
         # index_info[name]['tableName'] = ["_".join([name, f.split('_')[-1]]) for f in index_info[name]['func']]
         # index_info[name]['func'] = list(map(eval, index_info[name]['func']))
 
-    # with open('meta_EM_dataDownLoad/codes_info/index_info.json', 'w') as fp:
+    # with open('meta_EM_dataDownLoad/codes_info/index.json', 'w') as fp:
     #     json.dump(index_info, fp, indent=2, separators=(",", ": "))
 
     # DOWNLOAD
