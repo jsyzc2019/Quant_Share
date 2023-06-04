@@ -1,7 +1,7 @@
 from .log import *
 import os
 import pandas as pd
-from Euclid_work.Quant_Share import get_table_info, tradeDateList, format_date, dataBase_root_path_EMdata
+from Euclid_work.Quant_Share import get_table_info, tradeDateList, dataBase_root_path_EMdata
 from datetime import date
 import json
 from Euclid_work.Quant_Share.dev_dataDownload.meta_gm_dataDownLoad.save_gm_data_Y import save_gm_data_Y
@@ -19,7 +19,6 @@ def filt_codes(codes: str or list[str], **kwargs):
     return res
 
 def collate(data: c.EmQuantData, index_name='tradeDate', columns_name='codes', **kwargs):
-    final = pd.DataFrame()
     for i, ind in enumerate(data.Indicators):
         df = pd.DataFrame(
             dict([(k, v[i]) for k, v in data.Data.items()]), index=data.Dates
@@ -30,52 +29,51 @@ def collate(data: c.EmQuantData, index_name='tradeDate', columns_name='codes', *
         df.name = ind
         if i == 0:
             res = df
-            continue
-        res = pd.concat([res, df], axis=1)
+        else:
+            res = pd.concat([res, df], axis=1)
     res = res.reset_index()
-    final = pd.concat([final, res], ignore_index=True)
-    return final
+    return res
 
 def retrive_info(tableName:str):
     out = get_table_info(tableName)
     file_name_list = out['file_name_list']
     tableFolder = out['tableFolder']
+    date_column = out['date_column']
     newest_file = file_name_list[-1]
     abs_file_path = os.path.join(tableFolder, newest_file)
     print(f'File path:{abs_file_path}')
     old_data = pd.read_hdf(abs_file_path)
-    old_day = pd.to_datetime(old_data.tradeDate).max()
+    old_day = pd.to_datetime(old_data[date_column]).max()
     old_day_off_1 = tradeDateList[tradeDateList.index(old_day)+1]
     new_day = date.today()
     print(f"原始最新日期:{old_day}")
-    return old_data, abs_file_path, old_day_off_1, new_day
+    return old_data, abs_file_path, old_day_off_1, new_day, date_column
 
-def update(codes, tableName: str, func):
-    old_data, abs_file_path, old_day_off_1, new_day = retrive_info(tableName)
+def update(codes, tableName: str, func, **kwargs):
+    old_data, abs_file_path, old_day_off_1, new_day, date_column = retrive_info(tableName)
     if old_day_off_1 < new_day:
         new_data = func(codes=codes,
                        start=old_day_off_1.strftime('%Y-%m-%d'),
                        end=new_day.strftime('%Y-%m-%d'))
-        if len(new_data) >= 1:
+        if new_data is not None and len(new_data) >= 1:
             all_data = pd.concat([old_data, new_data], axis=0)
             all_data.to_hdf(abs_file_path, 'a', 'w')
-            print(f"{tableName}更新成功，最新日期{pd.to_datetime(new_data.tradeDate).max()}")
+            print(f"{tableName}更新成功，最新日期{pd.to_datetime(new_data['date_column']).max()}")
         else:
             print(f"{tableName}更新失败")
-        pass
     else:
         print(f"{tableName}无需更新")
 
 def map_func(infos):
     for name in infos.keys():
-        infos[name]['func'] = list(map(eval, infos[name]['func']))
+        infos[name]['func'] = list(map(lambda x:eval(x, globals(), locals()), infos[name]['func']))
     return infos
 
 def batch_update(infos, **kwargs):
     for name, info in infos.items():
         codes = info["codes"]
         for func, tableName in zip(info["func"], info["tableName"]):
-            update(codes, tableName=tableName, func=func)
+            update(codes, tableName=tableName, func=func, **kwargs)
 
 def batch_download(infos, **kwargs):
     for name, info in infos.items():

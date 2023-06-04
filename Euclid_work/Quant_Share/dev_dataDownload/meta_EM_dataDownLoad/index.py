@@ -1,6 +1,7 @@
 
 from .log import c
 from .utils import collate, check_status, Save_and_Log
+from Euclid_work.Quant_Share import get_tradeDates
 import pandas as pd
 from datetime import date
 from tqdm import tqdm
@@ -57,29 +58,23 @@ def index_financial(codes, start="2015-01-01", end=None, **kwargs):
         return df
 
 def CTR_index_download(indexcode='000300.SH',
-                       Date="2023-05-25",
-                       offset:int = 0,
+                       start='2023-05-25',
+                       end=None,
                        **kwargs):
     # 2023-05-26 17:19:11
     # 该表主要提供指定日期的指数成分股代码及权重等信息 参数: 指数代码 截止日期 字段: 指数代码 成分代码 交易日期 成分名称 收盘价 涨跌幅 指数权重 指数贡献点 流通市值 总市值 流通股本 总股本
-    if offset == 0:
-        datelst = [Date]
-    else:
-        offset_day = c.getdate(Date, offset, "Market=CNSESH")
-        offset_day = offset_day.Data[0]
-        datelst = c.tradedates(offset_day, Date, "period=1,order=1,market=CNSESH")
-        datelst = datelst.Data
-
+    end = end if end else date.today().strftime("%Y%m%d")
+    datelst = get_tradeDates(begin=start, end=end)
     res = pd.DataFrame()
     for _date in tqdm(datelst):
         data = c.ctr("INDEXCOMPOSITION",
                      "INDEXCODE,SECUCODE,TRADEDATE,NAME,CLOSE,PCTCHANGE,WEIGHT,CONTRIBUTEPT,SHRMARKETVALUE,MV,TOTALTRADABLE,SHARETOTAL",
-                     f"IndexCode={indexcode},EndDate={_date}")
+                     f"IndexCode={indexcode},EndDate={_date.strftime('%Y-%m-%d')}")
 
         if check_status(data):
             tmp = pd.DataFrame(data.Data, index=data.Indicators)
             tmp = tmp.T
             res = pd.concat([res, tmp], axis=0, ignore_index=True)
-    if len(res) > 0:
-        tableName = indexcode.replace('.','')
-        Save_and_Log(res, tableName=tableName, date_column='TRADEDATE', ticker_column='SECUCODE')
+
+    return res
+

@@ -69,7 +69,7 @@ def get_data(tableName, begin='20150101', end=None, sources='gm', fields: list =
     if not end:
         end = datetime.today().now().strftime('%Y%m%d')
 
-    begin = format_date(begin)
+    if begin: begin = format_date(begin)
     end = format_date(end)
 
     if not isinstance(ticker, list):
@@ -92,57 +92,58 @@ def get_data(tableName, begin='20150101', end=None, sources='gm', fields: list =
 
 
 def get_data_stock(tableName, begin, end, fields, ticker):
-    tabelFoldPath = os.path.join(dataBase_root_path, tableName)
-    if not os.path.exists(tabelFoldPath):
+    tableFoldPath = os.path.join(dataBase_root_path, tableName)
+    if not os.path.exists(tableFoldPath):
         try:
-            data = pd.read_hdf(tabelFoldPath + '.h5')
+            data = pd.read_hdf(tableFoldPath + '.h5')
             return selectFields(data, tableName, begin, end, fields, ticker)
         except FileNotFoundError:
             print("{} no exits!".format(tableName))
 
-    h5_file_name_list = os.listdir(tabelFoldPath)
+    h5_file_name_list = os.listdir(tableFoldPath)
     # 如果文件是季度组织的
-    if 'Q' in h5_file_name_list[0]:
-        load_begin, load_end = extend_date_span(begin, end, 'Q')
-        # load_begin = begin - pd.tseries.offsets.QuarterBegin(n=1, startingMonth=1)
-        # load_end = end + pd.tseries.offsets.QuarterEnd()
-        toLoadList = []
-        for fileName in ["{}_Y{}_Q{:.0f}.h5".format(tableName, QuarterEnd.year, QuarterEnd.month / 3) for QuarterEnd in
-                         pd.date_range(load_begin, load_end, freq='q')]:
-            if fileName not in h5_file_name_list:
-                raise AttributeError("{} is not exit!".format(fileName))
-            else:
-                filePath = os.path.join(tabelFoldPath, fileName)
-                toLoadList.append(filePath)
-        load_data = load_file(toLoadList)
-        return selectFields(load_data, tableName, begin, end, fields, ticker)
-    # 按照年组织
-    elif "Y" in h5_file_name_list[0]:
-        load_begin, load_end = extend_date_span(begin, end, 'Y')
-        # load_begin = begin - pd.tseries.offsets.YearBegin(0)
-        # load_end = end + pd.tseries.offsets.YearEnd(0)
-        toLoadList = []
-        for fileName in ["{}_Y{}.h5".format(tableName, YearEnd.year) for YearEnd in
-                         pd.date_range(load_begin, load_end, freq='Y')]:
-            if fileName not in h5_file_name_list:
-                raise AttributeError("{} is not exit!".format(fileName))
-            else:
-                filePath = os.path.join(tabelFoldPath, fileName)
-                toLoadList.append(filePath)
-        load_data = load_file(toLoadList)
-        return selectFields(load_data, tableName, begin, end, fields, ticker)
+    if begin:
+        if 'Q' in h5_file_name_list[0]:
+            load_begin, load_end = extend_date_span(begin, end, 'Q')
+            # load_begin = begin - pd.tseries.offsets.QuarterBegin(n=1, startingMonth=1)
+            # load_end = end + pd.tseries.offsets.QuarterEnd()
+            toLoadList = []
+            for fileName in ["{}_Y{}_Q{:.0f}.h5".format(tableName, QuarterEnd.year, QuarterEnd.month / 3) for QuarterEnd in
+                             pd.date_range(load_begin, load_end, freq='q')]:
+                if fileName not in h5_file_name_list:
+                    raise AttributeError("{} is not exit!".format(fileName))
+                else:
+                    filePath = os.path.join(tableFoldPath, fileName)
+                    toLoadList.append(filePath)
+        # 按照年组织
+        elif "Y" in h5_file_name_list[0]:
+            load_begin, load_end = extend_date_span(begin, end, 'Y')
+            # load_begin = begin - pd.tseries.offsets.YearBegin(0)
+            # load_end = end + pd.tseries.offsets.YearEnd(0)
+            toLoadList = []
+            for fileName in ["{}_Y{}.h5".format(tableName, YearEnd.year) for YearEnd in
+                             pd.date_range(load_begin, load_end, freq='Y')]:
+                if fileName not in h5_file_name_list:
+                    raise AttributeError("{} is not exit!".format(fileName))
+                else:
+                    filePath = os.path.join(tableFoldPath, fileName)
+                    toLoadList.append(filePath)
+        else:
+            raise KeyError("请检查{}, 文件不符合{}_Y*_Q*组织形式".format(tableFoldPath, tableName))
     else:
-        raise KeyError("请检查{}, 文件不符合{}_Y*_Q*组织形式".format(tabelFoldPath, tableName))
+        toLoadList = [os.path.join(tableFoldPath, filename) for filename in h5_file_name_list]
+    load_data = load_file(toLoadList)
+    return selectFields(load_data, tableName, begin, end, fields, ticker)
 
 
 def get_data_future(tableName, begin='20160101', end=None, sources='gm', fields: list = None, ticker: list = None):
-    tabelFoldPath = os.path.join(dataBase_root_path_future, tableName)
+    tableFoldPath = os.path.join(dataBase_root_path_future, tableName)
     load_begin, load_end = extend_date_span(begin, end, 'Y')
     # load_begin = begin - pd.tseries.offsets.YearBegin(0)
     # load_end = end + pd.tseries.offsets.YearEnd(0)
     toLoadList = []
     for year in [YearEnd.year for YearEnd in pd.date_range(load_begin, load_end, freq='Y')]:
-        tmpFolder = os.path.join(tabelFoldPath, str(year), sources)
+        tmpFolder = os.path.join(tableFoldPath, str(year), sources)
         tmpFileList = [tmpFile for tmpFile in os.listdir(tmpFolder) if tmpFile.endswith('.h5')]
         # 已在此处进行ticker筛选，不在selectFields中进行
         if ticker:
@@ -160,13 +161,13 @@ def get_data_future(tableName, begin='20160101', end=None, sources='gm', fields:
 
 def get_data_gmStockFactor(tableName, begin='20160101', end=None, fields: list = None, ticker: list = None):
     # D:\Share\Stk_Data\gm\ACCA
-    tabelFoldPath = os.path.join(dataBase_root_path_gmStockFactor, tableName)
+    tableFoldPath = os.path.join(dataBase_root_path_gmStockFactor, tableName)
     load_begin, load_end = extend_date_span(begin, end, 'Y')
     # load_begin = begin - pd.tseries.offsets.YearBegin(n=1)
     # load_end = end + pd.tseries.offsets.YearEnd(n=1)
     toLoadList = []
     for year in [YearEnd.year for YearEnd in pd.date_range(load_begin, load_end, freq='Y')]:
-        tmpFolder = os.path.join(tabelFoldPath, str(year))  # D:\Share\Stk_Data\gm\ACCA\2013
+        tmpFolder = os.path.join(tableFoldPath, str(year))  # D:\Share\Stk_Data\gm\ACCA\2013
         target = os.listdir(tmpFolder)  # D:\Share\Stk_Data\gm\ACCA\2013\ACCA.h5
         if target.__len__() > 0:
             toLoadList.extend([os.path.join(tmpFolder, target_i) for target_i in target])
@@ -178,92 +179,88 @@ def get_data_gmStockFactor(tableName, begin='20160101', end=None, fields: list =
 
 
 def get_data_gmStockData(tableName, begin, end, fields, ticker):
-    tabelFoldPath = os.path.join(dataBase_root_path_gmStockFactor, tableName)
-    if not os.path.exists(tabelFoldPath):
+    tableFoldPath = os.path.join(dataBase_root_path_gmStockFactor, tableName)
+    if not os.path.exists(tableFoldPath):
         try:
-            data = pd.read_hdf(tabelFoldPath + '.h5')
+            data = pd.read_hdf(tableFoldPath + '.h5')
             return selectFields(data, tableName, begin, end, fields, ticker)
         except FileNotFoundError:
             print("{} no exits!".format(tableName))
 
-    h5_file_name_list = os.listdir(tabelFoldPath)
-    # 如果文件是季度组织的
-    if 'Q' in h5_file_name_list[0]:
-        load_begin, load_end = extend_date_span(begin, end, 'Q')
-        # load_begin = begin - pd.tseries.offsets.QuarterBegin(n=1, startingMonth=1)
-        # load_end = end + pd.tseries.offsets.QuarterEnd()
-        toLoadList = []
-        for fileName in ["{}_Y{}_Q{:.0f}.h5".format(tableName, QuarterEnd.year, QuarterEnd.month / 3) for QuarterEnd in
-                         pd.date_range(load_begin, load_end, freq='q')]:
-            if fileName not in h5_file_name_list:
-                raise AttributeError("{} is not exit!".format(fileName))
-            else:
-                filePath = os.path.join(tabelFoldPath, fileName)
-                toLoadList.append(filePath)
-        load_data = load_file(toLoadList)
-        return selectFields(load_data, tableName, begin, end, fields, ticker)
-    # 按照年组织
-    elif "Y" in h5_file_name_list[0]:
-        load_begin, load_end = extend_date_span(begin, end, 'Y')
-        # load_begin = begin - pd.tseries.offsets.YearBegin(n=1)
-        # load_end = end + pd.tseries.offsets.YearEnd(n=1)
-        toLoadList = []
-        for fileName in ["{}_Y{}.h5".format(tableName, YearEnd.year) for YearEnd in
-                         pd.date_range(load_begin, load_end, freq='Y')]:
-            if fileName not in h5_file_name_list:
-                raise AttributeError("{} is not exit!".format(fileName))
-            else:
-                filePath = os.path.join(tabelFoldPath, fileName)
-                toLoadList.append(filePath)
-        load_data = load_file(toLoadList)
-        return selectFields(load_data, tableName, begin, end, fields, ticker)
+    h5_file_name_list = os.listdir(tableFoldPath)
+    if begin:
+        # 如果文件是季度组织的
+        if 'Q' in h5_file_name_list[0]:
+            load_begin, load_end = extend_date_span(begin, end, 'Q')
+            # load_begin = begin - pd.tseries.offsets.QuarterBegin(n=1, startingMonth=1)
+            # load_end = end + pd.tseries.offsets.QuarterEnd()
+            toLoadList = []
+            for fileName in ["{}_Y{}_Q{:.0f}.h5".format(tableName, QuarterEnd.year, QuarterEnd.month / 3) for QuarterEnd in
+                             pd.date_range(load_begin, load_end, freq='q')]:
+                if fileName not in h5_file_name_list:
+                    raise AttributeError("{} is not exit!".format(fileName))
+                else:
+                    filePath = os.path.join(tableFoldPath, fileName)
+                    toLoadList.append(filePath)
+        # 按照年组织
+        elif "Y" in h5_file_name_list[0]:
+            load_begin, load_end = extend_date_span(begin, end, 'Y')
+            # load_begin = begin - pd.tseries.offsets.YearBegin(n=1)
+            # load_end = end + pd.tseries.offsets.YearEnd(n=1)
+            toLoadList = []
+            for fileName in ["{}_Y{}.h5".format(tableName, YearEnd.year) for YearEnd in
+                             pd.date_range(load_begin, load_end, freq='Y')]:
+                if fileName not in h5_file_name_list:
+                    raise AttributeError("{} is not exit!".format(fileName))
+                else:
+                    filePath = os.path.join(tableFoldPath, fileName)
+                    toLoadList.append(filePath)
+        else:
+            raise KeyError("请检查{}, 文件不符合{}_Y*_Q*组织形式".format(tableFoldPath, tableName))
     else:
-        raise KeyError("请检查{}, 文件不符合{}_Y*_Q*组织形式".format(tabelFoldPath, tableName))
-
+        toLoadList = [os.path.join(tableFoldPath, filename) for filename in h5_file_name_list]
+    load_data = load_file(toLoadList)
+    return selectFields(load_data, tableName, begin, end, fields, ticker)
 
 def get_data_emData(tableName, begin, end, fields, ticker):
-    tabelFoldPath = os.path.join(dataBase_root_path_EMdata, tableName)
-    if not os.path.exists(tabelFoldPath):
+    tableFoldPath = os.path.join(dataBase_root_path_EMdata, tableName)
+    if not os.path.exists(tableFoldPath):
         try:
-            data = pd.read_hdf(tabelFoldPath + '.h5')
+            data = pd.read_hdf(tableFoldPath + '.h5')
             return selectFields(data, tableName, begin, end, fields, ticker)
         except FileNotFoundError:
             print("{} no exits!".format(tableName))
 
-    h5_file_name_list = os.listdir(tabelFoldPath)
-    # 如果文件是季度组织的
-    if 'Q' in h5_file_name_list[0]:
-        load_begin, load_end = extend_date_span(begin, end, 'Q')
-        # load_begin = begin - pd.tseries.offsets.QuarterBegin(n=1, startingMonth=1)
-        # load_end = end + pd.tseries.offsets.QuarterEnd()
-        toLoadList = []
-        for fileName in ["{}_Y{}_Q{:.0f}.h5".format(tableName, QuarterEnd.year, QuarterEnd.month / 3) for QuarterEnd in
-                         pd.date_range(load_begin, load_end, freq='q')]:
-            if fileName not in h5_file_name_list:
-                raise AttributeError("{} is not exit!".format(fileName))
-            else:
-                filePath = os.path.join(tabelFoldPath, fileName)
-                toLoadList.append(filePath)
-        load_data = load_file(toLoadList)
-        return selectFields(load_data, tableName, begin, end, fields, ticker)
-    # 按照年组织
-    elif "Y" in h5_file_name_list[0]:
-        load_begin, load_end = extend_date_span(begin, end, 'Y')
-        # load_begin = begin - pd.tseries.offsets.YearBegin(n=1)
-        # load_end = end + pd.tseries.offsets.YearEnd(n=1)
-        toLoadList = []
-        for fileName in ["{}_Y{}.h5".format(tableName, YearEnd.year) for YearEnd in
-                         pd.date_range(load_begin, load_end, freq='Y')]:
-            if fileName not in h5_file_name_list:
-                raise AttributeError("{} is not exit!".format(fileName))
-            else:
-                filePath = os.path.join(tabelFoldPath, fileName)
-                toLoadList.append(filePath)
-        load_data = load_file(toLoadList)
-        return selectFields(load_data, tableName, begin, end, fields, ticker)
+    h5_file_name_list = os.listdir(tableFoldPath)
+    if begin:
+        # 如果文件是季度组织的
+        if 'Q' in h5_file_name_list[0]:
+                load_begin, load_end = extend_date_span(begin, end, 'Q')
+                toLoadList = []
+                for fileName in ["{}_Y{}_Q{:.0f}.h5".format(tableName, QuarterEnd.year, QuarterEnd.month / 3) for QuarterEnd in
+                                 pd.date_range(load_begin, load_end, freq='q')]:
+                    if fileName not in h5_file_name_list:
+                        raise AttributeError("{} is not exit!".format(fileName))
+                    else:
+                        filePath = os.path.join(tableFoldPath, fileName)
+                        toLoadList.append(filePath)
+        # 按照年组织
+        elif "Y" in h5_file_name_list[0]:
+            load_begin, load_end = extend_date_span(begin, end, 'Y')
+            toLoadList = []
+            for fileName in ["{}_Y{}.h5".format(tableName, YearEnd.year) for YearEnd in
+                             pd.date_range(load_begin, load_end, freq='Y')]:
+                if fileName not in h5_file_name_list:
+                    raise AttributeError("{} is not exit!".format(fileName))
+                else:
+                    filePath = os.path.join(tableFoldPath, fileName)
+                    toLoadList.append(filePath)
+        else:
+            raise KeyError("请检查{}, 文件不符合{}_Y*_Q*组织形式".format(tableFoldPath, tableName))
     else:
-        raise KeyError("请检查{}, 文件不符合{}_Y*_Q*组织形式".format(tabelFoldPath, tableName))
-
+        toLoadList = [os.path.join(tableFoldPath, filename) for filename in h5_file_name_list]
+    load_data = load_file(toLoadList)
+    return selectFields(load_data, tableName, begin, end, fields, ticker)
 
 def selectFields(data, tableName, begin, end, fields: list = None, ticker: list = None):
     outData = data.copy()
@@ -315,13 +312,17 @@ def selectFields_ticker(Data, ticker, ticker_column):
 
 def selectFields_dateSpan(Data, begin, end, date_column):
     if isinstance(Data[date_column][0], int):
-        dateSpan = pd.to_datetime(Data[date_column], format='%Y%m%d')
+        Data[date_column] = pd.to_datetime(Data[date_column], format='%Y%m%d')
     else:
         # 提速可能会报错
         # dateSpan = pd.to_datetime(Data[date_column]).apply(lambda x: x.replace(tzinfo=None))
-        dateSpan = pd.to_datetime(Data[date_column]).dt.tz_localize(None)
-    outData = Data.loc[(dateSpan >= format_date(begin)).values & (dateSpan <= format_date(end))]
-    return outData
+        Data[date_column] = pd.to_datetime(Data[date_column]).dt.tz_localize(None)
+    if begin:
+        Data = Data[Data[date_column] >= format_date(begin)]
+    if end:
+        Data = Data[Data[date_column] <= format_date(end)]
+    # outData = Data.loc[(dateSpan >= format_date(begin)) & (dateSpan <= format_date(end))]
+    return Data
 
 
 def get_all_file(folderPath, query='.h5'):
@@ -356,6 +357,8 @@ def get_table_info(tableName):
         raise KeyError("{} is not ready for use!".format(tableName))
     tableSource = tableInfo[tableName]['tableSource']
     description = tableInfo[tableName]['description']
+    date_column = tableInfo[tableName]['date_column']
+    ticker_column = tableInfo[tableName]['ticker_column']
 
     # tablePath should be a folder or a .h5 file
     if tableSource == 'gmFuture':
@@ -393,6 +396,8 @@ def get_table_info(tableName):
         'tableSource': tableSource,
         'description': description,
         'tableFolder': tableFolder,
+        'date_column': date_column,
+        'ticker_column': ticker_column,
         # 'tablePath': tablePath,
         'file_name_list': file_name_list,
         'Access Time': st_atime,

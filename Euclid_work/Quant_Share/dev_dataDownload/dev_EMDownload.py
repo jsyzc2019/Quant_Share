@@ -1,8 +1,8 @@
 
-from meta_EM_dataDownLoad import c, load_json, collate, check_status, log
+from meta_EM_dataDownLoad import c, load_json, collate, check_status, log, map_func
 from meta_EM_dataDownLoad import batch_download, batch_update, update, Save_and_Log
 from meta_EM_dataDownLoad import index_daily, index_financial, stock_daily_csd
-# from meta_EM_dataDownLoad import CTR_index_download
+from meta_EM_dataDownLoad import CTR_index_download
 from tqdm import tqdm
 import pandas as pd
 from datetime import date
@@ -53,39 +53,16 @@ if __name__ == '__main__':
 
     log()
 
-    future_info = load_json('meta_EM_dataDownLoad/codes_info/future_info.json')
+    future_info = load_json('meta_EM_dataDownLoad/codes_info/future.json')
     stock_info = load_json('meta_EM_dataDownLoad/codes_info/stock.json')
+    index_info = load_json('meta_EM_dataDownLoad/codes_info/index.json')
 
-    for name in stock_info.keys():
-        stock_info[name]['func'] = list(map(eval, stock_info[name]['func']))
+    new_info = load_json('meta_EM_dataDownLoad/codes_info/new.json')
 
-    batch_download(stock_info,
-                   start='2023-05-01',
-                   end='2023-05-30')
+    for name in new_info.keys():
+        new_info[name]['func'] = list(map(eval, new_info[name]['func']))
 
-    # for name in index_info.keys():
-        # index_info[name]['tableName'] = ["_".join([name, f.split('_')[-1]]) for f in index_info[name]['func']]
-        # index_info[name]['func'] = list(map(eval, index_info[name]['func']))
-
-    # with open('meta_EM_dataDownLoad/codes_info/index_info.json', 'w') as fp:
-    #     json.dump(index_info, fp, indent=2, separators=(",", ": "))
-
-    # DOWNLOAD
-    # batch_download(new_info, 'stock', 'daily', start='2023-04-01')
-    # batch_download(new_info, 'index', 'daily')
-    # batch_download(new_info, 'index', 'financial')
-    # batch_download(future_info, 'future', 'daily', start='2018-01-01', end='2022-12-31')
-    # date.today().strftime("%Y-%m-%d")
-    # for key, val in stock_info.items():
-    #     # code = val.split(',')[1]
-    #     stock_daily_css(
-    #         codes=val,
-    #         Date='2023-5-25',
-    #         offset=0,
-    #         tableName="_".join([key, 'daily'])
-    #     )
-
-    # CTR_index_download(indexcode='000300.SH', EndDate="2023-05-25", offset=-90)
+    batch_download(new_info, start='2023-05-25', date_column='TRADEDATE', ticker_column='SECUCODE')
 
     c.stop()
 
