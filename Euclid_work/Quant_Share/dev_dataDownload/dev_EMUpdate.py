@@ -1,6 +1,7 @@
 from meta_EM_dataDownLoad import c, load_json, collate, check_status, log
 from meta_EM_dataDownLoad import batch_download, batch_update, update, Save_and_Log
 from meta_EM_dataDownLoad import index_daily, index_financial, future_daily, stock_daily_csd
+from meta_EM_dataDownLoad import CTR_index_download
 from tqdm import tqdm
 import pandas as pd
 from datetime import date

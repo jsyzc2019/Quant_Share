@@ -64,5 +64,23 @@
       "Global_broad_market_index_daily",
       "Global_broad_market_index_financial"
     ]
+  },
+  "000300.SH": {
+    "codes": "000300.SH",
+    "func": [
+      "CTR_index_download"
+    ],
+    "tableName": [
+      "000300SH"
+    ]
+  },
+    "000802.SH": {
+    "codes": "000300.SH",
+    "func": [
+      "CTR_index_download"
+    ],
+    "tableName": [
+      "000802SH"
+    ]
   }
 }

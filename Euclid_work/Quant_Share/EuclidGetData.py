@@ -357,6 +357,8 @@ def get_table_info(tableName):
         raise KeyError("{} is not ready for use!".format(tableName))
     tableSource = tableInfo[tableName]['tableSource']
     description = tableInfo[tableName]['description']
+    date_column = tableInfo[tableName]['date_column']
+    ticker_column = tableInfo[tableName]['ticker_column']
 
     # tablePath should be a folder or a .h5 file
     if tableSource == 'gmFuture':
@@ -394,6 +396,8 @@ def get_table_info(tableName):
         'tableSource': tableSource,
         'description': description,
         'tableFolder': tableFolder,
+        'date_column': date_column,
+        'ticker_column': ticker_column,
         # 'tablePath': tablePath,
         'file_name_list': file_name_list,
         'Access Time': st_atime,
