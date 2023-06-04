@@ -85,7 +85,7 @@ class simpleBT:
         # init negValues
         self.negMarketValue = self.tickerData['negMarketValue'].fillna(method='ffill', axis=0)
 
-    def backTest(self, Score, fee_rate=0.0008, group=1, dealPrice='close', plot=False):
+    def backTest(self, Score, fee_rate=0.0008, group=1, dealPrice='close', plot=False, med=True, Zcore=True, **kwargs):
         # format confirm
         if 'Code' in Score.columns:  # if Score from local file, need to do this
             Score.set_index('Code', inplace=True)
@@ -144,6 +144,16 @@ class simpleBT:
                 _, idx = binary_search(self.benchData['con_code'].index, format_date(date))
                 con_tag = self.benchData['con_code'].iloc[idx - 1] > 0
                 tmpScore[~con_tag] = np.nan
+
+                _scale = kwargs.get('scale', 2)
+                _inf2nan = kwargs.get('inf2nan', True)
+                _inclusive = kwargs.get('inclusive', True)
+                # 中位数去极值
+                if med:
+                    tmpScore = winsorize_med(data=tmpScore, scale=_scale, inclusive=_inclusive, inf2nan=_inf2nan)
+                # Zcore处理
+                if Zcore:
+                    tmpScore = standardlize(data=tmpScore, inf2nan=_inf2nan)
                 try:
                     this_pos = self.getGroupTargPost(Score=tmpScore, group=group)
                 except ValueError:
@@ -296,9 +306,11 @@ class simpleBT:
         Score.dropna(axis=0, how='all', inplace=True)
         metric_begin = get_tradeDate(kwargs.get('metric_begin', Score.index[0]), 0)
         plot_begin = get_tradeDate(kwargs.get('plot_begin', Score.index[0]), 0)
+        _med = kwargs.get('med', True)
+        _Zcore = kwargs.get('Zcore', True)
         group_res = {}
         for group in range(5):
-            (nav, pos_out, alpha_nav, result) = self.backTest(Score.loc[metric_begin:], group=group + 1, dealPrice='vwap')
+            (nav, pos_out, alpha_nav, result) = self.backTest(Score.loc[metric_begin:], group=group + 1, dealPrice='vwap', med=_med ** kwargs)
             group_res['{}'.format(group + 1)] = (nav, pos_out, alpha_nav, result)
 
         # plot
@@ -309,7 +321,7 @@ class simpleBT:
             # print(alpha_nav[-1])
             self.get_nav_data_2_plot(nav.loc[plot_begin:]).plot()  # 组合净值
         axis.set_title("Group nav")
-        bench_nav = group_res['4'][0] * group_res['4'][2]
+        bench_nav = group_res['4'][0] / group_res['4'][2]
         self.get_nav_data_2_plot(bench_nav.loc[plot_begin:]).plot()  # bench
         axis.legend(["Group_{}".format(i) for i in [1, 2, 3, 4, 5]] + ['bench_nav'])
 

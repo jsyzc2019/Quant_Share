@@ -26,7 +26,7 @@ dataBase_root_path_EMdata = r"E:\Share\EMData"
 __all__ = ['readPkl', 'savePkl', 'save_data_h5',  # files operation
            'get_tradeDate', 'format_date', 'format_stockCode', 'reindex', 'data2score', 'info_lag',
            'format_futures', 'printJson', 'extend_date_span', 'patList', 'is_tradeDate', 'get_tradeDates',
-           'isdate', 'binary_search',
+           'isdate', 'binary_search', 'winsorize_med', 'standardlize',
            # Consts
            'stock_info', 'stockList', 'stockNumList', 'bench_info', 'tradeDate_info', 'tradeDateList', 'quarter_begin',
            'quarter_end',
@@ -155,6 +155,50 @@ def data2score(data, neg=False, ascending=True, axis=1):
     if neg:
         score = score * 2 - 1
     return pd.DataFrame(data=score, columns=data.columns, index=data.index)
+
+
+def winsorize_med(data: pd.Series, scale=1, inclusive: bool = True, inf2nan: bool = True):
+    s = data.copy()
+    if inf2nan:
+        s[np.isinf(s)] = np.nan
+        med = np.median(s.dropna())
+        distance = np.median(np.abs(data - med).dropna())
+        up = med + scale * distance
+        down = med - scale * distance
+        if inclusive:
+            s[s > up] = up
+            s[s < down] = down
+        else:
+            s[s > up] = np.nan
+            s[s < down] = np.nan
+    else:
+        med = np.median(s.dropna())
+        distance = np.median(np.abs(s - med).dropna())
+        up = med + scale * distance
+        down = med - scale * distance
+        if inclusive:
+            s[s > up] = up
+            s[s < down] = down
+        else:
+            s[s > up] = np.nan
+            s[s < down] = np.nan
+    return s
+
+
+def standardlize(data: pd.Series, inf2nan=True):
+    s = data.copy()
+    if inf2nan:
+        s[np.isinf(s)] = np.nan
+        mean = np.mean(s.dropna())
+        std = np.std(s.dropna(), ddof=1)
+        s = (s - mean) / std
+    else:
+        s1 = s[~np.isinf(s)]
+        mean = np.mean(s1)
+        std = np.std(s1, ddof=1)
+        s = (s - mean) / std
+    _range = np.max(s) - np.min(s)
+    return (s - np.min(s)) / _range
 
 
 def reindex(data, tradeDate=True, **kwargs):
@@ -357,6 +401,7 @@ def extend_date_span(begin, end, freq):
     else:
         raise AttributeError("frq should be M, Q or Y!")
 
+
 def isdate(datestr, **kwargs):
     datestr = str(datestr)
     chinesenum = {'一': '1', '二': '2', '三': '3', '四': '4',
@@ -366,9 +411,9 @@ def isdate(datestr, **kwargs):
         temp = datestr[i]
         if temp in chinesenum:
             if temp == '十':
-                if datestr[i+1] not in chinesenum:
+                if datestr[i + 1] not in chinesenum:
                     strdate += chinesenum[temp]
-                elif datestr[i-1] in chinesenum:
+                elif datestr[i - 1] in chinesenum:
                     continue
                 else:
                     strdate += '1'
