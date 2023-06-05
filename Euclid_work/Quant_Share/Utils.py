@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 from functools import reduce, wraps
 from time import strptime
+from datetime import datetime as dt
 
 dataBase_root_path = r'E:\Share\Stk_Data\dataFile'
 dataBase_root_path_future = r"E:\Share\Fut_Data"
@@ -39,9 +40,9 @@ __all__ = ['readPkl', 'savePkl', 'save_data_h5',  # files operation
 def time_decorator(func):
     @wraps(func)
     def timer(*args, **kwargs):
-        start = datetime.now()
+        start = dt.now()
         result = func(*args, **kwargs)
-        end = datetime.now()
+        end = dt.now()
         print(f'“{func.__name__}” run time: {end - start}.')
         return result
 

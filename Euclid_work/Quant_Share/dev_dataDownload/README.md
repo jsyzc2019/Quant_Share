@@ -13,7 +13,10 @@
 相较于*dev_data_load*，更适用于gm，速度较快
 
 ## *dev_EM*
-东财数据的下载及更新函数
+东财数据的下载及更新函数，相关信息应当存放在`Euclid_work/Quant_Share/dev_dataDownload/meta_EM_dataDownLoad/codes_info`中。
+
+对于新信息，请存放于`new.json`文件中。测试通过后，将其归类进index,future,stock等文件中。
+
 - **Download**：根据新增信息进行批量下载，以及部分功能测试。
 - **Update**：对已入库的数据进行批量更新，较为成熟的模块才可在这里使用。
 

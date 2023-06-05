@@ -56,8 +56,9 @@ def update(codes, tableName: str, func, **kwargs):
                        start=old_day_off_1.strftime('%Y-%m-%d'),
                        end=new_day.strftime('%Y-%m-%d'))
         if new_data is not None and len(new_data) >= 1:
-            all_data = pd.concat([old_data, new_data], axis=0)
-            all_data.to_hdf(abs_file_path, 'a', 'w')
+            save_gm_data_Y(new_data, date_column, tableName, dataBase_root_path=dataBase_root_path_EMdata, reWrite=True)
+            # all_data = pd.concat([old_data, new_data], axis=0, ignore_index=True)
+            # all_data.to_hdf(abs_file_path, 'a', 'w')
             print(f"{tableName}更新成功，最新日期{pd.to_datetime(new_data['date_column']).max()}")
         else:
             print(f"{tableName}更新失败")
@@ -117,3 +118,15 @@ def check_status(data):
         return False
     else:
         return True
+
+def get_tradeDate_range(
+        Date:str,
+        offset:str):
+    if offset == 0:
+        datelst = [Date]
+    else:
+        offset_day = c.getdate(Date, offset, "Market=CNSESH")
+        offset_day = offset_day.Data[0]
+        datelst = c.tradedates(offset_day, Date, "period=1,order=1,market=CNSESH")
+        datelst = datelst.Data
+    return datelst
