@@ -8,10 +8,12 @@ import scipy.stats as st
 
 from .BackTest import DataPrepare, reindex
 from .EuclidGetData import get_data
+import datetime
 
 
 class FactorTest(DataPrepare):
     def __init__(self, beginDate: str, endDate: str = None):
+        endDate = endDate if endDate else datetime.date.today().strftime("%Y%m%d")
         super().__init__(beginDate, endDate)
         self.get_rtn_data()
 
@@ -28,7 +30,11 @@ class FactorTest(DataPrepare):
                 tmp.dropna(axis=0, inplace=True)
                 tmp = tmp.rank(axis=0)
                 # rank
-                rankIC.loc[index] = st.spearmanr(tmp)[0]
+                res = st.spearmanr(tmp)
+                if res.pvalue > 0.05:
+                    rankIC.loc[index] = 0
+                else:
+                    rankIC.loc[index] = res.statistic
         rankIC.dropna(axis=0, inplace=True)
         IR = (rankIC.mean())/rankIC.std()
 

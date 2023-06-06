@@ -18,7 +18,7 @@ class DataPrepare:
         # param init
         self.beginDate = beginDate
         self.endDate = endDate
-        if not self.endDate:
+        if self.endDate is None:
             self.endDate = datetime.date.today().strftime("%Y%m%d")
 
         # consts init
@@ -245,7 +245,6 @@ class simpleBT:
         :param group: 评分分组
         :return: 目标仓位
         """
-        Score.loc[Score < 0] = np.nan
         TargPost = (pd.qcut(Score, 5, labels=['1', '2', '3', '4', '5'], duplicates='drop') == str(group)).astype(int)
         TargPost = TargPost / TargPost.sum()
         return TargPost

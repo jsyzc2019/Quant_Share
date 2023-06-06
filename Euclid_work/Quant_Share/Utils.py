@@ -162,7 +162,7 @@ def winsorize_med(data: pd.Series, scale=1, inclusive: bool = True, inf2nan: boo
     s = data.copy()
     if inf2nan:
         s[np.isinf(s)] = np.nan
-        med = np.median(s.dropna())
+        med = np.nanmedian(s)
         distance = np.median(np.abs(data - med).dropna())
         up = med + scale * distance
         down = med - scale * distance
@@ -173,7 +173,7 @@ def winsorize_med(data: pd.Series, scale=1, inclusive: bool = True, inf2nan: boo
             s[s > up] = np.nan
             s[s < down] = np.nan
     else:
-        med = np.median(s.dropna())
+        med = np.nanmedian(s)
         distance = np.median(np.abs(s - med).dropna())
         up = med + scale * distance
         down = med - scale * distance
@@ -190,8 +190,8 @@ def standardlize(data: pd.Series, inf2nan=True):
     s = data.copy()
     if inf2nan:
         s[np.isinf(s)] = np.nan
-        mean = np.mean(s.dropna())
-        std = np.std(s.dropna(), ddof=1)
+        mean = np.nanmean(s)
+        std = np.nanstd(s, ddof=1)
         s = (s - mean) / std
     else:
         s1 = s[~np.isinf(s)]

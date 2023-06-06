@@ -276,7 +276,6 @@ class simpleBT:
         :param group: 评分分组
         :return: 目标仓位
         """
-        Score.loc[Score < 0] = np.nan
         TargPost = (pd.qcut(Score, 5, labels=['1', '2', '3', '4', '5'], duplicates='drop') == str(group)).astype(int)
         TargPost = TargPost / TargPost.sum()
         return TargPost

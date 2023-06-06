@@ -59,7 +59,7 @@ def update(codes, tableName: str, func, **kwargs):
             save_gm_data_Y(new_data, date_column, tableName, dataBase_root_path=dataBase_root_path_EMdata, reWrite=True)
             # all_data = pd.concat([old_data, new_data], axis=0, ignore_index=True)
             # all_data.to_hdf(abs_file_path, 'a', 'w')
-            print(f"{tableName}更新成功，最新日期{pd.to_datetime(new_data['date_column']).max()}")
+            print(f"{tableName}更新成功，最新日期{pd.to_datetime(new_data[date_column]).max()}")
         else:
             print(f"{tableName}更新失败")
     else:
