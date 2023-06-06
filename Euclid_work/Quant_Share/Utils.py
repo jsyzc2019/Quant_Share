@@ -162,27 +162,15 @@ def winsorize_med(data: pd.Series, scale=1, inclusive: bool = True, inf2nan: boo
     s = data.copy()
     if inf2nan:
         s[np.isinf(s)] = np.nan
-        med = np.nanmedian(s)
-        distance = np.median(np.abs(data - med).dropna())
-        up = med + scale * distance
-        down = med - scale * distance
-        if inclusive:
-            s[s > up] = up
-            s[s < down] = down
-        else:
-            s[s > up] = np.nan
-            s[s < down] = np.nan
+    med = np.nanmedian(s)
+    distance = np.nanmedian(np.abs(s - med))
+    up = med + scale * distance
+    down = med - scale * distance
+    if inclusive:
+        s = np.clip(s, down, up)
     else:
-        med = np.nanmedian(s)
-        distance = np.median(np.abs(s - med).dropna())
-        up = med + scale * distance
-        down = med - scale * distance
-        if inclusive:
-            s[s > up] = up
-            s[s < down] = down
-        else:
-            s[s > up] = np.nan
-            s[s < down] = np.nan
+        s[s > up] = np.nan
+        s[s < down] = np.nan
     return s
 
 
@@ -195,11 +183,11 @@ def standardlize(data: pd.Series, inf2nan=True):
         s = (s - mean) / std
     else:
         s1 = s[~np.isinf(s)]
-        mean = np.mean(s1)
-        std = np.std(s1, ddof=1)
+        mean = np.nanmean(s1)
+        std = np.nanstd(s1, ddof=1)
         s = (s - mean) / std
-    _range = np.max(s) - np.min(s)
-    return (s - np.min(s)) / _range
+    _range = np.nanmax(s) - np.nanmin(s)
+    return (s - np.nanmin(s)) / _range
 
 
 def reindex(data, tradeDate=True, **kwargs):
