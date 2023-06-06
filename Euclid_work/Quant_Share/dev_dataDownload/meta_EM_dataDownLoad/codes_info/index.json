@@ -82,5 +82,28 @@
     "tableName": [
       "000802SH"
     ]
+  },
+  "CITIC_primary_industry_index": {
+    "codes":  "CI005001.CI,CI005002.CI,CI005003.CI,CI005004.CI,CI005005.CI,CI005006.CI,CI005007.CI,CI005008.CI,CI005009.CI,CI005010.CI,CI005011.CI,CI005012.CI,CI005013.CI,CI005014.CI,CI005015.CI,CI005016.CI,CI005017.CI,CI005018.CI,CI005019.CI,CI005020.CI,CI005021.CI,CI005022.CI,CI005023.CI,CI005024.CI,CI005025.CI,CI005026.CI,CI005027.CI,CI005028.CI,CI005029.CI,CI005030.CI",
+    "func": [
+      "index_daily",
+      "index_financial"
+    ],
+    "tableName": [
+      "CITIC_primary_industry_index_daily",
+      "CITIC_primary_industry_index_financial"
+    ]
+  },
+  "SW_primary_industry_index": {
+    "codes":  "801010.SWI,801030.SWI,801040.SWI,801050.SWI,801080.SWI,801110.SWI,801120.SWI,801130.SWI,801140.SWI,801150.SWI,801160.SWI,801170.SWI,801180.SWI,801200.SWI,801210.SWI,801230.SWI,801710.SWI,801720.SWI,801730.SWI,801740.SWI,801750.SWI,801760.SWI,801770.SWI,801780.SWI,801790.SWI,801880.SWI,801890.SWI,801950.SWI,801960.SWI,801970.SWI,801980.SWI",
+    "func": [
+      "index_daily",
+      "index_financial"
+    ],
+    "tableName": [
+      "SW_primary_industry_index_daily",
+      "SW_primary_industry_index_financial"
+    ]
   }
+
 }

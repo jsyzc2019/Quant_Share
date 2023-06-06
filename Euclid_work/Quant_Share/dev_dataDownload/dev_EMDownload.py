@@ -22,7 +22,7 @@ if __name__ == '__main__':
     for name in new_info.keys():
         new_info[name]['func'] = list(map(eval, new_info[name]['func']))
 
-    batch_download(new_info, end='2023-01-01', start='2022-01-01')
+    batch_download(new_info, start='2016-01-01', end=None)
 
     c.stop()
 
