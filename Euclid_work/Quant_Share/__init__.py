@@ -6,4 +6,4 @@ from .Utils import *
 from .EuclidGetData import *
 from .BackTest import *
 from .FactorTest import *
-from .FactorCalc import *
+from .FactorKit import *
