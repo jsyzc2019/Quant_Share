@@ -180,12 +180,11 @@ def standardlize(data: pd.Series, inf2nan=True):
         s[np.isinf(s)] = np.nan
         mean = np.nanmean(s)
         std = np.nanstd(s, ddof=1)
-        s = (s - mean) / std
     else:
         s1 = s[~np.isinf(s)]
         mean = np.nanmean(s1)
         std = np.nanstd(s1, ddof=1)
-        s = (s - mean) / std
+    s = (s - mean) / std
     _range = np.nanmax(s) - np.nanmin(s)
     return (s - np.nanmin(s)) / _range
 

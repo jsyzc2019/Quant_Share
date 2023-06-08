@@ -1,4 +1,4 @@
-from ..Utils import lazyproperty, stockList
+from ..Utils import lazyproperty, stockList, get_tradeDate
 from ..BackTest import DataPrepare, reindex, info_lag, simpleBT, data2score
 from ..EuclidGetData import get_data
 import pandas as pd
@@ -16,9 +16,7 @@ import seaborn as sns
 from factor_analyzer import FactorAnalyzer
 from factor_analyzer.factor_analyzer import calculate_bartlett_sphericity, calculate_kmo
 import matplotlib.pylab as plt
-
-
-# from pyfinance.utils import rolling_windows
+from pyfinance.utils import rolling_windows
 # from dask import dataframe as dd
 
 
@@ -134,12 +132,66 @@ class FactorBase:
         df = get_data(
             tableName='MktEqud',
             ticker=stockList,
-            begin=self.beginDate,
+            begin=get_tradeDate(self.beginDate, -504),
             end=self.endDate,
             fields=['ticker', 'tradeDate', 'chgPct'])
         df = df.pivot(index='tradeDate', columns='ticker', values='chgPct')
         df.name = 'chgPct'
         return df
+
+    def capm_regress(self, X:pd.DataFrame, Y:pd.DataFrame, window=504, half_life=252):
+        X, Y = self.align_data([X, Y])
+        beta, alpha, sigma = self.rolling_regress(Y, X, window=window,
+                                                 half_life=half_life)
+        return beta, alpha, sigma
+
+    def rolling_regress(self,
+                        y,
+                        x,
+                        window=5,
+                        half_life=None,
+                        intercept: bool = True,
+                        verbose: bool = False,
+                        fill_na: str or (int, float) = 0):
+        fill_args = {'method': fill_na} if isinstance(fill_na, str) else {'value': fill_na}
+
+        stocks = y.columns
+        if half_life:
+            weight = self.get_exp_weight(window, half_life)
+        else:
+            weight = 1
+
+        start_idx = x.loc[pd.notnull(x).values.flatten()].index[0]
+        x, y = x.loc[start_idx:], y.loc[start_idx:, :]
+        rolling_ys = rolling_windows(y, window)
+        rolling_xs = rolling_windows(x, window)
+
+        beta = pd.DataFrame(columns=stocks)
+        alpha = pd.DataFrame(columns=stocks)
+        sigma = pd.DataFrame(columns=stocks)
+        for i, (rolling_x, rolling_y) in enumerate(zip(rolling_xs, rolling_ys)):
+            rolling_y = pd.DataFrame(rolling_y, columns=y.columns,
+                                     index=y.index[i:i + window])
+            window_sdate, window_edate = rolling_y.index[0], rolling_y.index[-1]
+            rolling_y = rolling_y.fillna(**fill_args)
+            try:
+                rolling_y_val = rolling_y.values
+                b, a, resid = self.regress(rolling_y_val, rolling_x,
+                                           intercept=True, weight=weight, verbose=True)
+            except:
+                print(i)
+                raise
+            vol = np.std(resid, axis=0)
+
+            vol = pd.DataFrame(vol.reshape((1, -1)), columns=stocks, index=[window_edate])
+            a = pd.DataFrame(a.reshape((1, -1)), columns=stocks, index=[window_edate])
+            b = pd.DataFrame(b, columns=stocks, index=[window_edate])
+
+            beta = pd.concat([beta, b], axis=0)
+            alpha = pd.concat([alpha, a], axis=0)
+            sigma = pd.concat([sigma, vol], axis=0)
+
+        return beta, alpha, sigma
 
     @lazyproperty
     def marketValue(self):
@@ -170,12 +222,30 @@ class FactorBase:
         df = get_data(
             tableName='MktEqud',
             ticker=stockList,
-            begin=self.beginDate,
+            begin=get_tradeDate(self.beginDate, -252),
             end=self.endDate,
             fields=['ticker', 'tradeDate', 'turnoverRate'])
         df = df.pivot(index='tradeDate', columns='ticker', values='turnoverRate')
         df.name = 'turnoverRate'
         return df
+
+    @lazyproperty
+    def bench(self, ticker: str or list[str] = '000300'):
+        df = get_data(tableName='gmData_bench_price',
+                       begin=get_tradeDate(self.beginDate, -504),
+                       end=self.endDate,
+                       ticker=ticker,
+                       fields=['symbol', 'pre_close', 'adj_factor', 'trade_date'])
+        # 指数收益率 =（T指数值 ÷ T-1指数值）× T-1复权因子 - 1
+        df['close'] = df['pre_close'].shift(-1)
+        df['pre_adj_factor'] = df['adj_factor'].shift(1) if not all(df['adj_factor'] == 0) else 1
+        df['return'] = (df['close'] - df['pre_close']) / df['pre_close'] * df['pre_adj_factor']
+        df = df[['trade_date', 'return']]
+        df['trade_date'] = df['trade_date'].dt.strftime('%Y-%m-%d')
+        df.dropna(axis=0, inplace=True)
+        df.set_index('trade_date', inplace=True)
+        df.name = 'bench'+ticker
+        return df[~np.isinf(df)]
 
     @lazyproperty
     def DataClass(self):

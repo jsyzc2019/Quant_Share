@@ -73,3 +73,17 @@ class Liquidity(FactorBase):
     @lazyproperty
     def Liquidity(self):
         return 0.35 * self.STOM + 0.35 * self.STOQ + 0.3 * self.STOA
+
+
+class Volatility(FactorBase):
+    def __init__(self, beginDate: str = None, endDate: str = None):
+        endDate = endDate if endDate else date.today().strftime("%Y%m%d")
+        super().__init__(beginDate, endDate)
+        pass
+
+class BARRA(Liquidity, SizeFactor):
+    def __init__(self, beginDate: str = None, endDate: str = None):
+        endDate = endDate if endDate else date.today().strftime("%Y%m%d")
+        super().__init__(beginDate, endDate)
+        pass
+
