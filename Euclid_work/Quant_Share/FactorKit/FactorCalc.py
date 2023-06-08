@@ -213,17 +213,18 @@ class MultiFactor(FactorBase):
         return res
 
     @staticmethod
-    def retrive_ticker(ticker, factor_lst, names):
+    def retrive_ticker(ticker, factor_lst, names=None):
         res = pd.concat([df[ticker] for df in factor_lst], axis=1)
-        # names = []
-        # suffix = 1
-        # for df in factor_lst:
-        #     try:
-        #         name = df.name
-        #         names.append(name)
-        #     except AttributeError:
-        #         names.append('unknown factor ' + str(suffix))
-        #         suffix += 1
+        if names is None:
+            names = []
+            suffix = 1
+            for df in factor_lst:
+                try:
+                    name = df.name
+                    names.append(name)
+                except AttributeError:
+                    names.append('unknown factor ' + str(suffix))
+                    suffix += 1
         res.columns = names
         return res
 
@@ -247,7 +248,7 @@ class MultiFactor(FactorBase):
         # 得到特征值ev、特征向量v
         ev, v = faa.get_eigenvalues()
 
-        plt.figure()
+        plt.figure(figsize=(8,8))
         # 同样的数据绘制散点图和折线图
         plt.scatter(range(1, mul.shape[1] + 1), ev)
         plt.plot(range(1, mul.shape[1] + 1), ev)
@@ -265,13 +266,19 @@ class MultiFactor(FactorBase):
         faa_sub.fit(mul)
 
         with pd.option_context('expand_frame_repr', False, 'display.max_rows', None):
-            print(pd.DataFrame(faa_sub.get_communalities(), index=mul.columns))
-            print(pd.DataFrame(faa_sub.get_eigenvalues()))
+            print('因子方差'.center(30,'-'))
+            print(pd.DataFrame(faa_sub.get_communalities(), index=mul.columns,columns=['Std']))
+            print('因子特征值'.center(30, '-'))
+            print(pd.DataFrame(faa_sub.get_eigenvalues(),
+                               index=['original_eigen_values(原始特征值)','common_factor_eigen_values(公共因子特征值)'],
+                               columns=mul.columns))
+            print('成分矩阵'.center(30, '-'))
             print(pd.DataFrame(faa_sub.loadings_, index=mul.columns))
+            print('因子贡献率'.center(30, '-'))
             print(pd.DataFrame(faa_sub.get_factor_variance(), index=['SS Loadings', 'Proportion Var', 'Cumulative Var']))
 
         df = pd.DataFrame(np.abs(faa_sub.loadings_), index=mul.columns)
-        plt.figure(figsize=(14, 14))
+        plt.figure(figsize=(8, 8))
         ax = sns.heatmap(df, annot=True, cmap="BuPu")
         # 设置y轴字体大小
         ax.yaxis.set_tick_params(labelsize=15)
@@ -282,8 +289,3 @@ class MultiFactor(FactorBase):
         plt.show()
 
         return faa_sub
-
-
-
-
-
