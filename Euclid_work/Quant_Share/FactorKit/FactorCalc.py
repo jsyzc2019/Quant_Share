@@ -1,4 +1,4 @@
-from ..Utils import lazyproperty, stockList, get_tradeDate
+from ..Utils import lazyproperty, stockList, get_tradeDate, time_decorator
 from ..BackTest import DataPrepare, reindex, info_lag, simpleBT, data2score
 from ..EuclidGetData import get_data
 import pandas as pd
@@ -11,19 +11,92 @@ from datetime import date
 import warnings
 warnings.filterwarnings('ignore')
 
+from multiprocessing import cpu_count
 from pyfinance.utils import rolling_windows
-# from dask import dataframe as dd
-
-
+from dask import dataframe as dd
 import re
 import inspect
+
 def varname(p):
     for line in inspect.getframeinfo(inspect.currentframe().f_back)[3]:
         m = re.search(r'\bvarname\s*\(\s*([A-Za-z_][A-Za-z0-9_]*)\s*\)', line)
         if m:
             return m.group(1)
 
-class FactorBase:
+class FactorData():
+    def __init__(self, beginDate: str = None, endDate: str = None, **kwargs) -> None:
+        self.beginDate = beginDate
+        self.endDate = endDate if endDate else date.today().strftime("%Y%m%d")
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+    @lazyproperty
+    def chgPct(self):
+        df = get_data(
+            tableName='MktEqud',
+            ticker=stockList,
+            begin=get_tradeDate(self.beginDate, -504),
+            end=self.endDate,
+            fields=['ticker', 'tradeDate', 'chgPct'])
+        df = df.pivot(index='tradeDate', columns='ticker', values='chgPct')
+        df.name = 'chgPct'
+        return df
+
+    @lazyproperty
+    def marketValue(self):
+        df = get_data(
+            tableName='MktEqud',
+            ticker=stockList,
+            begin=self.beginDate,
+            end=self.endDate,
+            fields=['ticker', 'tradeDate', 'marketValue'])
+        df = df.pivot(index='tradeDate', columns='ticker', values='marketValue')
+        setattr(df, 'name', 'marketValue')
+        return df
+
+    @lazyproperty
+    def closePrice(self):
+        df = get_data(
+            tableName='MktEqud',
+            ticker=stockList,
+            begin=self.beginDate,
+            end=self.endDate,
+            fields=['ticker', 'tradeDate', 'closePrice'])
+        df = df.pivot(index='tradeDate', columns='ticker', values='closePrice')
+        setattr(df, 'name', 'closePrice')
+        return df
+
+    @lazyproperty
+    def turnoverRate(self):
+        df = get_data(
+            tableName='MktEqud',
+            ticker=stockList,
+            begin=get_tradeDate(self.beginDate, -252),
+            end=self.endDate,
+            fields=['ticker', 'tradeDate', 'turnoverRate'])
+        df = df.pivot(index='tradeDate', columns='ticker', values='turnoverRate')
+        setattr(df, 'name', 'turnoverRate')
+        return df
+
+    @lazyproperty
+    def bench(self, ticker: str or list[str] = '000300'):
+        df = get_data(tableName='gmData_bench_price',
+                      begin=get_tradeDate(self.beginDate, -504),
+                      end=self.endDate,
+                      ticker=ticker,
+                      fields=['symbol', 'pre_close', 'adj_factor', 'trade_date'])
+        # 指数收益率 =（T指数值 ÷ T-1指数值）× T-1复权因子 - 1
+        df['close'] = df['pre_close'].shift(-1)
+        df['pre_adj_factor'] = df['adj_factor'].shift(1) if not all(df['adj_factor'] == 0) else 1
+        df['return'] = (df['close'] - df['pre_close']) / df['pre_close'] * df['pre_adj_factor']
+        df = df[['trade_date', 'return']]
+        # df['trade_date'] = df['trade_date'].dt.strftime('%Y-%m-%d')
+        df.dropna(axis=0, inplace=True)
+        df.set_index('trade_date', inplace=True)
+        setattr(df, 'name', 'bench' + ticker)
+        return df[~np.isinf(df)]
+
+class FactorBase(FactorData):
     def __init__(self, beginDate: str = None, endDate: str = None, **kwargs) -> None:
         self.beginDate = beginDate
         self.endDate = endDate if endDate else date.today().strftime("%Y%m%d")
@@ -122,30 +195,86 @@ class FactorBase:
         norm = (series - mu) / sigma
         return norm
 
-    @lazyproperty
-    def chgPct(self):
-        df = get_data(
-            tableName='MktEqud',
-            ticker=stockList,
-            begin=get_tradeDate(self.beginDate, -504),
-            end=self.endDate,
-            fields=['ticker', 'tradeDate', 'chgPct'])
-        df = df.pivot(index='tradeDate', columns='ticker', values='chgPct')
-        df.name = 'chgPct'
-        return df
+
 
     def capm_regress(self, X:pd.DataFrame, Y:pd.DataFrame, window=504, half_life=252):
         X, Y = self.align_data([X, Y])
         beta, alpha, sigma = self.rolling_regress(Y, X, window=window, half_life=half_life)
         return beta, alpha, sigma
 
+    def rolling(self, datdf, window, half_life=None,
+                func_name='nansum', weights=None):
+
+        func = getattr(np, func_name)
+        if func is None:
+            msg = f"""Search func:{func_name} from numpy failed,
+                   only numpy ufunc is supported currently, please retry."""
+            raise AttributeError(msg)
+
+        if half_life or (weights is not None):
+            exp_wt = self.get_exp_weight(window, half_life) if half_life else weights
+            args = func, exp_wt
+        else:
+            args = func
+
+        try:
+            res = self.pandas_parallelcal(datdf, self.nanfunc, args=args,
+                                          window=window)
+        except Exception:
+            print('Calculating under single core mode...')
+            res = self.rolling_apply(datdf, self.nanfunc, args=args,
+                                     axis=0, window=window)
+        return res
+
+    def rolling_apply(self, datdf, func, args=None, axis=0, window=None):
+        if window:
+            res = datdf.rolling(window=window).apply(func, args=args, raw=True)
+        else:
+            res = datdf.apply(func, args=args, axis=axis, raw=True)
+        return res
+
+    @staticmethod
+    def round_up_to_hundred(num):
+        return int(np.ceil(num / 100) * 100)
+    @staticmethod
+    @time_decorator
+    def pandas_parallelcal(dat, myfunc, args=None, window=None):
+        ncores = len(dat)//window
+        print(f'Try with npartitions={ncores}')
+        res = dd.from_pandas(dat, npartitions=ncores)
+        if window:
+            res = res.rolling(window=window)
+            if args is None:
+                res = res.apply(myfunc, raw=True)
+            else:
+                res = res.apply(myfunc, args=args, raw=True)
+        else:
+            res = res.apply(myfunc, args=args, axis=1)
+        # distributed, multiprocessing, processes, single-threaded, sync, synchronous, threading, threads
+        return res.compute(scheduler='processes')
+
+    def nanfunc(self, series, func, weights=None):
+        if weights is not None:
+            return self.weighted_func(func, series, weights=weights)
+        else:
+            return func(series)
+
+    def weighted_func(self, func, series, weights):
+        weights /= np.nansum(weights)
+        if 'std' in func.__name__:
+            return self.weighted_std(series, weights)
+        else:
+            return func(series * weights)
+
+    @staticmethod
+    def weighted_std(series, weights):
+        return np.sqrt(np.nansum((series - np.nanmean(series)) ** 2 * weights))
+
     def rolling_regress(self,
                         y,
                         x,
                         window=5,
                         half_life=None,
-                        intercept: bool = True,
-                        verbose: bool = False,
                         fill_na: str or (int, float) = 0):
         fill_args = {'method': fill_na} if isinstance(fill_na, str) else {'value': fill_na}
 
@@ -155,7 +284,7 @@ class FactorBase:
         else:
             weight = 1
 
-        start_idx = x.loc[pd.notnull(x).values.flatten()].index[0]
+        start_idx = x.index[0]
         x, y = x.loc[start_idx:], y.loc[start_idx:, :]
         rolling_ys = rolling_windows(y, window)
         rolling_xs = rolling_windows(x, window)
@@ -169,13 +298,10 @@ class FactorBase:
                                      index=y.index[i:i + window])
             window_sdate, window_edate = rolling_y.index[0], rolling_y.index[-1]
             rolling_y = rolling_y.fillna(**fill_args)
-            try:
-                rolling_y_val = rolling_y.values
-                b, a, resid = self.regress(rolling_y_val, rolling_x,
-                                           intercept=True, weight=weight, verbose=True)
-            except:
-                print(i)
-                raise
+
+            rolling_y_val = rolling_y.values
+            b, a, resid = self.regress(rolling_y_val, rolling_x,
+                                       intercept=True, weight=weight, verbose=True)
             vol = np.std(resid, axis=0)
 
             vol = pd.DataFrame(vol.reshape((1, -1)), columns=stocks, index=[window_edate])
@@ -192,60 +318,6 @@ class FactorBase:
     def get_exp_weight(window: int, half_life: int):
         exp_wt = np.asarray([0.5 ** (1 / half_life)] * window) ** np.arange(window)
         return exp_wt[::-1] / np.sum(exp_wt)
-
-    @lazyproperty
-    def marketValue(self):
-        df = get_data(
-            tableName='MktEqud',
-            ticker=stockList,
-            begin=self.beginDate,
-            end=self.endDate,
-            fields=['ticker', 'tradeDate', 'marketValue'])
-        df = df.pivot(index='tradeDate', columns='ticker', values='marketValue')
-        df.name = 'marketValue'
-        return df
-
-    @lazyproperty
-    def closePrice(self):
-        df = get_data(
-            tableName='MktEqud',
-            ticker=stockList,
-            begin=self.beginDate,
-            end=self.endDate,
-            fields=['ticker', 'tradeDate', 'closePrice'])
-        df = df.pivot(index='tradeDate', columns='ticker', values='closePrice')
-        df.name = 'closePrice'
-        return df
-
-    @lazyproperty
-    def turnoverRate(self):
-        df = get_data(
-            tableName='MktEqud',
-            ticker=stockList,
-            begin=get_tradeDate(self.beginDate, -252),
-            end=self.endDate,
-            fields=['ticker', 'tradeDate', 'turnoverRate'])
-        df = df.pivot(index='tradeDate', columns='ticker', values='turnoverRate')
-        df.name = 'turnoverRate'
-        return df
-
-    @lazyproperty
-    def bench(self, ticker: str or list[str] = '000300'):
-        df = get_data(tableName='gmData_bench_price',
-                       begin=get_tradeDate(self.beginDate, -504),
-                       end=self.endDate,
-                       ticker=ticker,
-                       fields=['symbol', 'pre_close', 'adj_factor', 'trade_date'])
-        # 指数收益率 =（T指数值 ÷ T-1指数值）× T-1复权因子 - 1
-        df['close'] = df['pre_close'].shift(-1)
-        df['pre_adj_factor'] = df['adj_factor'].shift(1) if not all(df['adj_factor'] == 0) else 1
-        df['return'] = (df['close'] - df['pre_close']) / df['pre_close'] * df['pre_adj_factor']
-        df = df[['trade_date', 'return']]
-        df['trade_date'] = df['trade_date'].dt.strftime('%Y-%m-%d')
-        df.dropna(axis=0, inplace=True)
-        df.set_index('trade_date', inplace=True)
-        df.name = 'bench'+ticker
-        return df[~np.isinf(df)]
 
     @lazyproperty
     def DataClass(self):

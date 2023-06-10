@@ -297,7 +297,6 @@ def get_tradeDate(InputDate, lag=0):
             # print("{} is not tradeDate".format(date))
             return tradeDateList[index + lag]
 
-
 def get_tradeDates(begin, end=None, n: int = None):
     """
     获取指定时间段内的交易日列表
