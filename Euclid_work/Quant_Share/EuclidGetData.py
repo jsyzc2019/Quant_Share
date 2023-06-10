@@ -23,12 +23,19 @@ import warnings
 warnings.filterwarnings('ignore')
 __all__ = ['get_data', 'get_table_info', 'search_keyword']
 
+table_MAP = {
+        'info':dataBase_root_path,
+        'stock':dataBase_root_path,
+        'gmFuture':dataBase_root_path_future,
+        'gmStockFactor':dataBase_root_path_gmStockFactor,
+        'gmStockData':dataBase_root_path_gmStockFactor,
+        'emData':dataBase_root_path_EMdata,
+    }
 
 # 并行加速
 def applyParallel(dfGrouped, function):
     retLst = Parallel(n_jobs=multiprocessing.cpu_count())(delayed(function)(group) for name, group in tqdm(dfGrouped))
     return pd.concat(retLst)
-
 
 # 带返回的并行调用
 def run_thread_pool_sub(target, args, max_work_count):
@@ -63,6 +70,7 @@ def get_data(tableName, begin='20150101', end=None, sources='gm', fields: list =
     :param ticker:
     :return:
     """
+    global table_MAP
     if tableName not in list(tableInfo.keys()):
         raise KeyError("{} is not ready for use!".format(tableName))
 
@@ -77,22 +85,15 @@ def get_data(tableName, begin='20150101', end=None, sources='gm', fields: list =
             ticker = [ticker]
 
     tableAssets = tableInfo[tableName]['assets']
-    if tableAssets == 'stock':
-        return get_data_stock(tableName, begin, end, fields, ticker)
+    if tableAssets in ['stock', 'info', 'emData', 'gmStockData']:
+        return get_data_Base(tableName, begin, end, fields, ticker, table_MAP[tableAssets])
     elif tableAssets == 'future':
         return get_data_future(tableName, begin, end, sources, fields, ticker)
-    elif tableAssets == 'info':
-        return get_data_stock(tableName, begin, end, fields, ticker)
     elif tableAssets == 'gmStockFactor':
         return get_data_gmStockFactor(tableName, begin, end, fields, ticker)
-    elif tableAssets == 'gmStockData':
-        return get_data_gmStockData(tableName, begin, end, fields, ticker)
-    elif tableAssets == 'emData':
-        return get_data_emData(tableName, begin, end, fields, ticker)
 
-
-def get_data_stock(tableName, begin, end, fields, ticker):
-    tableFoldPath = os.path.join(dataBase_root_path, tableName)
+def get_data_Base(tableName, begin, end, fields, ticker, path):
+    tableFoldPath = os.path.join(path, tableName)
     if not os.path.exists(tableFoldPath):
         try:
             data = pd.read_hdf(tableFoldPath + '.h5')
@@ -105,8 +106,6 @@ def get_data_stock(tableName, begin, end, fields, ticker):
     if begin:
         if 'Q' in h5_file_name_list[0]:
             load_begin, load_end = extend_date_span(begin, end, 'Q')
-            # load_begin = begin - pd.tseries.offsets.QuarterBegin(n=1, startingMonth=1)
-            # load_end = end + pd.tseries.offsets.QuarterEnd()
             toLoadList = []
             for fileName in ["{}_Y{}_Q{:.0f}.h5".format(tableName, QuarterEnd.year, QuarterEnd.month / 3) for QuarterEnd in
                              pd.date_range(load_begin, load_end, freq='q')]:
@@ -118,8 +117,6 @@ def get_data_stock(tableName, begin, end, fields, ticker):
         # 按照年组织
         elif "Y" in h5_file_name_list[0]:
             load_begin, load_end = extend_date_span(begin, end, 'Y')
-            # load_begin = begin - pd.tseries.offsets.YearBegin(0)
-            # load_end = end + pd.tseries.offsets.YearEnd(0)
             toLoadList = []
             for fileName in ["{}_Y{}.h5".format(tableName, YearEnd.year) for YearEnd in
                              pd.date_range(load_begin, load_end, freq='Y')]:
@@ -139,8 +136,6 @@ def get_data_stock(tableName, begin, end, fields, ticker):
 def get_data_future(tableName, begin='20160101', end=None, sources='gm', fields: list = None, ticker: list = None):
     tableFoldPath = os.path.join(dataBase_root_path_future, tableName)
     load_begin, load_end = extend_date_span(begin, end, 'Y')
-    # load_begin = begin - pd.tseries.offsets.YearBegin(0)
-    # load_end = end + pd.tseries.offsets.YearEnd(0)
     toLoadList = []
     for year in [YearEnd.year for YearEnd in pd.date_range(load_begin, load_end, freq='Y')]:
         tmpFolder = os.path.join(tableFoldPath, str(year), sources)
@@ -160,11 +155,8 @@ def get_data_future(tableName, begin='20160101', end=None, sources='gm', fields:
 
 
 def get_data_gmStockFactor(tableName, begin='20160101', end=None, fields: list = None, ticker: list = None):
-    # D:\Share\Stk_Data\gm\ACCA
     tableFoldPath = os.path.join(dataBase_root_path_gmStockFactor, tableName)
     load_begin, load_end = extend_date_span(begin, end, 'Y')
-    # load_begin = begin - pd.tseries.offsets.YearBegin(n=1)
-    # load_end = end + pd.tseries.offsets.YearEnd(n=1)
     toLoadList = []
     for year in [YearEnd.year for YearEnd in pd.date_range(load_begin, load_end, freq='Y')]:
         tmpFolder = os.path.join(tableFoldPath, str(year))  # D:\Share\Stk_Data\gm\ACCA\2013
@@ -176,91 +168,6 @@ def get_data_gmStockFactor(tableName, begin='20160101', end=None, fields: list =
         return selectFields(load_data, tableName, begin, end, fields, ticker)
     else:
         raise KeyError("未找到{}文件".format(tableName))
-
-
-def get_data_gmStockData(tableName, begin, end, fields, ticker):
-    tableFoldPath = os.path.join(dataBase_root_path_gmStockFactor, tableName)
-    if not os.path.exists(tableFoldPath):
-        try:
-            data = pd.read_hdf(tableFoldPath + '.h5')
-            return selectFields(data, tableName, begin, end, fields, ticker)
-        except FileNotFoundError:
-            print("{} no exits!".format(tableName))
-
-    h5_file_name_list = os.listdir(tableFoldPath)
-    if begin:
-        # 如果文件是季度组织的
-        if 'Q' in h5_file_name_list[0]:
-            load_begin, load_end = extend_date_span(begin, end, 'Q')
-            # load_begin = begin - pd.tseries.offsets.QuarterBegin(n=1, startingMonth=1)
-            # load_end = end + pd.tseries.offsets.QuarterEnd()
-            toLoadList = []
-            for fileName in ["{}_Y{}_Q{:.0f}.h5".format(tableName, QuarterEnd.year, QuarterEnd.month / 3) for QuarterEnd in
-                             pd.date_range(load_begin, load_end, freq='q')]:
-                if fileName not in h5_file_name_list:
-                    raise AttributeError("{} is not exit!".format(fileName))
-                else:
-                    filePath = os.path.join(tableFoldPath, fileName)
-                    toLoadList.append(filePath)
-        # 按照年组织
-        elif "Y" in h5_file_name_list[0]:
-            load_begin, load_end = extend_date_span(begin, end, 'Y')
-            # load_begin = begin - pd.tseries.offsets.YearBegin(n=1)
-            # load_end = end + pd.tseries.offsets.YearEnd(n=1)
-            toLoadList = []
-            for fileName in ["{}_Y{}.h5".format(tableName, YearEnd.year) for YearEnd in
-                             pd.date_range(load_begin, load_end, freq='Y')]:
-                if fileName not in h5_file_name_list:
-                    raise AttributeError("{} is not exit!".format(fileName))
-                else:
-                    filePath = os.path.join(tableFoldPath, fileName)
-                    toLoadList.append(filePath)
-        else:
-            raise KeyError("请检查{}, 文件不符合{}_Y*_Q*组织形式".format(tableFoldPath, tableName))
-    else:
-        toLoadList = [os.path.join(tableFoldPath, filename) for filename in h5_file_name_list]
-    load_data = load_file(toLoadList)
-    return selectFields(load_data, tableName, begin, end, fields, ticker)
-
-def get_data_emData(tableName, begin, end, fields, ticker):
-    tableFoldPath = os.path.join(dataBase_root_path_EMdata, tableName)
-    if not os.path.exists(tableFoldPath):
-        try:
-            data = pd.read_hdf(tableFoldPath + '.h5')
-            return selectFields(data, tableName, begin, end, fields, ticker)
-        except FileNotFoundError:
-            print("{} no exits!".format(tableName))
-
-    h5_file_name_list = os.listdir(tableFoldPath)
-    if begin:
-        # 如果文件是季度组织的
-        if 'Q' in h5_file_name_list[0]:
-                load_begin, load_end = extend_date_span(begin, end, 'Q')
-                toLoadList = []
-                for fileName in ["{}_Y{}_Q{:.0f}.h5".format(tableName, QuarterEnd.year, QuarterEnd.month / 3) for QuarterEnd in
-                                 pd.date_range(load_begin, load_end, freq='q')]:
-                    if fileName not in h5_file_name_list:
-                        raise AttributeError("{} is not exit!".format(fileName))
-                    else:
-                        filePath = os.path.join(tableFoldPath, fileName)
-                        toLoadList.append(filePath)
-        # 按照年组织
-        elif "Y" in h5_file_name_list[0]:
-            load_begin, load_end = extend_date_span(begin, end, 'Y')
-            toLoadList = []
-            for fileName in ["{}_Y{}.h5".format(tableName, YearEnd.year) for YearEnd in
-                             pd.date_range(load_begin, load_end, freq='Y')]:
-                if fileName not in h5_file_name_list:
-                    raise AttributeError("{} is not exit!".format(fileName))
-                else:
-                    filePath = os.path.join(tableFoldPath, fileName)
-                    toLoadList.append(filePath)
-        else:
-            raise KeyError("请检查{}, 文件不符合{}_Y*_Q*组织形式".format(tableFoldPath, tableName))
-    else:
-        toLoadList = [os.path.join(tableFoldPath, filename) for filename in h5_file_name_list]
-    load_data = load_file(toLoadList)
-    return selectFields(load_data, tableName, begin, end, fields, ticker)
 
 def selectFields(data, tableName, begin, end, fields: list = None, ticker: list = None):
     outData = data.copy()
@@ -353,19 +260,14 @@ def get_tablePath_info(tablePath):
 
 
 def get_table_info(tableName):
+
+    global table_MAP
     if tableName not in list(tableInfo.keys()):
         raise KeyError("{} is not ready for use!".format(tableName))
     tableSource = tableInfo[tableName]['tableSource']
     description = tableInfo[tableName]['description']
     date_column = tableInfo[tableName]['date_column']
     ticker_column = tableInfo[tableName]['ticker_column']
-
-    table_MAP = {
-        'gmFuture':dataBase_root_path_future,
-        'gmStockFactor':dataBase_root_path_gmStockFactor,
-        'gmStockData':dataBase_root_path_gmStockFactor,
-        'emData':dataBase_root_path_EMdata,
-    }
 
     if tableSource in table_MAP:
         tablePath = os.path.join(table_MAP[tableSource], tableName)
