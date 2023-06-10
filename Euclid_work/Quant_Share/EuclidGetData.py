@@ -360,24 +360,17 @@ def get_table_info(tableName):
     date_column = tableInfo[tableName]['date_column']
     ticker_column = tableInfo[tableName]['ticker_column']
 
-    # tablePath should be a folder or a .h5 file
-    if tableSource == 'gmFuture':
-        tablePath = os.path.join(dataBase_root_path_future, tableName)
-        tableFolder, file_name_list, file_full_path_list = get_tablePath_info(tablePath)
+    table_MAP = {
+        'gmFuture':dataBase_root_path_future,
+        'gmStockFactor':dataBase_root_path_gmStockFactor,
+        'gmStockData':dataBase_root_path_gmStockFactor,
+        'emData':dataBase_root_path_EMdata,
+    }
 
-    elif tableSource == 'gmStockFactor':
-        tablePath = os.path.join(dataBase_root_path_gmStockFactor, tableName)
+    if tableSource in table_MAP:
+        tablePath = os.path.join(table_MAP[tableSource], tableName)
         tableFolder, file_name_list, file_full_path_list = get_tablePath_info(tablePath)
-
-    elif tableSource == 'gmStockData':
-        tablePath = os.path.join(dataBase_root_path_gmStockFactor, tableName)
-        tableFolder, file_name_list, file_full_path_list = get_tablePath_info(tablePath)
-
-    elif tableSource == 'emData':
-        tablePath = os.path.join(dataBase_root_path_EMdata, tableName)
-        tableFolder, file_name_list, file_full_path_list = get_tablePath_info(tablePath)
-
-    else:  # InfoTable, dataYesStock, gmStock
+    else:
         tablePath = os.path.join(dataBase_root_path, tableName)
         tableFolder, file_name_list, file_full_path_list = get_tablePath_info(tablePath)
 
