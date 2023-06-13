@@ -10,4 +10,4 @@ for tableName in tableNameList:
     if begin < get_tradeDate(datetime.now(), -5):
         print("{} update start!".format(tableName))
         eval(tableName + '_update(upDateBegin=begin)')
-AutoEmail('GM数据, 自动更新完成!')
+# AutoEmail('GM数据, 自动更新完成!')

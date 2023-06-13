@@ -54,12 +54,19 @@ end_date = st.sidebar.date_input('回测截至日期', value=pd.to_datetime('202
 # 研究标的
 bench_code = st.sidebar.selectbox("研究标的", ('000852.XSHG', '000905.XSHG', '000300.XSHG'))
 
-uploaded_file = st.file_uploader("## uploader wide score data")
+tradeDateCol = st.text_input('日期列名称', value='tradeDate')
+uploaded_file = st.file_uploader("## uploader wide score data", type=['h5','csv'])
 score = None
 if uploaded_file is not None:
     # Can be used wherever a "file-like" object is accepted:
-    score = pd.read_csv(uploaded_file)
-    score = score.set_index('tradeDate')
+    st.write("filename:", uploaded_file.name)
+    if uploaded_file.name.endswith('csv'):
+        score = pd.read_csv(uploaded_file)
+    elif uploaded_file.name.endswith('h5'):
+        # score = pd.read_hdf(uploaded_file.name)
+        score_hdf = pd.HDFStore(r'E:\Share\Stk_Data\gm\balance_sheet\balance_sheet_Y2022.h5')
+        score = score_hdf.get('/a')
+    score = score.set_index(tradeDateCol)
     score.index = pd.to_datetime(score.index)
     st.write(score)
 
