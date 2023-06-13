@@ -7,8 +7,8 @@
 import numpy as np
 import pandas as pd
 
-from Euclid_work.Quant_Share.Utils import printJson, reindex, info_lag, get_tradeDate, format_date, dataBase_root_path
-from Euclid_work.Quant_Share.Euclid_get_data import get_data
+from .Utils import printJson, reindex, info_lag, get_tradeDate, format_date, dataBase_root_path
+from .EuclidGetData import get_data
 
 
 def format_nav(nav):
@@ -207,9 +207,3 @@ def get_limit_up_down_filter(Score=None):
         fit = fit.reindex(Score.index, Score.columns)
         Score[fit] = np.nan
         return Score
-
-
-if __name__ == '__main__':
-    score = pd.read_csv(r"D:\Share\Euclid_work\Src_Test\score.csv", index_col='tradeDate')
-
-    get_limit_up_down_filter(score)

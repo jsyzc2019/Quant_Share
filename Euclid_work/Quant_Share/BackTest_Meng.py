@@ -85,10 +85,13 @@ class simpleBT:
         # init negValues
         self.negMarketValue = self.tickerData['negMarketValue'].fillna(method='ffill', axis=0)
 
-    def backTest(self, Score, fee_rate=0.0008, group=1, dealPrice='close', plot=False, med=True, Zcore=True, **kwargs):
+    def backTest(self, Score, fee_rate=0.0008, group=1, dealPrice='close', plot=False, **kwargs):
         # format confirm
         if 'Code' in Score.columns:  # if Score from local file, need to do this
             Score.set_index('Code', inplace=True)
+
+        _med = kwargs.get('med', True)
+        _Zcore = kwargs.get('Zcore', True)
 
         print(">>> Back Test staring ...")
         print("\t>>> the shape of score is {}".format(Score.shape))
@@ -149,14 +152,15 @@ class simpleBT:
                 _inf2nan = kwargs.get('inf2nan', True)
                 _inclusive = kwargs.get('inclusive', True)
                 # 中位数去极值
-                if med:
+                if _med:
                     tmpScore = winsorize_med(data=tmpScore, scale=_scale, inclusive=_inclusive, inf2nan=_inf2nan)
                 # Zcore处理
-                if Zcore:
+                if _Zcore:
                     tmpScore = standardlize(data=tmpScore, inf2nan=_inf2nan)
                 try:
                     this_pos = self.getGroupTargPost(Score=tmpScore, group=group)
-                except ValueError:
+                except Exception as e:
+                    # print(e)
                     this_pos = temp_pos
                 if self.negValueAdjust:
                     # adjust by negValue
@@ -305,11 +309,9 @@ class simpleBT:
         Score.dropna(axis=0, how='all', inplace=True)
         metric_begin = get_tradeDate(kwargs.get('metric_begin', Score.index[0]), 0)
         plot_begin = get_tradeDate(kwargs.get('plot_begin', Score.index[0]), 0)
-        _med = kwargs.get('med', True)
-        _Zcore = kwargs.get('Zcore', True)
         group_res = {}
         for group in range(5):
-            (nav, pos_out, alpha_nav, result) = self.backTest(Score.loc[metric_begin:], group=group + 1, dealPrice='vwap', med=_med ** kwargs)
+            (nav, pos_out, alpha_nav, result) = self.backTest(Score.loc[metric_begin:], group=group + 1, dealPrice='vwap', **kwargs)
             group_res['{}'.format(group + 1)] = (nav, pos_out, alpha_nav, result)
 
         # plot
