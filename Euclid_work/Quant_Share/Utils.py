@@ -347,6 +347,8 @@ def is_tradeDate(date: int or str or datetime.datetime):
 def format_date(date):
     if isinstance(date, datetime.datetime):
         return pd.to_datetime(date.date())
+    elif isinstance(date, datetime.date):
+        return pd.to_datetime(date)
     elif isinstance(date, int):
         date = pd.to_datetime(date, format='%Y%m%d')
         return date

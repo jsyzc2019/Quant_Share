@@ -11,3 +11,8 @@ rqfactor
 pyecharts
 uqer
 fuzzywuzzy
+streamlit
+pyfinance
+seaborn
+scikit-learn
+dask
