@@ -5,7 +5,6 @@
 # @File    : Euclid_stEcharts_Test.py
 """
 import os
-
 from Euclid_work.Quant_Share.BackTest_Meng import *
 from Euclid_work.Quant_Share import get_tradeDate
 import streamlit as st
@@ -21,10 +20,8 @@ import pandas as pd
 import numpy as np
 import pyecharts.options as opts
 from pyecharts.charts import Line
-from tqdm import *
 import streamlit as st
 import pandas as pd
-from io import StringIO
 
 
 def get_nav_data_2_plot(data: pd.Series):
@@ -38,13 +35,13 @@ st.markdown("<h1 style='text-align: center; color: black;'>Factor Backtesting An
 st.sidebar.header('回测参数设置')
 st.sidebar.write('请完成以下基本回测参数设置')
 st.sidebar.text(
-    '基本事项说明：\n1. 当前支持的回测范围：2015年1月1日至2023年5月31日\n2. 研究标的对照：\n中证500 000985.XSHG\n中证1000 000852.XSHG\n沪深300 000300.XSHG\n3. 回测默认分5组')
+    '基本事项说明：\n1. 当前支持的回测范围：2015年1月1日至2023年5月31日\n2. 研究标的对照：\n中证500 000905.XSHG\n中证1000 000852.XSHG\n沪深300 000300.XSHG\n3. 回测默认分5组')
 
 
 @st.cache_resource
 def data_prepare(_start_date, _end_date, _bench_code):
     # group beck data prepare
-    _DataClass = DataPrepare(beginDate=_start_date, endDate=_end_date, bench=_bench_code[0:6])
+    _DataClass = DataPrepare(beginDate=_start_date, endDate=_end_date, bench=_bench_code[3:6])
     _DataClass.get_Tushare_data()
     return _DataClass
 
@@ -55,7 +52,7 @@ start_date = st.sidebar.date_input('回测起始日期', value=pd.to_datetime('2
 # 截至时间
 end_date = st.sidebar.date_input('回测截至日期', value=pd.to_datetime('20221231'))
 # 研究标的
-bench_code = st.sidebar.selectbox("研究标的", ('000852.XSHG', '000985.XSHG', '000300.XSHG'))
+bench_code = st.sidebar.selectbox("研究标的", ('000852.XSHG', '000905.XSHG', '000300.XSHG'))
 
 uploaded_file = st.file_uploader("## uploader wide score data")
 score = None
