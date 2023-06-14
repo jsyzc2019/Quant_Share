@@ -8,6 +8,9 @@ from .base_package import *
 
 
 def save_gm_data_Q(df, date_column_name, tableName, dataBase_root_path=dataBase_root_path_gmStockFactor, reWrite=False):
+    """
+    对df进行拆分, 进一步存储
+    """
     if len(df) == 0:
         raise ValueError("data for save is null!")
     print("数据将存储在: {}/{}".format(dataBase_root_path, tableName))

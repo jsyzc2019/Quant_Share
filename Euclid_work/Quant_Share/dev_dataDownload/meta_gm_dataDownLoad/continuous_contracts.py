@@ -45,4 +45,7 @@ def continuous_contracts_update(upDateBegin, endDate='20231231'):
     continuous_contracts_info = pd.read_excel(os.path.join(dev_files_dir, 'continuous_contracts_csymbol.xlsx'))
     csymbol = continuous_contracts_info.csymbol.tolist()
     data = continuous_contracts(begin=upDateBegin, end=endDate, csymbol=csymbol)
-    save_gm_data_Y(data, 'trade_date', 'continuous_contracts', reWrite=True)
+    if len(data) == 0:
+        print("无数据更新")
+    else:
+        save_gm_data_Y(data, 'trade_date', 'continuous_contracts', reWrite=True)

@@ -46,5 +46,7 @@ def trading_derivative_indicator_update(upDateBegin, endDate='20231231'):
     trading_derivative_indicator_fields = trading_derivative_indicator_info['列名'].to_list()
     data = trading_derivative_indicator(begin=upDateBegin, end=endDate, symbol=symbolList,
                                         trading_derivative_indicator_fields=trading_derivative_indicator_fields)
-
-    save_gm_data_Q(data, 'pub_date', 'trading_derivative_indicator', reWrite=True)
+    if len(data) == 0:
+        print("无数据更新")
+    else:
+        save_gm_data_Q(data, 'pub_date', 'trading_derivative_indicator', reWrite=True)

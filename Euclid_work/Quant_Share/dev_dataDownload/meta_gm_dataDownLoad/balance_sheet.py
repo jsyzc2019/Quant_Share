@@ -46,4 +46,7 @@ def balance_sheet_update(upDateBegin, endDate='20231231'):
     balance_sheet_fields = balance_sheet_info['列名'].to_list()
     data = balance_sheet(begin=upDateBegin, end=endDate, symbol=symbolList,
                          balance_sheet_fields=balance_sheet_fields)
-    save_gm_data_Y(data, 'pub_date', 'balance_sheet', reWrite=True)
+    if len(data) == 0:
+        print("无数据更新")
+    else:
+        save_gm_data_Y(data, 'pub_date', 'balance_sheet', reWrite=True)

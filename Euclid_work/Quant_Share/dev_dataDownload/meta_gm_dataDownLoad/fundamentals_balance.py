@@ -39,4 +39,7 @@ def fundamentals_balance_update(upDateBegin, endDate='20231231'):
     fundamentals_balance_fields = ",".join(fundamentals_balance_info['字段名'].to_list())
     data = fundamentals_balance(begin=upDateBegin, end=endDate, symbol=symbolList,
                                 fundamentals_balance_fields=fundamentals_balance_fields)
-    save_gm_data_Y(data, 'pub_date', 'fundamentals_balance', reWrite=True)
+    if len(data) == 0:
+        print("无数据更新")
+    else:
+        save_gm_data_Y(data, 'pub_date', 'fundamentals_balance', reWrite=True)

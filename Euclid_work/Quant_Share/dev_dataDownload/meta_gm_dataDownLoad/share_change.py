@@ -29,4 +29,7 @@ def share_change(begin, end, **kwargs):
 
 def share_change_update(upDateBegin, endDate='20231231'):
     data = share_change(begin=upDateBegin, end=endDate, symbol=symbolList)
-    save_gm_data_Y(data, 'pub_date', 'share_change', reWrite=True)
+    if len(data) == 0:
+        print("无数据更新")
+    else:
+        save_gm_data_Y(data, 'pub_date', 'share_change', reWrite=True)

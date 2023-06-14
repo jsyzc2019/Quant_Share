@@ -81,7 +81,7 @@ def symbol_industry(begin='20150101', end=None):
 
 
 def symbol_industry_update(begin='20150101', end=None):
-    data = symbol_industry(begin=begin,end=end)
+    data = symbol_industry(begin=begin, end=end)
     save_gm_data_Y(data, 'query_date', 'symbol_industry', reWrite=True)
 
 

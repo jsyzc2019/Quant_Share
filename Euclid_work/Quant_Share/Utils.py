@@ -122,7 +122,7 @@ futures_list = ['AG', 'AL', 'AU', 'A', 'BB', 'BU', 'B', 'CF', 'CS', 'CU', 'C', '
                 'EB', 'AP', 'LU', 'SA', 'TS', 'CY', 'IM', 'PF', 'PK', 'CJ', 'UR', 'NR', 'SS', 'FU', 'EG', 'LH', 'SP',
                 'RR', 'SC', 'WR', 'BC']
 
-bench_info = pd.read_hdf('{}/bench_info.h5'.format(dataBase_root_path))
+bench_info = pd.read_hdf('{}/bench_info.h5'.format(dataBase_root_path))  # gm's bench info
 tradeDate_info = pd.read_hdf("{}/tradeDate_info.h5".format(dataBase_root_path))
 tradeDateList = tradeDate_info['tradeDate'].dropna().to_list()
 quarter_begin = ['0101', '0401', '0701', '1001']
@@ -365,7 +365,22 @@ def printJson(dataJson):
     print(json.dumps(dataJson, ensure_ascii=False, indent=2))
 
 
-def extend_date_span(begin, end, freq):
+def extend_date_span(begin, end, freq) -> tuple[datetime.datetime, datetime.datetime]:
+    """
+    将区间[begin, end] 进行拓宽, 依据freq将拓展至指定位置, 详见下
+    freq = M :
+        [2018-01-04, 2018-04-20] -> [2018-01-01, 2018-04-30]
+        [2018-01-01, 2018-04-20] -> [2018-01-01, 2018-04-30]
+        [2018-01-04, 2018-04-30] -> [2018-01-01, 2018-04-30]
+    freq = Q :
+        [2018-01-04, 2018-04-20] -> [2018-01-01, 2018-06-30]
+        [2018-01-01, 2018-04-20] -> [2018-01-01, 2018-06-30]
+        [2018-01-04, 2018-06-30] -> [2018-01-01, 2018-06-30]
+    freq = Y :
+        [2018-01-04, 2018-04-20] -> [2018-01-01, 2018-12-31]
+        [2018-01-01, 2018-04-20] -> [2018-01-01, 2018-12-31]
+        [2018-01-04, 2018-12-31] -> [2018-01-01, 2018-12-31]
+    """
     begin = format_date(begin)
     end = format_date(end)
     if freq in ["Q", "q"]:

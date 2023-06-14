@@ -39,4 +39,7 @@ def fundamentals_cashflow_update(upDateBegin, endDate='20231231'):
     fundamentals_cashflow_fields = ",".join(fundamentals_cashflow_info['字段名'].to_list()[:-3])  # 最后三个字段没有
     data = fundamentals_cashflow(begin=upDateBegin, end=endDate, symbol=symbolList,
                                  fundamentals_cashflow_fields=fundamentals_cashflow_fields)
-    save_gm_data_Y(data, 'pub_date', 'fundamentals_cashflow', reWrite=True)
+    if len(data) == 0:
+        print("无数据更新")
+    else:
+        save_gm_data_Y(data, 'pub_date', 'fundamentals_cashflow', reWrite=True)

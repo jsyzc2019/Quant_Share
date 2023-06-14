@@ -47,4 +47,7 @@ def deriv_finance_indicator_update(upDateBegin, endDate='20231231'):
     deriv_finance_indicator_fields = deriv_finance_indicator_info['列名'].to_list()
     data = deriv_finance_indicator(begin=upDateBegin, end=endDate, symbol=symbolList,
                                    deriv_finance_indicator_fields=deriv_finance_indicator_fields)
-    save_gm_data_Y(data, 'pub_date', 'deriv_finance_indicator', reWrite=True)
+    if len(data) == 0:
+        print("无数据更新")
+    else:
+        save_gm_data_Y(data, 'pub_date', 'deriv_finance_indicator', reWrite=True)
