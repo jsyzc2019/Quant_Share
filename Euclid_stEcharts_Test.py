@@ -56,13 +56,15 @@ end_date = st.sidebar.date_input('回测截至日期', value=pd.to_datetime('202
 bench_code = st.sidebar.selectbox("研究标的", ('000852.XSHG', '000905.XSHG', '000300.XSHG'))
 
 tradeDateCol_factor = st.text_input('因子日期列名称', value='tradeDate')
-uploaded_factor = st.file_uploader("## uploader wide factor data", type=['h5','csv'])
+uploaded_factor = st.file_uploader("## uploader wide factor data", type=['h5', 'csv'])
 tradeDateCol_rtn = st.text_input('回报率日期列名称', value='tradeDate')
-uploaded_rtn = st.file_uploader("## uploader wide return data", type=['h5','csv'])
+uploaded_rtn = st.file_uploader("## uploader wide return data", type=['h5', 'csv'])
 
 factor = None
 score = None
 rtn = None
+
+
 def read_file(uploaded_file, tradeDateCol):
     if uploaded_file is not None:
         # Can be used wherever a "file-like" object is accepted:
@@ -78,6 +80,7 @@ def read_file(uploaded_file, tradeDateCol):
             return data
         return None
 
+
 factor = read_file(uploaded_factor, tradeDateCol_factor)
 if factor is not None:
     factor.index = pd.to_datetime(factor.index)
@@ -87,6 +90,7 @@ if factor is not None:
     st.write(factor.head())
 
 rtn = read_file(uploaded_rtn, tradeDateCol_rtn)
+
 
 @st.cache_resource
 def bkTest():
@@ -111,6 +115,7 @@ if st.sidebar.button("分组回测指标"):
     outMetrics, group_res = bkTest()
     st.write("### 回测结束, 各组指标如下")
     st.dataframe(outMetrics.set_index('group'))
+
 
 def nav_plot(_group_res, _plot_begin, _plot_end):
     _plot_begin = get_tradeDate(_plot_begin, 0)
@@ -188,7 +193,9 @@ if st.sidebar.button("分组净值绘图"):
     outMetrics, group_res = bkTest()
     streamlit_echarts.st_pyecharts(nav_plot(group_res, plot_begin, plot_end), height="500px", width="100%")
 
-def IC_Calc(start_date, end_date):
+
+@st.cache_resource
+def IC_Calc():
     global score, rtn
     if rtn is None:
         price_df = get_data('MktEqud', begin=start_date, end=end_date)
@@ -207,17 +214,17 @@ def IC_Calc(start_date, end_date):
             if res.pvalue > 0.05:
                 rankIC.loc[index] = 0
             else:
-                rankIC.loc[index] = res.statistic
+                rankIC.loc[index] = res.correlation
     rankIC.dropna(axis=0, inplace=True)
     IR = (rankIC.mean()) / rankIC.std()
     return rankIC, IR
 
-def ICIR_plot(rankIC, IR, plot_start, plot_end):
-    plot_begin = get_tradeDate(plot_start, 0)
-    plot_end = get_tradeDate(plot_end, -1)
-    rankIC_lim = rankIC.loc[plot_begin:plot_end]
+
+def ICIR_plot(rankIC, IR, _plot_begin, _plot_end):
+    _plot_begin = get_tradeDate(_plot_begin, 0)
+    _plot_end = get_tradeDate(_plot_end, -1)
+    rankIC_lim = rankIC.loc[_plot_begin:_plot_end]
     st.write(f"IC数据量为{len(rankIC_lim)}")
-    x_data = rankIC_lim.index.strftime("%Y%m%d").tolist()
     bar = (
         Bar(
             init_opts=opts.InitOpts(
@@ -226,11 +233,11 @@ def ICIR_plot(rankIC, IR, plot_start, plot_end):
                 theme="white"
             )
         )
-        .add_xaxis(xaxis_data=x_data)
+        .add_xaxis(xaxis_data=rankIC_lim.index.strftime("%Y%m%d").tolist())
         .add_yaxis(
             series_name="IC",
-            y_axis=list(rankIC_lim.values),
-            itemstyle_opts = opts.ItemStyleOpts(color="#00CD96"))
+            y_axis=rankIC_lim['rankIC'].tolist(),
+            itemstyle_opts=opts.ItemStyleOpts(color="#00CD96"))
         .set_global_opts(
             title_opts={"text": f"IR={float(IR)}"},
             brush_opts=opts.BrushOpts(),  # 设置操作图表的画笔功能
@@ -240,9 +247,11 @@ def ICIR_plot(rankIC, IR, plot_start, plot_end):
             xaxis_opts=opts.AxisOpts(name="日期"),  # 设置X轴名称
 
         )
-        )
+        .set_series_opts(label_opts=opts.LabelOpts(is_show=False))
+    )
     return bar
 
+
 if st.sidebar.button("绘制因子ICIR图"):
-    rankIC, IR = IC_Calc(plot_begin, plot_end)
+    rankIC, IR = IC_Calc()
     streamlit_echarts.st_pyecharts(ICIR_plot(rankIC, IR, plot_begin, plot_end), height="500px", width="100%")
