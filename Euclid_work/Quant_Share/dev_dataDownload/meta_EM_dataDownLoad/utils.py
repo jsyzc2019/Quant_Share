@@ -51,6 +51,7 @@ def retrive_info(tableName:str):
 
 def update(codes, tableName: str, func, **kwargs):
     old_data, abs_file_path, old_day_off_1, new_day, date_column = retrive_info(tableName)
+    flag = True
     if old_day_off_1 < new_day:
         new_data = func(codes=codes,
                        start=old_day_off_1.strftime('%Y-%m-%d'),
@@ -62,8 +63,10 @@ def update(codes, tableName: str, func, **kwargs):
             print(f"{tableName}更新成功，最新日期{pd.to_datetime(new_data[date_column]).max()}")
         else:
             print(f"{tableName}更新失败")
+            flag = False
     else:
         print(f"{tableName}无需更新")
+    return flag
 
 def map_func(infos):
     for name in infos.keys():
@@ -71,10 +74,14 @@ def map_func(infos):
     return infos
 
 def batch_update(infos, **kwargs):
+    fail_lst = []
     for name, info in infos.items():
         codes = info["codes"]
         for func, tableName in zip(info["func"], info["tableName"]):
-            update(codes, tableName=tableName, func=func, **kwargs)
+            flag = update(codes, tableName=tableName, func=func, **kwargs)
+            if not flag: fail_lst.append(tableName)
+    if fail_lst:
+        print(f"以下数据表更新失败:\n{fail_lst}")
 
 def batch_download(infos, **kwargs):
     for name, info in infos.items():
