@@ -31,31 +31,29 @@ def read_file(uploaded_file, tradeDateCol):
         return None
 
 @st.cache_resource
-def bkTest():
-    global score, start_date, end_date, bench_code
+def bkTest(_score, _start_date, _end_date, _bench_code):
     # group beck test
-    _DataClass = data_prepare(start_date, end_date, bench_code)
+    _DataClass = data_prepare(_start_date, _end_date, _bench_code)
     BTClass = simpleBT(_DataClass.TICKER, _DataClass.BENCH)
-    if score is not None:
-        tmpScore = score
+    if _score is not None:
+        tmpScore = _score
     else:
         tmpScore = _DataClass.Score
     _, _outMetrics, _group_res = BTClass.groupBT(tmpScore)
     return _outMetrics, _group_res
 
 @st.cache_resource
-def IC_Calc():
-    global score, rtn
-    if rtn is None:
-        price_df = get_data('MktEqud', begin=start_date, end=end_date)
-        rtn = reindex(price_df.pivot(index='tradeDate', columns='ticker', values='chgPct'))
+def IC_Calc(_rtn, _score, _start_date, _end_date):
+    if _rtn is None:
+        price_df = get_data('MktEqud', begin=_start_date, end=_end_date)
+        _rtn = reindex(price_df.pivot(index='tradeDate', columns='ticker', values='chgPct'))
         st.write('自动获取回报率数值')
 
-    score.dropna(how='all', axis=0, inplace=True)
-    rankIC = pd.DataFrame(np.zeros((score.shape[0], 1)), index=score.index, columns=['rankIC'])
-    for index, values in score.iterrows():
-        if index in rtn.index:
-            tmp = pd.concat([values, rtn.loc[index]], axis=1, ignore_index=True)
+    _score.dropna(how='all', axis=0, inplace=True)
+    rankIC = pd.DataFrame(np.zeros((_score.shape[0], 1)), index=_score.index, columns=['rankIC'])
+    for index, values in _score.iterrows():
+        if index in _rtn.index:
+            tmp = pd.concat([values, _rtn.loc[index]], axis=1, ignore_index=True)
             tmp.dropna(axis=0, inplace=True)
             tmp = tmp.rank(axis=0)
             # rank

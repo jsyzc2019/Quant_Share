@@ -6,8 +6,7 @@ import pyecharts.options as opts
 from funcs import get_nav_data_2_plot
 import streamlit as st
 
-def nav_plot(_group_res, _plot_begin, _plot_end):
-    global bench_code
+def nav_plot(_group_res, _plot_begin, _plot_end, _bench_code):
     _plot_begin = get_tradeDate(_plot_begin, 0)
     _plot_end = get_tradeDate(_plot_end, -1)
 
@@ -50,7 +49,7 @@ def nav_plot(_group_res, _plot_begin, _plot_end):
             label_opts=opts.LabelOpts(is_show=False),
         )
         .add_yaxis(
-            series_name="{}".format(bench_code),
+            series_name="{}".format(_bench_code),
             y_axis=get_nav_data_2_plot(bench_nav.loc[_plot_begin:_plot_end]).tolist(),
             label_opts=opts.LabelOpts(is_show=False),
         )

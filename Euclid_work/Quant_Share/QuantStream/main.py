@@ -6,7 +6,7 @@ from Euclid_work.Quant_Share import info_lag, reindex, data2score
 import streamlit_echarts
 import streamlit as st
 import pandas as pd
-from funcs import data_prepare, read_file, bkTest
+from funcs import data_prepare, read_file, bkTest, IC_Calc
 from plots import nav_plot, ICIR_plot
 
 # 基本网页设置
@@ -53,14 +53,14 @@ if st.sidebar.button('准备基础数据'):
     DataClass = data_prepare(start_date, end_date, bench_code)
 
 if st.sidebar.button("分组回测指标"):
-    outMetrics, group_res = bkTest()
+    outMetrics, group_res = bkTest(score, start_date, end_date, bench_code)
     st.write("### 回测结束, 各组指标如下")
     st.dataframe(outMetrics.set_index('group'))
 
 if st.sidebar.button("分组净值绘图"):
-    outMetrics, group_res = bkTest()
-    streamlit_echarts.st_pyecharts(nav_plot(group_res, plot_begin, plot_end), height="500px", width="100%")
+    outMetrics, group_res = bkTest(score, start_date, end_date, bench_code)
+    streamlit_echarts.st_pyecharts(nav_plot(group_res, plot_begin, plot_end, bench_code), height="500px", width="100%")
 
-if st.sidebar.button("绘制因子ICIR图"):
-    rankIC, IR = IC_Calc()
+if st.sidebar.button("因子ICIR绘图"):
+    rankIC, IR = IC_Calc(rtn, score, start_date, end_date)
     streamlit_echarts.st_pyecharts(ICIR_plot(rankIC, IR, plot_begin, plot_end), height="500px", width="100%")
