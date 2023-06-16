@@ -19,21 +19,31 @@ st.sidebar.text(
     '基本事项说明：\n1. 当前支持的回测范围：2015年1月1日至2023年5月31日\n2. 研究标的对照：\n中证500 000905.XSHG\n中证1000 000852.XSHG\n沪深300 000300.XSHG\n3. 回测默认分5组')
 
 # 用户交互参数设置
-# 起始时间
-start_date = st.sidebar.date_input('回测起始日期', value=pd.to_datetime('20180101'))
-# 截至时间
-end_date = st.sidebar.date_input('回测截至日期', value=pd.to_datetime('20221231'))
-# 绘图起始
-plot_begin = st.sidebar.date_input('绘图开始日期', value=pd.to_datetime('20200531'))
-# 绘图截至
-plot_end = st.sidebar.date_input('绘图结束日期', value=pd.to_datetime('20221231'))
-# 研究标的
-bench_code = st.sidebar.selectbox("研究标的", ('000852.XSHG', '000905.XSHG', '000300.XSHG'))
+with st.sidebar:
+    calc_col, plot_col = st.columns(2)
+    with calc_col:
+        # 起始时间
+        start_date = st.date_input('回测起始日期', value=pd.to_datetime('20180101'))
+        # 截至时间
+        end_date = st.date_input('回测截至日期', value=pd.to_datetime('20221231'))
+    with plot_col:
+        # 绘图起始
+        plot_begin = st.date_input('绘图开始日期', value=pd.to_datetime('20200531'))
+        # 绘图截至
+        plot_end = st.date_input('绘图结束日期', value=pd.to_datetime('20221231'))
+    # 研究标的
+    bench_code = st.sidebar.selectbox("研究标的", ('000852.XSHG', '000905.XSHG', '000300.XSHG'))
 
-tradeDateCol_factor = st.text_input('因子日期列名称', value='tradeDate')
-uploaded_factor = st.file_uploader("## uploader wide factor data", type=['h5', 'csv'])
-tradeDateCol_rtn = st.text_input('回报率日期列名称', value='tradeDate')
-uploaded_rtn = st.file_uploader("## uploader wide return data", type=['h5', 'csv'])
+
+date_name_col, file_upload_col = st.columns(2)
+with date_name_col:
+    tradeDateCol_factor = st.text_input('因子日期列名称', value='tradeDate')
+    uploaded_factor = st.file_uploader("## 上传因子数据（宽表格式）", type=['h5', 'csv'])
+
+with file_upload_col:
+    tradeDateCol_rtn = st.text_input('回报率日期列名称', value='tradeDate')
+    uploaded_rtn = st.file_uploader("## 上传回报率数据（宽表格式）", type=['h5', 'csv'])
+
 
 factor = None
 score = None
@@ -49,18 +59,24 @@ if factor is not None:
 rtn = read_file(uploaded_rtn, tradeDateCol_rtn)
 
 
-if st.sidebar.button('准备基础数据'):
-    DataClass = data_prepare(start_date, end_date, bench_code)
 
-if st.sidebar.button("分组回测指标"):
-    outMetrics, group_res = bkTest(score, start_date, end_date, bench_code)
-    st.write("### 回测结束, 各组指标如下")
-    st.dataframe(outMetrics.set_index('group'))
+with st.sidebar:
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button('准备基础数据'):
+            DataClass = data_prepare(start_date, end_date, bench_code)
+        if st.button("分组回测指标"):
+            outMetrics, group_res = bkTest(score, start_date, end_date, bench_code)
+            st.write("### 回测结束, 各组指标如下")
+            st.dataframe(outMetrics.set_index('group'))
 
-if st.sidebar.button("分组净值绘图"):
-    outMetrics, group_res = bkTest(score, start_date, end_date, bench_code)
-    streamlit_echarts.st_pyecharts(nav_plot(group_res, plot_begin, plot_end, bench_code), height="500px", width="100%")
+    with col2:
+        if st.button("分组净值绘图"):
+            outMetrics, group_res = bkTest(score, start_date, end_date, bench_code)
+            streamlit_echarts.st_pyecharts(nav_plot(group_res, plot_begin, plot_end, bench_code), height="500px", width="100%")
 
-if st.sidebar.button("因子ICIR绘图"):
-    rankIC, IR = IC_Calc(rtn, score, start_date, end_date)
-    streamlit_echarts.st_pyecharts(ICIR_plot(rankIC, IR, plot_begin, plot_end), height="500px", width="100%")
+        if st.button("因子ICIR绘图"):
+            with st.spinner('Wait for it...'):
+                rankIC, IR = IC_Calc(rtn, score, start_date, end_date)
+                streamlit_echarts.st_pyecharts(ICIR_plot(rankIC, IR, plot_begin, plot_end), height="500px", width="100%")
+            st.success('Done!')
