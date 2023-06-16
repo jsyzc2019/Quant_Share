@@ -60,23 +60,21 @@ rtn = read_file(uploaded_rtn, tradeDateCol_rtn)
 
 
 
-with st.sidebar:
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button('准备基础数据'):
-            DataClass = data_prepare(start_date, end_date, bench_code)
-        if st.button("分组回测指标"):
-            outMetrics, group_res = bkTest(score, start_date, end_date, bench_code)
-            st.write("### 回测结束, 各组指标如下")
-            st.dataframe(outMetrics.set_index('group'))
 
-    with col2:
-        if st.button("分组净值绘图"):
-            outMetrics, group_res = bkTest(score, start_date, end_date, bench_code)
-            streamlit_echarts.st_pyecharts(nav_plot(group_res, plot_begin, plot_end, bench_code), height="500px", width="100%")
 
-        if st.button("因子ICIR绘图"):
-            with st.spinner('Wait for it...'):
-                rankIC, IR = IC_Calc(rtn, score, start_date, end_date)
-                streamlit_echarts.st_pyecharts(ICIR_plot(rankIC, IR, plot_begin, plot_end), height="500px", width="100%")
-            st.success('Done!')
+if st.sidebar.button('准备基础数据'):
+    DataClass = data_prepare(start_date, end_date, bench_code)
+if st.sidebar.button("分组回测指标"):
+    outMetrics, group_res = bkTest(score, start_date, end_date, bench_code)
+    st.write("### 回测结束, 各组指标如下")
+    st.dataframe(outMetrics.set_index('group'))
+
+if st.sidebar.button("分组净值绘图"):
+    outMetrics, group_res = bkTest(score, start_date, end_date, bench_code)
+    streamlit_echarts.st_pyecharts(nav_plot(group_res, plot_begin, plot_end, bench_code), height="500px", width="100%")
+
+if st.sidebar.button("因子ICIR绘图"):
+    with st.spinner('Wait for it...'):
+        rankIC, IR = IC_Calc(rtn, score, start_date, end_date)
+        streamlit_echarts.st_pyecharts(ICIR_plot(rankIC, IR, plot_begin, plot_end), height="500px", width="100%")
+    st.success('Done!')
