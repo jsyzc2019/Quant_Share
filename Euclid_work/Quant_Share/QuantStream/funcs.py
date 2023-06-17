@@ -18,7 +18,7 @@ def data_prepare(_start_date, _end_date, _bench_code):
 def read_file(uploaded_file, tradeDateCol):
     if uploaded_file is not None:
         # Can be used wherever a "file-like" object is accepted:
-        st.write("filename:", uploaded_file.name)
+        st.write(f"正在读取：{uploaded_file.name}")
         if uploaded_file.name.endswith('csv'):
             data = pd.read_csv(uploaded_file)
             data = data.set_index(tradeDateCol)
