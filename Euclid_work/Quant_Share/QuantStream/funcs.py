@@ -1,9 +1,11 @@
 import streamlit as st
 import pandas as pd
 from Euclid_work.Quant_Share.BackTest_Meng import DataPrepare, simpleBT
-from Euclid_work.Quant_Share import get_tradeDate, get_data, reindex
+from Euclid_work.Quant_Share import get_tradeDate, get_data, reindex, info_lag, data2score
 import numpy as np
 from scipy.stats import spearmanr
+import h5py
+import tempfile
 
 def get_nav_data_2_plot(data: pd.Series):
     return data / data.iloc[0] - 1
@@ -24,11 +26,27 @@ def read_file(uploaded_file, tradeDateCol):
             data = data.set_index(tradeDateCol)
             return data
         elif uploaded_file.name.endswith('h5'):
-            data = pd.HDFStore(r'E:\Share\Stk_Data\gm\balance_sheet\balance_sheet_Y2022.h5')
-            data = data.get('/a')
+            # 创建临时文件
+            temp_file = tempfile.NamedTemporaryFile(delete=False)
+            # 将上传的文件内容保存到临时文件
+            temp_file.write(uploaded_file.read())
+            # 关闭临时文件
+            temp_file.close()
+            file_path = temp_file.name
+            data = pd.read_hdf(file_path)
             data = data.set_index(tradeDateCol)
+            # st.write(data)
             return data
-        return None
+        else:
+            raise NotImplemented(uploaded_file.name.split('.')[-1])
+
+def factor2score(factor):
+    factor.index = pd.to_datetime(factor.index)
+    factor = reindex(factor)
+    score = info_lag(data2score(factor), n_lag=1)
+    st.write("因子数据前五行为：")
+    st.write(factor.head())
+    return factor, score
 
 @st.cache_resource
 def bkTest(_score, _start_date, _end_date, _bench_code):
