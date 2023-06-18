@@ -1,10 +1,10 @@
 import streamlit as st
 import pandas as pd
-from Euclid_work.Quant_Share.BackTest_Meng import DataPrepare, simpleBT
+from Euclid_work.Quant_Share.BackTest_Meng import DataPrepare, simpleBT, isdate
 from Euclid_work.Quant_Share import get_tradeDate, get_data, reindex, info_lag, data2score
 import numpy as np
 from scipy.stats import spearmanr
-import h5py
+import os
 import tempfile
 
 def get_nav_data_2_plot(data: pd.Series):
@@ -17,14 +17,12 @@ def data_prepare(_start_date, _end_date, _bench_code):
     _DataClass.get_Tushare_data()
     return _DataClass
 
-def read_file(uploaded_file, tradeDateCol):
+def read_file(uploaded_file, tradeDateCol='', auto=False):
     if uploaded_file is not None:
         # Can be used wherever a "file-like" object is accepted:
         st.write(f"正在读取：{uploaded_file.name}")
         if uploaded_file.name.endswith('csv'):
             data = pd.read_csv(uploaded_file)
-            data = data.set_index(tradeDateCol)
-            return data
         elif uploaded_file.name.endswith('h5'):
             # 创建临时文件
             temp_file = tempfile.NamedTemporaryFile(delete=False)
@@ -34,22 +32,33 @@ def read_file(uploaded_file, tradeDateCol):
             temp_file.close()
             file_path = temp_file.name
             data = pd.read_hdf(file_path)
-            data = data.set_index(tradeDateCol)
-            # st.write(data)
-            return data
+            os.remove(file_path)
         else:
             raise NotImplemented(uploaded_file.name.split('.')[-1])
 
-def factor2score(factor):
+        if auto:
+            col_names = data.columns
+            for col in col_names:
+                sample = data[col].dropna().values[0]
+                if isdate(str(sample)):
+                    tradeDateCol = col
+                    break
+
+        data = data.set_index(tradeDateCol)
+        return data, tradeDateCol
+
+@st.cache_resource
+def factor2score(factor, verbose=True):
     factor.index = pd.to_datetime(factor.index)
     factor = reindex(factor)
     score = info_lag(data2score(factor), n_lag=1)
-    st.write("因子数据前五行为：")
-    st.write(factor.head())
+    if verbose:
+        st.write("因子数据前五行为：")
+        st.write(factor.head())
     return factor, score
 
 @st.cache_resource
-def bkTest(_score, _start_date, _end_date, _bench_code):
+def bkTest(_score, _start_date, _end_date, _bench_code, key=''):
     # group beck test
     _DataClass = data_prepare(_start_date, _end_date, _bench_code)
     BTClass = simpleBT(_DataClass.TICKER, _DataClass.BENCH)
