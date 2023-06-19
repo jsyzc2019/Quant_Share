@@ -1,4 +1,4 @@
-from ..Utils import lazyproperty, stockList, get_tradeDate, time_decorator
+from ..Utils import lazyproperty, stockList, get_tradeDate, time_decorator, get_tradeDates
 from ..BackTest import DataPrepare, reindex, info_lag, simpleBT, data2score
 from ..EuclidGetData import get_data
 import pandas as pd
@@ -31,6 +31,62 @@ class FactorData():
             setattr(self, k, v)
 
     @lazyproperty
+    def perCashDiv(self):
+        df = get_data(tableName='EquDiv_info', verbose=False)
+        df = df.sort_values(by='recordDate')
+        df = df.drop_duplicates(subset=['ticker', 'endDate'], keep='last')
+        df = df.pivot(values='perCashDiv', index='endDate', columns='ticker')
+        df.index = pd.to_datetime(df.index)
+        df = df.resample('D').asfreq().fillna(method='ffill')
+        tds = pd.to_datetime(get_tradeDates(get_tradeDate(self.beginDate, -365*3), self.endDate))
+        tds = df.index.intersection(tds)
+        df = df.loc[tds]
+        df.name = 'perCashDiv'
+        return df
+
+    @lazyproperty
+    def EPS(self):
+        df = get_data(
+            tableName='FdmtIndiPSPit',
+            ticker=stockList,
+            begin=get_tradeDate(self.beginDate, -365*3),
+            end=self.endDate)
+        df.actPubtime = pd.to_datetime(df.actPubtime)
+        df = df.sort_values(by='actPubtime')
+        df = df.drop_duplicates(subset=['ticker', 'endDate'], keep='last')
+        df = df.pivot(index='endDate', columns='ticker', values='EPS')
+        df = df.resample('D').asfreq().fillna(method='ffill')
+        tds = pd.to_datetime(get_tradeDates(get_tradeDate(self.beginDate, -365*3), self.endDate))
+        tds = df.index.intersection(tds)
+        df = df.loc[tds]
+        df.name = 'EPS'
+        return df
+
+    @lazyproperty
+    def turnoverValue(self):
+        df = get_data(
+            tableName='MktEqud',
+            ticker=stockList,
+            begin=get_tradeDate(self.beginDate, -504),
+            end=self.endDate,
+            fields=['ticker', 'tradeDate', 'turnoverValue'])
+        df = df.pivot(index='tradeDate', columns='ticker', values='turnoverValue')
+        df.name = 'turnoverValue'
+        return df
+
+    @lazyproperty
+    def negMarketValue(self):
+        df = get_data(
+            tableName='MktEqud',
+            ticker=stockList,
+            begin=get_tradeDate(self.beginDate, -504),
+            end=self.endDate,
+            fields=['ticker', 'tradeDate', 'negMarketValue'])
+        df = df.pivot(index='tradeDate', columns='ticker', values='negMarketValue')
+        df.name = 'negMarketValue'
+        return df
+
+    @lazyproperty
     def chgPct(self):
         df = get_data(
             tableName='MktEqud',
@@ -59,7 +115,7 @@ class FactorData():
         df = get_data(
             tableName='MktEqud',
             ticker=stockList,
-            begin=self.beginDate,
+            begin=get_tradeDate(self.beginDate, -365),
             end=self.endDate,
             fields=['ticker', 'tradeDate', 'closePrice'])
         df = df.pivot(index='tradeDate', columns='ticker', values='closePrice')

@@ -46,6 +46,15 @@ class DividendYield(FactorBase):
         endDate = endDate if endDate else date.today().strftime("%Y%m%d")
         super().__init__(beginDate, endDate)
 
+    @lazyproperty
+    def DTOP(self):
+        perCashDiv = self.perCashDiv
+        closePrice = self.closePrice
+        perCashDiv, closePrice = self.align_data([perCashDiv, closePrice])
+        perCashDiv = sum([perCashDiv.shift(i*63) for i in range(4)])
+        df = perCashDiv/closePrice
+        df = df.loc[(df.index >= pd.to_datetime(self.beginDate)) & (df.index <= pd.to_datetime(self.endDate))]
+        return df
 
 class Liquidity(FactorBase):
 
@@ -144,7 +153,9 @@ class Volatility(FactorBase):
         HSIGMA, CMRA, DASTD = self.align_data([self.HSIGMA, self.CMRA, self.DASTD])
         return 0.1 * HSIGMA + 0.16 * CMRA + 0.74 * DASTD
 
-class BARRA(Liquidity, SizeFactor, Volatility):
+
+
+class BARRA(Liquidity, SizeFactor, Volatility, DividendYield):
     def __init__(self, beginDate: str = None, endDate: str = None):
         endDate = endDate if endDate else date.today().strftime("%Y%m%d")
         super().__init__(beginDate, endDate)

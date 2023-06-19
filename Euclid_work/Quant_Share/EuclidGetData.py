@@ -60,7 +60,7 @@ def load_file(toLoadList):
     return load_data
 
 
-def get_data(tableName, begin='20150101', end=None, sources='gm', fields: list = None, ticker: list = None):
+def get_data(tableName, begin='20150101', end=None, sources='gm', fields: list = None, ticker: list = None, **kwargs):
     """
     :param tableName: bench_info / bench_price / stock_info / stock_price / tradeDate_info / HKshszHold
     :param begin:
@@ -86,13 +86,13 @@ def get_data(tableName, begin='20150101', end=None, sources='gm', fields: list =
 
     tableAssets = tableInfo[tableName]['assets']
     if tableAssets in ['stock', 'info', 'emData', 'gmStockData']:
-        return get_data_Base(tableName, begin, end, fields, ticker, table_MAP[tableAssets])
+        return get_data_Base(tableName, begin, end, fields, ticker, table_MAP[tableAssets], **kwargs)
     elif tableAssets == 'future':
         return get_data_future(tableName, begin, end, sources, fields, ticker)
     elif tableAssets == 'gmStockFactor':
         return get_data_gmStockFactor(tableName, begin, end, fields, ticker)
 
-def get_data_Base(tableName, begin, end, fields, ticker, path):
+def get_data_Base(tableName, begin, end, fields, ticker, path, **kwargs):
     tableFoldPath = os.path.join(path, tableName)
     if not os.path.exists(tableFoldPath):
         try:
@@ -130,7 +130,7 @@ def get_data_Base(tableName, begin, end, fields, ticker, path):
     else:
         toLoadList = [os.path.join(tableFoldPath, filename) for filename in h5_file_name_list]
     load_data = load_file(toLoadList)
-    return selectFields(load_data, tableName, begin, end, fields, ticker)
+    return selectFields(load_data, tableName, begin, end, fields, ticker, verbose=kwargs.get('verbose', True))
 
 
 def get_data_future(tableName, begin='20160101', end=None, sources='gm', fields: list = None, ticker: list = None):
@@ -169,19 +169,21 @@ def get_data_gmStockFactor(tableName, begin='20160101', end=None, fields: list =
     else:
         raise KeyError("未找到{}文件".format(tableName))
 
-def selectFields(data, tableName, begin, end, fields: list = None, ticker: list = None):
+def selectFields(data, tableName, begin, end, fields: list = None, ticker: list = None, verbose: bool = False):
     outData = data.copy()
     # get date_column, ticker_column
     try:
         date_column = tableInfo[tableName]['date_column']
         outData[date_column] = pd.to_datetime(outData[date_column])
     except KeyError:
-        print("{} 不支持时间筛选".format(tableName))
+        if verbose:
+            print("{} 不支持时间筛选".format(tableName))
         date_column = ''
     try:
         ticker_column = tableInfo[tableName]['ticker_column']
     except KeyError:
-        print("{} 不支持ticker筛选".format(tableName))
+        if verbose:
+            print("{} 不支持ticker筛选".format(tableName))
         ticker_column = ''
 
     # data filter: date -> ticker -> fields
