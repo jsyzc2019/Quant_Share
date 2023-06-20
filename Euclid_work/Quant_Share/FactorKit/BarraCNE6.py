@@ -1,5 +1,5 @@
 from .FactorCalc import FactorBase
-from ..Utils import lazyproperty
+from ..Utils import lazyproperty, get_tradeDates, get_tradeDate
 import numpy as np
 import pandas as pd
 from datetime import date
@@ -49,6 +49,10 @@ class DividendYield(FactorBase):
     @lazyproperty
     def DTOP(self):
         perCashDiv = self.perCashDiv
+        perCashDiv = perCashDiv.resample('D').asfreq().fillna(method='ffill')
+        # tds = pd.to_datetime(get_tradeDates(get_tradeDate(self.beginDate, -365*3), self.endDate))
+        # tds = perCashDiv.index.intersection(tds)
+        # perCashDiv = perCashDiv.loc[tds]
         closePrice = self.closePrice
         perCashDiv, closePrice = self.align_data([perCashDiv, closePrice])
         perCashDiv = sum([perCashDiv.shift(i*63) for i in range(4)])

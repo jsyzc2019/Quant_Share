@@ -33,14 +33,15 @@ class FactorData():
     @lazyproperty
     def perCashDiv(self):
         df = get_data(tableName='EquDiv_info', verbose=False)
-        df = df.sort_values(by='recordDate')
-        df = df.drop_duplicates(subset=['ticker', 'endDate'], keep='last')
-        df = df.pivot(values='perCashDiv', index='endDate', columns='ticker')
+        df = df.sort_values(by='publishDate')
+        df = df.dropna(subset='publishDate')
+        df = df.drop_duplicates(subset=['ticker', 'publishDate'], keep='last')
+        df = df.pivot(values='perCashDiv', index='publishDate', columns='ticker')
         df.index = pd.to_datetime(df.index)
-        df = df.resample('D').asfreq().fillna(method='ffill')
-        tds = pd.to_datetime(get_tradeDates(get_tradeDate(self.beginDate, -365*3), self.endDate))
-        tds = df.index.intersection(tds)
-        df = df.loc[tds]
+        # df = df.resample('D').asfreq().fillna(method='ffill')
+        # tds = pd.to_datetime(get_tradeDates(get_tradeDate(self.beginDate, -365*3), self.endDate))
+        # tds = df.index.intersection(tds)
+        # df = df.loc[tds]
         df.name = 'perCashDiv'
         return df
 
@@ -51,14 +52,14 @@ class FactorData():
             ticker=stockList,
             begin=get_tradeDate(self.beginDate, -365*3),
             end=self.endDate)
-        df.actPubtime = pd.to_datetime(df.actPubtime)
-        df = df.sort_values(by='actPubtime')
-        df = df.drop_duplicates(subset=['ticker', 'endDate'], keep='last')
-        df = df.pivot(index='endDate', columns='ticker', values='EPS')
-        df = df.resample('D').asfreq().fillna(method='ffill')
-        tds = pd.to_datetime(get_tradeDates(get_tradeDate(self.beginDate, -365*3), self.endDate))
-        tds = df.index.intersection(tds)
-        df = df.loc[tds]
+        df['publishDate'] = pd.to_datetime(df['publishDate'])
+        df = df.sort_values(by='publishDate')
+        df = df.drop_duplicates(subset=['ticker', 'publishDate'], keep='last')
+        df = df.pivot(index='publishDate', columns='ticker', values='EPS')
+        # df = df.resample('D').asfreq().fillna(method='ffill')
+        # tds = pd.to_datetime(get_tradeDates(get_tradeDate(self.beginDate, -365*3), self.endDate))
+        # tds = df.index.intersection(tds)
+        # df = df.loc[tds]
         df.name = 'EPS'
         return df
 

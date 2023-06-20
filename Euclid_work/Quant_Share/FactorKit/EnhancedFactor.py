@@ -1,14 +1,15 @@
 
 from .BarraCNE6 import BARRA
 from datetime import date
-from ..Utils import lazyproperty
+from ..Utils import lazyproperty, tradeDateList
 import numpy as np
+import pandas as pd
 
 class EnhancingDividend(BARRA):
 
     '''
     增强红利因子的设计
-    正如前文所述，考虑到股息率与市值、盈利性指标的高相关性。我们认为股息率选股的成功之处在于选择大市值中盈利稳健、收入较高的公司，
+    考虑到股息率与市值、盈利性指标的高相关性。我们认为股息率选股的成功之处在于选择大市值中盈利稳健、收入较高的公司，
     因此我们对股息率施以更加严格的市值、盈利能力和分红约束：1）市值和交易活跃度；2）盈利能力和盈利持续性；3）分红能力和持续性。
     为了进一步发挥红利策略的优势，个股权重按照个股分红占全部成份股股票总分红的比例设计（Smart beta的处理方式）。其次，为了
     避免权重向某一些股息率较高或流通市值较高的股票过度倾斜，我们认为还必须对个股和行业的权重进行限制，让组合尽量分散，已达到
@@ -31,22 +32,57 @@ class EnhancingDividend(BARRA):
     def bool_negMarketValue(self):
         df = self.negMarketValue
         df = df.apply(lambda x:x>1e10)
+        df = df.fillna(0)
         return df
 
     @lazyproperty
     def bool_turnoverValue(self):
         df = self.turnoverValue
         df = self.pandas_parallelcal(df, myfunc=lambda x:np.nanmean(x) > 1e7, window=6*21)
+        df = df.fillna(0)
         return df
+
+    @lazyproperty
+    def bool_perCashDiv(self):
+        df = self.perCashDiv
+        df = df.groupby(pd.Grouper(freq='y')).sum()
+        df = (df - df.shift(1))/df.shift(1)
+        df = df.loc[df.index.year != pd.to_datetime(self.endDate).year]
+        df = df.rolling(window=3).apply(lambda x:np.nanmean(x) >= 0.05)
+        df = df.fillna(0)
+        res = pd.DataFrame(data=0, columns=df.columns, index=pd.date_range(self.beginDate, self.endDate))
+        res = res.loc[res.index.intersection(pd.to_datetime(tradeDateList))]
+        years = np.unique(res.index.year)
+        for y in years:
+            res.loc[res.index.year == y, :] = df.loc[df.index.year == y-1, :].values
+        return res
+
+    @lazyproperty
+    def bool_EPS(self):
+        df = self.EPS
+        df = df.resample('Q').mean()
+        df = (df - df.shift(4)) / df.shift(4)
+        df = df.rolling(window=12).apply(lambda x:(x[-1]-x[0])/3, raw=True).fillna(0)
+        df = df.rolling(window=2).apply(lambda x: any(x > 0)).fillna(0)
+        df = df.resample('D').asfreq().fillna(method='ffill')
+        res = pd.DataFrame(data=0, columns=df.columns, index=pd.date_range(self.beginDate, self.endDate))
+        res = res.loc[res.index.intersection(pd.to_datetime(tradeDateList))]
+        inter_index = df.index.intersection(res.index)
+        res.loc[inter_index] = df.loc[inter_index]
+        res = res.fillna(method='ffill')
+        return res
 
 
     @lazyproperty
     def EnhancingDividend(self):
-        DTOP = self.DTOP
-        EPS = self.EPS
-        perCashDiv = self.perCashDiv
-        turnoverValue = self.turnoverValue
-        pass
+        DTOP, bool_negMarketValue, bool_turnoverValue, bool_perCashDiv, bool_EPS = self.align_data([self.DTOP,
+                                                                                                    self.bool_negMarketValue,
+                                                                                                    self.bool_turnoverValue,
+                                                                                                    self.bool_perCashDiv,
+                                                                                                    self.bool_EPS])
+        D_t = bool_negMarketValue & bool_turnoverValue & bool_perCashDiv & bool_EPS
+        EnhancingDividend = DTOP * D_t
+        return EnhancingDividend
 
 
 
