@@ -12,7 +12,7 @@ import multiprocessing
 from joblib import Parallel, delayed
 from .Utils import format_date, format_stockCode, format_futures, futures_list, dataBase_root_path, \
     dataBase_root_path_future, dataBase_root_path_gmStockFactor, extend_date_span, isdate
-from .Utils import dataBase_root_path_EMdata
+from .Utils import dataBase_root_path_EM_data
 from .TableInfo import tableInfo
 import json
 from collections import defaultdict
@@ -29,7 +29,7 @@ table_MAP = {
         'gmFuture':dataBase_root_path_future,
         'gmStockFactor':dataBase_root_path_gmStockFactor,
         'gmStockData':dataBase_root_path_gmStockFactor,
-        'emData':dataBase_root_path_EMdata,
+        'emData':dataBase_root_path_EM_data,
     }
 
 # 并行加速
