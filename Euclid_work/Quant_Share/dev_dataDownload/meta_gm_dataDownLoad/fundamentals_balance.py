@@ -5,7 +5,7 @@
 # @File    : fundamentals_balance.py
 """
 from .base_package import *
-from .save_gm_data_Y import save_gm_data_Y
+from ...Utils import save_data_Y
 
 
 def fundamentals_balance(begin, end, **kwargs):
@@ -42,4 +42,4 @@ def fundamentals_balance_update(upDateBegin, endDate='20231231'):
     if len(data) == 0:
         print("无数据更新")
     else:
-        save_gm_data_Y(data, 'pub_date', 'fundamentals_balance', reWrite=True)
+        save_data_Y(data, 'pub_date', 'fundamentals_balance', reWrite=True, dataBase_root_path=dataBase_root_path_gmStockFactor)

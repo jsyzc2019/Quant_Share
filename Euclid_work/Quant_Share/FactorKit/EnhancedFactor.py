@@ -2,6 +2,7 @@
 from .BarraCNE6 import BARRA
 from datetime import date
 from ..Utils import lazyproperty, tradeDateList
+from functools import cached_property
 import numpy as np
 import pandas as pd
 
@@ -28,21 +29,21 @@ class EnhancingDividend(BARRA):
         endDate = endDate if endDate else date.today().strftime("%Y%m%d")
         super().__init__(beginDate, endDate)
 
-    @lazyproperty
+    @cached_property
     def bool_negMarketValue(self):
         df = self.negMarketValue
         df = df.apply(lambda x:x>1e10)
         df = df.fillna(0)
         return df
 
-    @lazyproperty
+    @cached_property
     def bool_turnoverValue(self):
         df = self.turnoverValue
         df = self.pandas_parallelcal(df, myfunc=lambda x:np.nanmean(x) > 1e7, window=6*21)
         df = df.fillna(0)
         return df
 
-    @lazyproperty
+    @cached_property
     def bool_perCashDiv(self):
         df = self.perCashDiv
         df = df.groupby(pd.Grouper(freq='y')).sum()
@@ -57,7 +58,7 @@ class EnhancingDividend(BARRA):
             res.loc[res.index.year == y, :] = df.loc[df.index.year == y-1, :].values
         return res
 
-    @lazyproperty
+    @cached_property
     def bool_EPS(self):
         df = self.EPS
         df = df.resample('Q').mean()
@@ -73,7 +74,7 @@ class EnhancingDividend(BARRA):
         return res
 
 
-    @lazyproperty
+    @cached_property
     def EnhancingDividend(self):
         DTOP, bool_negMarketValue, bool_turnoverValue, bool_perCashDiv, bool_EPS = self.align_data([self.DTOP,
                                                                                                     self.bool_negMarketValue,

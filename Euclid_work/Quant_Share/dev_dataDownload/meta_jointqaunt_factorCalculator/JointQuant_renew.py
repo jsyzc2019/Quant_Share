@@ -1,12 +1,10 @@
 import os
-from ..Utils import dataBase_root_path_JointQuant_Factor
-from ..EuclidGetData import get_data
+from Euclid_work.Quant_Share.Utils import dataBase_root_path_JointQuant_Factor
+from Euclid_work.Quant_Share.EuclidGetData import get_data
 from .JointQuant_utils import *
 from datetime import datetime
 from gm.api import *
 
-def gm_log():
-    set_token('cac6f11ecf01f9539af72142faf5c3066cb1915b')
 
 def quarter_net(stock_file, factor_name):
     stock_file = stock_file.sort_values(['symbol', 'rpt_date']).reset_index(drop=True)
@@ -122,7 +120,7 @@ def original_data():
     market_sheet2 = market_sheet2.reset_index(drop=True)
 
     # 查看需要的值
-    df = pd.read_excel(os.path.join(os.path.dirname(__file__), '../dev_files/jointquant_factor.xlsx'))
+    df = pd.read_excel(os.path.join(os.path.dirname(__file__), '../../dev_files/jointquant_factor.xlsx'))
     b_name = f(df, 'balance_sheet')
     b_old_name = f(df, 'balance_old')
     i_name = f(df, 'income_sheet')
@@ -270,7 +268,7 @@ def original_data():
 
 # 获取因子需要的数据
 def data(factor_name, financial_data, market_sheet, market_financial_sheet, ResConSecCorederi):
-    df = pd.read_excel(os.path.join(os.path.dirname(__file__), "../dev_files/jointquant_factor.xlsx"))
+    df = pd.read_excel(os.path.join(os.path.dirname(__file__), "../../dev_files/jointquant_factor.xlsx"))
     df = df[df['factor_name'] == factor_name].reset_index(drop=True).T
     if pd.isnull(df.loc['pre', 0]):
         if not pd.isnull(df.loc['balance_sheet', 0]) or not pd.isnull(df.loc['cashflow_sheet', 0]) \
@@ -326,7 +324,7 @@ def factor_max_rpt(factor_name):
 
 
 def renew():
-    df = pd.read_excel(os.path.join(os.path.dirname(__file__), '../dev_files/jointquant_factor.xlsx'))
+    df = pd.read_excel(os.path.join(os.path.dirname(__file__), '../../dev_files/jointquant_factor.xlsx'))
     factor_list = list(df['factor_name'])
     financial_data, market_sheet, market_financial_sheet, ResConSecCorederi = original_data()
     for i in factor_list:

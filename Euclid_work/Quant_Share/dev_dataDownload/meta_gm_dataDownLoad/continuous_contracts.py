@@ -5,7 +5,7 @@
 # @File    : continuous_contracts.py
 """
 from .base_package import *
-from .save_gm_data_Y import save_gm_data_Y
+from ...Utils import save_data_Y
 
 
 def continuous_contracts(begin, end, **kwargs):
@@ -48,4 +48,4 @@ def continuous_contracts_update(upDateBegin, endDate='20231231'):
     if len(data) == 0:
         print("无数据更新")
     else:
-        save_gm_data_Y(data, 'trade_date', 'continuous_contracts', reWrite=True)
+        save_data_Y(data, 'trade_date', 'continuous_contracts', reWrite=True, dataBase_root_path=dataBase_root_path_gmStockFactor)

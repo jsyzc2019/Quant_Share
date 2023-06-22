@@ -1,6 +1,5 @@
 
 from .base_package import *
-from .save_gm_data_Y import save_gm_data_Y
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date
 from Euclid_work.Quant_Share import tradeDateList
@@ -8,6 +7,8 @@ import pandas as pd
 from time import sleep
 from tqdm import tqdm
 import re
+
+from ...Utils import save_data_Y
 
 
 def run_thread_pool_sub(target, args, max_work_count):
@@ -82,6 +83,6 @@ def symbol_industry(begin='20150101', end=None):
 
 def symbol_industry_update(begin='20150101', end=None):
     data = symbol_industry(begin=begin, end=end)
-    save_gm_data_Y(data, 'query_date', 'symbol_industry', reWrite=True)
+    save_data_Y(data, 'query_date', 'symbol_industry', reWrite=True, dataBase_root_path=dataBase_root_path_gmStockFactor)
 
 

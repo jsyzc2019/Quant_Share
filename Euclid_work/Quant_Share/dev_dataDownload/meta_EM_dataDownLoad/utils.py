@@ -4,7 +4,7 @@ import pandas as pd
 from Euclid_work.Quant_Share import get_table_info, tradeDateList, dataBase_root_path_EM_data
 from datetime import date
 import json
-from Euclid_work.Quant_Share.dev_dataDownload.meta_gm_dataDownLoad.save_gm_data_Y import save_gm_data_Y
+from Euclid_work.Quant_Share import save_data_Y
 from collections import OrderedDict
 
 
@@ -57,7 +57,7 @@ def update(codes, tableName: str, func, **kwargs):
                        start=old_day_off_1.strftime('%Y-%m-%d'),
                        end=new_day.strftime('%Y-%m-%d'))
         if new_data is not None and len(new_data) >= 1:
-            save_gm_data_Y(new_data, date_column, tableName, dataBase_root_path=dataBase_root_path_EM_data, reWrite=True)
+            save_data_Y(new_data, date_column, tableName, dataBase_root_path=dataBase_root_path_EM_data, reWrite=True)
             # all_data = pd.concat([old_data, new_data], axis=0, ignore_index=True)
             # all_data.to_hdf(abs_file_path, 'a', 'w')
             print(f"{tableName}更新成功，最新日期{pd.to_datetime(new_data[date_column]).max()}")
