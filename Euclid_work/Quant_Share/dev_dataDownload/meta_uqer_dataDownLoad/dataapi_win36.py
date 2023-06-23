@@ -59,7 +59,6 @@ class Client:
     def getData(self, path):
         result = None
         path = '/data/v1' + path
-        print(path)
         path = self.encodepath(path)
         for i in range(self.reconnectTimes):
             try:
