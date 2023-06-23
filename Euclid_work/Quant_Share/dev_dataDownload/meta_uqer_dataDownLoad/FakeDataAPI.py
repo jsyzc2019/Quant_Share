@@ -60,7 +60,11 @@ class FakeDataAPI:
             outData_df = pd.DataFrame()
             for pat_ticker_list in tqdm(patList(ticker, pat_len)):
                 _, result = cls.client.getData(cls.fill_uqer_url(base_url, pat_ticker_list, beginDate, endDate, tradeDate))
-                outData_df = pd.concat([outData_df, pd.DataFrame(eval(result)["data"])])
+                try:
+                    outData_df = pd.concat([outData_df, pd.DataFrame(eval(result)["data"])])
+                except KeyError:
+                    print(eval(result)["retMsg"])
+                    break
             return outData_df
         else:
             _, result = cls.client.getData(cls.fill_uqer_url(base_url, [ticker], beginDate, endDate, tradeDate))
