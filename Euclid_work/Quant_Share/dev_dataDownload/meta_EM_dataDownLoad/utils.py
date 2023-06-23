@@ -103,7 +103,7 @@ def Save_and_Log(df:pd.DataFrame,
     current_dir = os.path.abspath(os.path.dirname(__file__))
     emTableJson = os.path.join(current_dir, '../../dev_files/emData_tableInfo.json')
     rewrite = kwargs.get('rewrite', True)
-    save_gm_data_Y(df, date_column, tableName, dataBase_root_path=dataBase_root_path_EM_data, reWrite=rewrite)
+    save_data_Y(df, date_column, tableName, dataBase_root_path=dataBase_root_path_EM_data, reWrite=rewrite)
     with open(emTableJson, 'r') as f:
         jsonDict = json.load(f, object_pairs_hook=OrderedDict)
     jsonDict[tableName] = {

@@ -3,7 +3,8 @@ from Euclid_work.Quant_Share.Utils import dataBase_root_path_JointQuant_Factor
 from Euclid_work.Quant_Share.EuclidGetData import get_data
 from .JointQuant_utils import *
 from datetime import datetime
-from gm.api import *
+from .base_package import *
+from tqdm import tqdm
 
 
 def quarter_net(stock_file, factor_name):
@@ -49,9 +50,12 @@ def f(df, column_name):
     for i in b_list:
         if type(i) == str:
             c = c + i.split(',')
-    while '' in c:
-        c.remove('')
+    # while '' in c:
+    #     c.remove('')
+    # c = list(set(c))
     c = list(set(c))
+    if "" in c:
+        c.remove('')
     c = ['symbol', 'rpt_date', 'pub_date'] + c
     return c
 
@@ -59,7 +63,7 @@ def f(df, column_name):
 # 将数据转换为日度数据
 def change_frequency(stock_file, Mean_day_list):
     stock_file = stock_file.copy()
-    stock_unique = np.unique(list(stock_file['symbol']))
+    stock_unique = np.unique(stock_file['symbol'])
     stock_file[Mean_day_list] = stock_file[Mean_day_list] / 63
     stock_file = stock_file.sort_values(by=['symbol', 'pub_date', 'rpt_date'])
     stock_file.drop_duplicates(subset=['symbol', 'pub_date'], keep='last', inplace=True)
@@ -89,98 +93,95 @@ def original_data():
     市场数据 gmData_history
     股本数据 share_change
     '''
+    filenames = ['fundamentals_balance', 'balance_sheet', 'fundamentals_income',
+                 'fundamentals_cashflow', 'deriv_finance_indicator', 'gmData_history', 'trading_derivative_indicator']
 
-    balance_sheet = get_data('fundamentals_balance')
-    balance_sheet1 = get_data('balance_sheet')
-    income_sheet = get_data('fundamentals_income')
-    cashflow_sheet = get_data('fundamentals_cashflow')
-    deriv_finance_sheet = get_data('deriv_finance_indicator')
-    deriv_finance_sheet[deriv_finance_sheet == 0] = np.nan
-    balance_sheet1[balance_sheet1 == 0] = np.nan
+    replace_lst = ['deriv_finance_indicator', 'balance_sheet', 'trading_derivative_indicator']
 
-    market_sheet = get_data('gmData_history')  # 更改日期格式，并且改名字为rpt_date
-    share_number_sheet = get_data('share_change')  # chg_date变动日期 pub_date发布日期 取大的作为rpt_date
-    market_sheet2 = get_data('trading_derivative_indicator')
-    market_sheet2[market_sheet2 == 0] = np.nan
+    datas = {}
+    jointquant_factor = pd.read_excel(os.path.join(os.path.dirname(__file__), '../../dev_files/jointquant_factor.xlsx'))
+    with tqdm(filenames) as t:
+        for file in t:
+            t.set_description(f"处理{file}中...")
+            df = get_data(file)
+            if file in replace_lst:
+                df[df == 0] = np.nan
+            if file in ['fundamentals_balance', 'fundamentals_income', 'fundamentals_cashflow']:
+                df = df.drop_duplicates(subset=['symbol', 'rpt_date'], keep='last')
+            elif file in ['balance_sheet', 'deriv_finance_indicator', 'trading_derivative_indicator']:
+                df = df.drop_duplicates(subset=['symbol', 'end_date'], keep='last')
+            elif file in ['gmData_history']:
+                df = df.drop_duplicates(subset=['symbol', 'eob'], keep='last')
 
-    balance_sheet.drop_duplicates(subset=['symbol', 'rpt_date'], keep='last', inplace=True)
-    balance_sheet1.drop_duplicates(subset=['symbol', 'end_date'], keep='last', inplace=True)
-    income_sheet.drop_duplicates(subset=['symbol', 'rpt_date'], keep='last', inplace=True)
-    cashflow_sheet.drop_duplicates(subset=['symbol', 'rpt_date'], keep='last', inplace=True)
-    deriv_finance_sheet.drop_duplicates(subset=['symbol', 'end_date'], keep='last', inplace=True)
-    market_sheet.drop_duplicates(subset=['symbol', 'eob'], keep='last', inplace=True)
-    market_sheet2.drop_duplicates(subset=['symbol', 'end_date'], keep='last', inplace=True)
+            df = df.reset_index(drop=True)
 
-    balance_sheet = balance_sheet.reset_index(drop=True)
-    balance_sheet1 = balance_sheet1.reset_index(drop=True)
-    income_sheet = income_sheet.reset_index(drop=True)
-    cashflow_sheet = cashflow_sheet.reset_index(drop=True)
-    deriv_finance_sheet = deriv_finance_sheet.reset_index(drop=True)
-    market_sheet = market_sheet.reset_index(drop=True)
-    market_sheet2 = market_sheet2.reset_index(drop=True)
-
-    # 查看需要的值
-    df = pd.read_excel(os.path.join(os.path.dirname(__file__), '../../dev_files/jointquant_factor.xlsx'))
-    b_name = f(df, 'balance_sheet')
-    b_old_name = f(df, 'balance_old')
-    i_name = f(df, 'income_sheet')
-    c_name = f(df, 'cashflow_sheet')
-    d_name = f(df, 'deriv_finance_indicator')
-
-    # 资产负债表填充缺失值并改变日期格式
-    balance_sheet = balance_sheet[b_name].copy()
-    balance_sheet["rpt_date"] = pd.to_datetime(balance_sheet['rpt_date'])
-    balance_sheet["pub_date"] = pd.to_datetime(balance_sheet['pub_date'])
-
-    # 原始接口资产负债表数据
-    b_old_name.remove('rpt_date')
-    b_old_name.append('end_date')
-    balance_sheet1 = balance_sheet1[b_old_name].copy()
-    balance_sheet1.rename(columns={'end_date': 'rpt_date'}, inplace=True)
-    balance_sheet1['rpt_date'] = balance_sheet1['rpt_date'].dt.strftime('%Y-%m-%d')
-    balance_sheet1["rpt_date"] = pd.to_datetime(balance_sheet1['rpt_date'])
-    balance_sheet1['pub_date'] = balance_sheet1['pub_date'].dt.strftime('%Y-%m-%d')
-    balance_sheet1["pub_date"] = pd.to_datetime(balance_sheet1['pub_date'])
-    balance_sheet = pd.merge(balance_sheet, balance_sheet1, on=['symbol', 'rpt_date'], how='outer')
-    balance_sheet['pub_date'] = balance_sheet[['pub_date_x', 'pub_date_y']].max(axis=1)
-    balance_sheet.drop(['pub_date_x', 'pub_date_y'], axis=1, inplace=True)
-
-    # 利润表填充缺失值并改变日期格式并改为非累计
-    income_sheet = income_sheet[i_name].copy()
-    income_sheet["rpt_date"] = pd.to_datetime(income_sheet['rpt_date'])
-    income_sheet["pub_date"] = pd.to_datetime(income_sheet['pub_date'])
-    change_list = list(income_sheet.columns)
-    change_list.remove('symbol')
-    change_list.remove('pub_date')
-    change_list.remove('rpt_date')
-    income_sheet = fill_quarter(income_sheet, change_list)
-
-    # 现金流量表填充缺失值并改变日期格式并改为非累计
-    cashflow_sheet = cashflow_sheet[c_name].copy()
-    cashflow_sheet["rpt_date"] = pd.to_datetime(cashflow_sheet['rpt_date'])
-    cashflow_sheet["pub_date"] = pd.to_datetime(cashflow_sheet['pub_date'])
-    change_list = list(cashflow_sheet.columns)
-    change_list.remove('symbol')
-    change_list.remove('pub_date')
-    change_list.remove('rpt_date')
-    cashflow_sheet = fill_quarter(cashflow_sheet, change_list)
-
-    # 衍生表
-    d_name.remove('rpt_date')
-    d_name.append('end_date')
-    deriv_finance_sheet = deriv_finance_sheet[d_name].copy()
-    deriv_finance_sheet.rename(columns={'end_date': 'rpt_date'}, inplace=True)
-    deriv_finance_sheet['rpt_date'] = deriv_finance_sheet['rpt_date'].dt.strftime('%Y-%m-%d')
-    deriv_finance_sheet["rpt_date"] = pd.to_datetime(deriv_finance_sheet['rpt_date'])
-    deriv_finance_sheet['pub_date'] = deriv_finance_sheet['pub_date'].dt.strftime('%Y-%m-%d')
-    deriv_finance_sheet["pub_date"] = pd.to_datetime(deriv_finance_sheet['pub_date'])
+            if file == 'fundamentals_balance':
+                name = f(jointquant_factor, 'balance_sheet')
+                df = df[name].copy()
+                df["rpt_date"] = pd.to_datetime(df['rpt_date'])
+                df["pub_date"] = pd.to_datetime(df['pub_date'])
+                datas['balance_sheet'] = {'df':df, 'file':file}
+            elif file == 'fundamentals_income':
+                # 利润表填充缺失值并改变日期格式并改为非累计
+                name = f(jointquant_factor,'income_sheet')
+                df = df[name].copy()
+                df["rpt_date"] = pd.to_datetime(df['rpt_date'])
+                df["pub_date"] = pd.to_datetime(df['pub_date'])
+                change_list = list(df.columns)
+                change_list.remove('symbol')
+                change_list.remove('pub_date')
+                change_list.remove('rpt_date')
+                df = fill_quarter(df, change_list)
+                datas[file] = {'df': df, 'file': file}
+            elif file == 'fundamentals_cashflow':
+                # 现金流量表填充缺失值并改变日期格式并改为非累计
+                name = f(jointquant_factor, 'cashflow_sheet')
+                df = df[name].copy()
+                df["rpt_date"] = pd.to_datetime(df['rpt_date'])
+                df["pub_date"] = pd.to_datetime(df['pub_date'])
+                change_list = list(df.columns)
+                change_list.remove('symbol')
+                change_list.remove('pub_date')
+                change_list.remove('rpt_date')
+                df = fill_quarter(df, change_list)
+                datas[file] = {'df': df, 'file': file}
+            elif file == 'deriv_finance_indicator':
+                name = f(jointquant_factor, 'deriv_finance_indicator')
+                name.remove('rpt_date')
+                name.append('end_date')
+                df = df[name].copy()
+                df.rename(columns={'end_date': 'rpt_date'}, inplace=True)
+                df['rpt_date'] = df['rpt_date'].dt.strftime('%Y-%m-%d')
+                df["rpt_date"] = pd.to_datetime(df['rpt_date'])
+                df['pub_date'] = df['pub_date'].dt.strftime('%Y-%m-%d')
+                df["pub_date"] = pd.to_datetime(df['pub_date'])
+                datas[file] = {'df': df, 'file': file}
+            elif file == 'balance_sheet':
+                # 原始接口资产负债表数据
+                name = f(jointquant_factor, 'balance_old')
+                name.remove('rpt_date')
+                name.append('end_date')
+                df = df[name].copy()
+                df.rename(columns={'end_date': 'rpt_date'}, inplace=True)
+                df['rpt_date'] = df['rpt_date'].dt.strftime('%Y-%m-%d')
+                df["rpt_date"] = pd.to_datetime(df['rpt_date'])
+                df['pub_date'] = df['pub_date'].dt.strftime('%Y-%m-%d')
+                df["pub_date"] = pd.to_datetime(df['pub_date'])
+                df = pd.merge(datas['balance_sheet']['df'], df, on=['symbol', 'rpt_date'], how='outer')
+                df['pub_date'] = df[['pub_date_x', 'pub_date_y']].max(axis=1)
+                df.drop(['pub_date_x', 'pub_date_y'], axis=1, inplace=True)
+                datas['balance_sheet']['df'] = df
+            elif file == 'gmData_history':
+                market_sheet = df
+            elif file == 'trading_derivative_indicator':
+                market_sheet2 = df
 
     # 财务报表进行合并
-    financial_data = pd.merge(income_sheet, cashflow_sheet, on=['symbol', 'rpt_date'], how='outer')
-    financial_data = pd.merge(financial_data, balance_sheet, on=['symbol', 'rpt_date'], how='outer')
+    financial_data = pd.merge(datas['fundamentals_income']['df'], datas['fundamentals_cashflow']['df'], on=['symbol', 'rpt_date'], how='outer')
+    financial_data = pd.merge(financial_data, datas['balance_sheet']['df'], on=['symbol', 'rpt_date'], how='outer')
     financial_data['pub_date'] = financial_data[['pub_date_x', 'pub_date_y', 'pub_date']].max(axis=1)
     financial_data.drop(['pub_date_x', 'pub_date_y'], axis=1, inplace=True)
-    financial_data = pd.merge(financial_data, deriv_finance_sheet, on=['symbol', 'rpt_date'], how='outer')
+    financial_data = pd.merge(financial_data, datas['deriv_finance_indicator']['df'], on=['symbol', 'rpt_date'], how='outer')
     financial_data['pub_date'] = financial_data[['pub_date_x', 'pub_date_y']].max(axis=1)
     financial_data.drop(['pub_date_x', 'pub_date_y'], axis=1, inplace=True)
 
@@ -231,7 +232,7 @@ def original_data():
     market_sheet['pub_date'] = market_sheet['rpt_date']
 
     # 市场数据和财务数据进行合并
-    list1 = i_name[3:] + c_name[3:]
+    list1 = f(jointquant_factor, 'income_sheet')[3:] + f(jointquant_factor, 'cashflow_sheet')[3:]
     financial_data1 = change_frequency(financial_data, list1)
     market_financial_sheet = pd.merge(market_sheet, financial_data1, on=['symbol', 'pub_date'], how='left')
     market_financial_sheet['rpt_date'] = market_sheet['pub_date']
