@@ -11,7 +11,7 @@ import pandas as pd
 from tqdm import tqdm
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from Euclid_work.Quant_Share.Utils import format_date, patList
-from dataapi_win36 import Client
+from .dataapi_win36 import Client
 
 
 class FakeDataAPI:
@@ -25,7 +25,8 @@ class FakeDataAPI:
     @classmethod
     def MktEqudGet(cls, ticker: Union[list, str],
                    tradeDate: Union[list[Union[pd.datetime, str]], pd.datetime, str] = '',
-                   beginDate: Union[pd.datetime, str, int] = None, endDate: Union[pd.datetime, str, int] = None):
+                   beginDate: Union[pd.datetime, str, int] = None, endDate: Union[pd.datetime, str, int] = None,
+                   **kwargs):
         """
         doc: https://mall.datayes.com/datapreview/80
         demoUrl: /api/market/getMktEqud.json?field=&beginDate=&endDate=&secID=&ticker=688001&tradeDate=20190723
@@ -54,12 +55,13 @@ class FakeDataAPI:
             raise AttributeError("begin + end or tradeDate should be param in")
 
         base_url = '/api/market/getMktEqud.json?field=&beginDate={}&endDate={}&secID=&ticker={}&tradeDate={}'
-        outData_df = pd.DataFrame()
+        pat_len = kwargs.get("pat_len", 5)
         if isinstance(ticker, list):
-            Url_list = [cls.fill_uqer_url(base_url, pat_ticker_list, beginDate, endDate, tradeDate)
-                        for pat_ticker_list in patList(ticker, 5)]
-
-            return cls.load_file(cls, Url_list)
+            outData_df = pd.DataFrame()
+            for pat_ticker_list in tqdm(patList(ticker, pat_len)):
+                _, result = cls.client.getData(cls.fill_uqer_url(base_url, pat_ticker_list, beginDate, endDate, tradeDate))
+                outData_df = pd.concat([outData_df, pd.DataFrame(eval(result)["data"])])
+            return outData_df
         else:
             _, result = cls.client.getData(cls.fill_uqer_url(base_url, [ticker], beginDate, endDate, tradeDate))
             return pd.DataFrame(eval(result)["data"])
@@ -89,9 +91,3 @@ class FakeDataAPI:
                     res = res.reset_index()
                 load_data = pd.concat((load_data, res), axis=0, ignore_index=True)
         return load_data
-
-
-if __name__ == '__main__':
-    from Euclid_work.Quant_Share import stockNumList, patList, tradeDateList, format_date
-
-    FakeDataAPI.MktEqudGet(ticker=stockNumList[0:10], tradeDate=u"", beginDate=20210101, endDate=20230101)
