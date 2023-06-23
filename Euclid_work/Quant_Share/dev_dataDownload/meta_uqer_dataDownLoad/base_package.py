@@ -1,6 +1,9 @@
 import pandas as pd
 from tqdm import tqdm
-from uqer import DataAPI, Client
+# 目前只能使用webAPI
+from uqer import DataAPI
+# from uqer import Client
+from dataapi_win36 import Client
 from Euclid_work.Quant_Share.Utils import stockNumList, format_date, save_data_h5, dataBase_root_path, extend_date_span
 import os
 import time
@@ -15,4 +18,6 @@ dev_files_dir = os.path.join(grand_dir, 'dev_files')
 # 通联登录
 with open(os.path.join(current_dir, 'token.txt'), 'rt', encoding='utf-8') as f:
     token = f.read().strip()
-client = Client(token=token)
+# 目前只能使用webAPI
+Client().init(token)
+# client = Client(token=token)
