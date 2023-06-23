@@ -5,7 +5,6 @@
 # @File    : fundamentals_cashflow.py
 """
 from .base_package import *
-from ...Utils import save_data_Y
 
 
 def fundamentals_cashflow(begin, end, **kwargs):
@@ -42,4 +41,4 @@ def fundamentals_cashflow_update(upDateBegin, endDate='20231231'):
     if len(data) == 0:
         print("无数据更新")
     else:
-        save_data_Y(data, 'pub_date', 'fundamentals_cashflow', reWrite=True, dataBase_root_path=dataBase_root_path_gmStockFactor)
+        save_data_Y(data, 'pub_date', 'fundamentals_cashflow', reWrite=True, _dataBase_root_path=dataBase_root_path_gmStockFactor)

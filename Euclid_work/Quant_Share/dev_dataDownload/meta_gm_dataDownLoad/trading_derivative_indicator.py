@@ -5,7 +5,6 @@
 # @File    : trading_derivative_indicator.py
 """
 from .base_package import *
-from ...Utils import save_gm_data_Q
 
 
 def trading_derivative_indicator(begin, end, **kwargs):
@@ -49,4 +48,4 @@ def trading_derivative_indicator_update(upDateBegin, endDate='20231231'):
     if len(data) == 0:
         print("无数据更新")
     else:
-        save_gm_data_Q(data, 'pub_date', 'trading_derivative_indicator', reWrite=True, dataBase_root_path=dataBase_root_path_gmStockFactor)
+        save_data_Q(data, 'pub_date', 'trading_derivative_indicator', reWrite=True, _dataBase_root_path=dataBase_root_path_gmStockFactor)

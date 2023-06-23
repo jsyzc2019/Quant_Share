@@ -1,4 +1,3 @@
-
 from .base_package import *
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date
@@ -8,19 +7,18 @@ from time import sleep
 from tqdm import tqdm
 import re
 
-from ...Utils import save_data_Y
-
 
 def run_thread_pool_sub(target, args, max_work_count):
     with ThreadPoolExecutor(max_workers=max_work_count) as t:
         res = [t.submit(target, i) for i in args]
     return res
 
+
 def get_industry_info(date):
     res = pd.DataFrame()
     symbols = get_symbols(sec_type1=1010, df=True, trade_date=date)['symbol'].tolist()
     # t.set_description(f"正在获取{td}的数据")
-    for i,s in enumerate(symbols):
+    for i, s in enumerate(symbols):
         try:
             df = stk_get_symbol_industry(symbols=s, source="sw2021", level=1, date=date)
             # t.set_postfix({"状态": "symbol {}成功获取, total {:.2f}%".format(s, (i+1)/len(symbols)*100)})
@@ -30,6 +28,7 @@ def get_industry_info(date):
             # t.set_postfix({"状态": "symbol {}无效, total {:.2f}%".format(s, (i+1)/len(symbols)*100)})
             continue
     return res
+
 
 def stk_symbol_industry(begin='20150101', end=None):
     end = end if end else date.today()
@@ -43,7 +42,10 @@ def stk_symbol_industry(begin='20150101', end=None):
             res = pd.concat([res, df], axis=0, ignore_index=True)
     return res
 
+
 re_symbol = re.compile('[A-Z]{4}.[0-9]+')
+
+
 def get_info_loop(symbols, td):
     try:
         df = stk_get_symbol_industry(symbols=symbols, source="sw2021", level=1, date=td)
@@ -53,6 +55,7 @@ def get_info_loop(symbols, td):
         symbols.remove(wrong_symbol)
         print(f'symbol {wrong_symbol} has been removed')
         get_info_loop(symbols, td)
+
 
 def symbol_industry(begin='20150101', end=None):
     end = end if end else date.today()
@@ -83,6 +86,4 @@ def symbol_industry(begin='20150101', end=None):
 
 def symbol_industry_update(begin='20150101', end=None):
     data = symbol_industry(begin=begin, end=end)
-    save_data_Y(data, 'query_date', 'symbol_industry', reWrite=True, dataBase_root_path=dataBase_root_path_gmStockFactor)
-
-
+    save_data_Y(data, 'query_date', 'symbol_industry', reWrite=True, _dataBase_root_path=dataBase_root_path_gmStockFactor)

@@ -274,27 +274,29 @@ def save_data_h5(toSaveData, name, subPath='dataFile', reWrite=False):
         raise TypeError("only save pd.DataFrame format!")
         # pd.DataFrame(toSaveData).to_hdf(name,'a','w')
 
-def save_data_Y(df, date_column_name, tableName, dataBase_root_path, reWrite=False):
+
+def save_data_Y(df, date_column_name, tableName, _dataBase_root_path, reWrite=False):
     """
     对df进行拆分, 进一步存储
     """
     if len(df) == 0:
         raise ValueError("data for save is null!")
-    print("数据将存储在: {}/{}".format(dataBase_root_path, tableName))
+    print("数据将存储在: {}/{}".format(_dataBase_root_path, tableName))
     df["year"] = df[date_column_name].apply(lambda x: format_date(x).year)
     for yeari in range(df["year"].min(), df["year"].max() + 1):
         df1 = df[df["year"] == yeari]
         df1 = df1.drop(['year'], axis=1)
         save_data_h5(df1, name='{}_Y{}'.format(tableName, yeari),
-                     subPath="{}/{}".format(dataBase_root_path, tableName), reWrite=reWrite)
+                     subPath="{}/{}".format(_dataBase_root_path, tableName), reWrite=reWrite)
 
-def save_data_Q(df, date_column_name, tableName, dataBase_root_path, reWrite=False):
+
+def save_data_Q(df, date_column_name, tableName, _dataBase_root_path, reWrite=False):
     """
     对df进行拆分, 进一步存储
     """
     if len(df) == 0:
         raise ValueError("data for save is null!")
-    print("数据将存储在: {}/{}".format(dataBase_root_path, tableName))
+    print("数据将存储在: {}/{}".format(_dataBase_root_path, tableName))
     df["year"] = df[date_column_name].apply(lambda x: format_date(x).year)
     df["quarter"] = df[date_column_name].apply(lambda x: format_date(x).quarter)
     for yeari in range(df["year"].min(), df["year"].max() + 1):
@@ -303,7 +305,7 @@ def save_data_Q(df, date_column_name, tableName, dataBase_root_path, reWrite=Fal
             df2 = df1[df1["quarter"] == quarteri]
             df2 = df2.drop(columns=['year', 'quarter'], axis=1)
             save_data_h5(df2, name='{}_Y{}_Q{}'.format(tableName, yeari, quarteri),
-                         subPath="{}/{}".format(dataBase_root_path, tableName), reWrite=reWrite)
+                         subPath="{}/{}".format(_dataBase_root_path, tableName), reWrite=reWrite)
 
 
 def get_tradeDate(InputDate, lag=0):
@@ -328,6 +330,7 @@ def get_tradeDate(InputDate, lag=0):
         else:
             # print("{} is not tradeDate".format(date))
             return tradeDateList[index + lag]
+
 
 def get_tradeDates(begin, end=None, n: int = None):
     """

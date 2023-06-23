@@ -7,7 +7,7 @@ from datetime import datetime
 tableNameList = [
     # 'share_change', 'balance_sheet', 'deriv_finance_indicator', 'fundamentals_balance', 'fundamentals_income',
     # 'fundamentals_cashflow', 'trading_derivative_indicator', 'future_daily', 'continuous_contracts', 'symbol_industry',
-    # 'gmData_history', 'gmData_bench_price'
+    'gmData_history', 'gmData_bench_price'
 ]
 for tableName in tableNameList:
     begin = get_tradeDate(get_table_info(tableName)['Modify Time'], -1)

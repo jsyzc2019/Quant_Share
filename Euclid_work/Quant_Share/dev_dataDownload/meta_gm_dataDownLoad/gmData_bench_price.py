@@ -5,7 +5,6 @@
 # @File    : gmData_bench_price.py
 """
 from .base_package import *
-from ...Utils import save_gm_data_Y
 
 
 def gmData_bench_price(begin, end, **kwargs):
@@ -33,4 +32,4 @@ def gmData_bench_price_update(upDateBegin, endDate='20231231'):
     if len(data) == 0:
         print("无数据更新")
     else:
-        save_gm_data_Y(data, 'trade_date', 'gmData_bench_price', reWrite=True, dataBase_root_path=dataBase_root_path_gmStockFactor)
+        save_data_Y(data, 'trade_date', 'gmData_bench_price', reWrite=True, _dataBase_root_path=dataBase_root_path_gmStockFactor)

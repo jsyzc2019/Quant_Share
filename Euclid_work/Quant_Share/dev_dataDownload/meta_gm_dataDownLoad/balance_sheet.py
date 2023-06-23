@@ -5,7 +5,6 @@
 # @File    : balance_sheet.py
 """
 from .base_package import *
-from ...Utils import save_data_Y
 
 
 def balance_sheet(begin, end, **kwargs):
@@ -49,4 +48,4 @@ def balance_sheet_update(upDateBegin, endDate='20231231'):
     if len(data) == 0:
         print("无数据更新")
     else:
-        save_data_Y(data, 'pub_date', 'balance_sheet', reWrite=True, dataBase_root_path=dataBase_root_path_gmStockFactor)
+        save_data_Y(data, 'pub_date', 'balance_sheet', reWrite=True, _dataBase_root_path=dataBase_root_path_gmStockFactor)
