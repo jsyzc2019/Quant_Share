@@ -44,9 +44,9 @@ class FakeDataAPI:
         if isinstance(ticker, list):
             outData_df = pd.DataFrame()
             for pat_ticker_list in tqdm(patList(ticker, pat_len)):
-                _, result = cls.client.getData(base_url.format(",".join(pat_ticker_list),
-                                                               beginDate,
+                _, result = cls.client.getData(base_url.format(beginDate,
                                                                endDate,
+                                                               ",".join(pat_ticker_list),
                                                                ",".join(tradeDate)
                                                                )
                                                )
@@ -57,9 +57,9 @@ class FakeDataAPI:
                     break
             return outData_df
         else:
-            _, result = cls.client.getData(base_url.format(",".join(ticker),
-                                                           beginDate,
+            _, result = cls.client.getData(base_url.format(beginDate,
                                                            endDate,
+                                                           ticker,
                                                            ",".join(tradeDate)
                                                            )
                                            )
@@ -147,7 +147,7 @@ class FakeDataAPI:
                 _, result = cls.client.getData(base_url.format(",".join(pat_ticker_list),
                                                                kwargs.get('beginYear', ''),
                                                                kwargs.get('endYear', ''),
-                                                               kwargs.get('reportType', ''),
+                                                               ",".join(kwargs.get('reportType', [])),
                                                                beginDate,
                                                                endDate
                                                                )
@@ -162,7 +162,7 @@ class FakeDataAPI:
             _, result = cls.client.getData(base_url.format(ticker,
                                                            kwargs.get('beginYear', ''),
                                                            kwargs.get('endYear', ''),
-                                                           kwargs.get('reportType', ''),
+                                                           ",".join(kwargs.get('reportType', [])),
                                                            beginDate,
                                                            endDate
                                                            )
@@ -195,7 +195,7 @@ class FakeDataAPI:
                 _, result = cls.client.getData(base_url.format(",".join(pat_ticker_list),
                                                                kwargs.get('beginYear', ''),
                                                                kwargs.get('endYear', ''),
-                                                               kwargs.get('reportType', ''),
+                                                               ",".join(kwargs.get('reportType', [])),
                                                                beginDate,
                                                                endDate
                                                                )
@@ -210,7 +210,7 @@ class FakeDataAPI:
             _, result = cls.client.getData(base_url.format(ticker,
                                                            kwargs.get('beginYear', ''),
                                                            kwargs.get('endYear', ''),
-                                                           kwargs.get('reportType', ''),
+                                                           ",".join(kwargs.get('reportType', [])),
                                                            beginDate,
                                                            endDate
                                                            )

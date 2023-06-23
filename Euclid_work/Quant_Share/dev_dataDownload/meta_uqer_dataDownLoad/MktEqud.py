@@ -45,4 +45,4 @@ def MktEqud(begin, end, **kwargs):
 
 def MktEqud_update(upDateBegin, endDate='20231231'):
     rolling_save(MktEqud, 'MktEqud', upDateBegin, endDate, freq='q', subPath="{}/MktEqud".format(dataBase_root_path),
-                 reWrite=True, monthlyStack=True, ticker=stockNumList)
+                 reWrite=True, monthlyStack=False, ticker=stockNumList)
