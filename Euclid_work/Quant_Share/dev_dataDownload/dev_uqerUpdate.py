@@ -12,7 +12,9 @@ from datetime import datetime
 # 根据数据表最后写入的时间做增量更新
 tableNameList = [
     "MktEqud",
-    "MktLimit"
+    "MktLimit",
+    "FdmtIndiRtnPit",
+    "FdmtIndiPSPit"
 ]
 for tableName in tableNameList:
     begin = get_tradeDate(get_table_info(tableName)['Modify Time'], -1)

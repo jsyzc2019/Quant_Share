@@ -4,6 +4,7 @@ from tqdm import tqdm
 # from uqer import DataAPI
 # from uqer import Client
 from Euclid_work.Quant_Share.Utils import stockNumList, format_date, save_data_h5, dataBase_root_path, extend_date_span
+from Euclid_work.Quant_Share import get_data
 import os
 import time
 from .FakeDataAPI import FakeDataAPI as DataAPI

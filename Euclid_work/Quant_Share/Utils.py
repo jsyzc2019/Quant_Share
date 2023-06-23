@@ -64,7 +64,10 @@ class lazyproperty:
 
 
 def patList(InList: list, pat: int):
-    return [InList[i: i + pat] for i in range(0, len(InList), pat)]
+    if pat == -1:
+        return [InList]
+    else:
+        return [InList[i: i + pat] for i in range(0, len(InList), pat)]
 
 
 def format_stockCode(numCode):

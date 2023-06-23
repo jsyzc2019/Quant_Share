@@ -24,18 +24,20 @@ warnings.filterwarnings('ignore')
 __all__ = ['get_data', 'get_table_info', 'search_keyword']
 
 table_MAP = {
-        'info':dataBase_root_path,
-        'stock':dataBase_root_path,
-        'gmFuture':dataBase_root_path_future,
-        'gmStockFactor':dataBase_root_path_gmStockFactor,
-        'gmStockData':dataBase_root_path_gmStockFactor,
-        'emData':dataBase_root_path_EM_data,
-    }
+    'info': dataBase_root_path,
+    'stock': dataBase_root_path,
+    'gmFuture': dataBase_root_path_future,
+    'gmStockFactor': dataBase_root_path_gmStockFactor,
+    'gmStockData': dataBase_root_path_gmStockFactor,
+    'emData': dataBase_root_path_EM_data,
+}
+
 
 # 并行加速
 def applyParallel(dfGrouped, function):
     retLst = Parallel(n_jobs=multiprocessing.cpu_count())(delayed(function)(group) for name, group in tqdm(dfGrouped))
     return pd.concat(retLst)
+
 
 # 带返回的并行调用
 def run_thread_pool_sub(target, args, max_work_count):
@@ -91,6 +93,7 @@ def get_data(tableName, begin='20150101', end=None, sources='gm', fields: list =
         return get_data_future(tableName, begin, end, sources, fields, ticker)
     elif tableAssets == 'gmStockFactor':
         return get_data_gmStockFactor(tableName, begin, end, fields, ticker)
+
 
 def get_data_Base(tableName, begin, end, fields, ticker, path, **kwargs):
     tableFoldPath = os.path.join(path, tableName)
@@ -168,6 +171,7 @@ def get_data_gmStockFactor(tableName, begin='20160101', end=None, fields: list =
         return selectFields(load_data, tableName, begin, end, fields, ticker)
     else:
         raise KeyError("未找到{}文件".format(tableName))
+
 
 def selectFields(data, tableName, begin, end, fields: list = None, ticker: list = None, verbose: bool = False):
     outData = data.copy()
@@ -262,7 +266,6 @@ def get_tablePath_info(tablePath):
 
 
 def get_table_info(tableName):
-
     global table_MAP
     if tableName not in list(tableInfo.keys()):
         raise KeyError("{} is not ready for use!".format(tableName))

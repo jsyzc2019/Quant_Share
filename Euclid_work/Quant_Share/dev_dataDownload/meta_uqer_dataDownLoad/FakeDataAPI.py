@@ -102,9 +102,115 @@ class FakeDataAPI:
                     break
             return outData_df
         else:
-            _, result = cls.client.getData(base_url.format(",".join(ticker),
+            _, result = cls.client.getData(base_url.format(ticker,
                                                            kwargs.get('exchangeCD', ''),
                                                            ",".join(tradeDate),
+                                                           beginDate,
+                                                           endDate
+                                                           )
+                                           )
+            return pd.DataFrame(eval(result)["data"])
+
+    @classmethod
+    def MktIdxdGet(cls, indexID: Union[list, str],
+                   tradeDate: Union[list[Union[pd.datetime, str]], pd.datetime, str] = '',
+                   beginDate: Union[pd.datetime, str, int] = None, endDate: Union[pd.datetime, str, int] = None,
+                   **kwargs):
+        """
+        无权限
+        """
+
+    @classmethod
+    def FdmtIndiRtnPitGet(cls, ticker: Union[list, str],
+                          beginDate: Union[pd.datetime, str, int] = None, endDate: Union[pd.datetime, str, int] = None,
+                          **kwargs):
+        """
+        doc: https://mall.datayes.com/datapreview/1853
+        demoUrl: https://mall.datayes.com/datapreview/1853
+        :param ticker:
+        :param beginDate:
+        :param endDate:
+        :param kwargs:
+            pat_len: int, 5
+            reportType: list[str], ["Q1", "S1", "CQ3", "A"]
+            endYear: str, "2019"
+            endYear: str, "2020"
+        :return:
+        """
+        # TODO 似乎beginDate和endDate并不起filter作用
+        beginDate, endDate, tradeDate = cls.assert_format_data(beginDate, endDate, '')
+        base_url = '/api/fundamental/getFdmtIndiRtnPit.json?field=&ticker={}&beginYear={}&endYear={}&reportType={}&publishDateBegin{}=&publishDateEnd={}'
+        pat_len = kwargs.get("pat_len", 5)
+        if isinstance(ticker, list):
+            outData_df = pd.DataFrame()
+            for pat_ticker_list in tqdm(patList(ticker, pat_len)):
+                _, result = cls.client.getData(base_url.format(",".join(pat_ticker_list),
+                                                               kwargs.get('beginYear', ''),
+                                                               kwargs.get('endYear', ''),
+                                                               kwargs.get('reportType', ''),
+                                                               beginDate,
+                                                               endDate
+                                                               )
+                                               )
+                try:
+                    outData_df = pd.concat([outData_df, pd.DataFrame(eval(result)["data"])])
+                except KeyError:
+                    print(eval(result)["retMsg"])
+                    break
+            return outData_df
+        else:
+            _, result = cls.client.getData(base_url.format(ticker,
+                                                           kwargs.get('beginYear', ''),
+                                                           kwargs.get('endYear', ''),
+                                                           kwargs.get('reportType', ''),
+                                                           beginDate,
+                                                           endDate
+                                                           )
+                                           )
+            return pd.DataFrame(eval(result)["data"])
+
+    @classmethod
+    def FdmtIndiPSPitGet(cls, ticker: Union[list, str],
+                         beginDate: Union[pd.datetime, str, int] = None, endDate: Union[pd.datetime, str, int] = None,
+                         **kwargs):
+        """
+        doc: https://mall.datayes.com/datapreview/1851
+        demoUrl = /api/fundamental/getFdmtIndiPSPit.json?field=&ticker=688002&beginYear=&endYear=&reportType=&publishDateBegin=&publishDateEnd=
+        :param ticker:
+        :param beginDate:
+        :param endDate:
+        :param kwargs:
+            pat_len: int, 5
+            reportType: list[str], ["Q1", "S1", "CQ3", "A"]
+            beginYear: str, 2019
+            endYear: str, 2020
+        :return:
+        """
+        beginDate, endDate, tradeDate = cls.assert_format_data(beginDate, endDate, '')
+        base_url = '/api/fundamental/getFdmtIndiPSPit.json?field=&ticker={}&beginYear={}&endYear={}&reportType={}&publishDateBegin={}&publishDateEnd={}'
+        pat_len = kwargs.get("pat_len", 5)
+        if isinstance(ticker, list):
+            outData_df = pd.DataFrame()
+            for pat_ticker_list in tqdm(patList(ticker, pat_len)):
+                _, result = cls.client.getData(base_url.format(",".join(pat_ticker_list),
+                                                               kwargs.get('beginYear', ''),
+                                                               kwargs.get('endYear', ''),
+                                                               kwargs.get('reportType', ''),
+                                                               beginDate,
+                                                               endDate
+                                                               )
+                                               )
+                try:
+                    outData_df = pd.concat([outData_df, pd.DataFrame(eval(result)["data"])])
+                except KeyError:
+                    print(eval(result)["retMsg"])
+                    break
+            return outData_df
+        else:
+            _, result = cls.client.getData(base_url.format(ticker,
+                                                           kwargs.get('beginYear', ''),
+                                                           kwargs.get('endYear', ''),
+                                                           kwargs.get('reportType', ''),
                                                            beginDate,
                                                            endDate
                                                            )
