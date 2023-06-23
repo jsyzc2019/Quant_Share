@@ -11,4 +11,4 @@ from .base_package import *
 from .AutoEmail import AutoEmail
 from .symbol_industry import symbol_industry_update
 from .gmData_history import gmData_history_update
-from .gmData_bench_price import gmData_bench_price_update
+from .gmData_bench_price import gmData_bench_price_update, gmData_bench_price
