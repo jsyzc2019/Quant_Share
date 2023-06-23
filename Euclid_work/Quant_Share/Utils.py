@@ -113,6 +113,7 @@ def format_futures(file_name):
 
 
 # consts
+# https://www.myquant.cn/docs2/sdk/python/API%E4%BB%8B%E7%BB%8D.html#get-symbol-infos-%E6%9F%A5%E8%AF%A2%E6%A0%87%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BF%A1%E6%81%AF
 stock_info = pd.read_hdf('{}/stock_info.h5'.format(dataBase_root_path))
 stockList = [format_stockCode(code) for code in stock_info['symbol']]  # 000001.SZ
 stockNumList = list(set(stock_info.sec_id))  # 000001

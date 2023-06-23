@@ -11,7 +11,8 @@ from datetime import datetime
 # 接口文档 https://mall.datayes.com/mydata/purchasedData
 # 根据数据表最后写入的时间做增量更新
 tableNameList = [
-    "MktEqud"
+    "MktEqud",
+    "MktLimit"
 ]
 for tableName in tableNameList:
     begin = get_tradeDate(get_table_info(tableName)['Modify Time'], -1)
