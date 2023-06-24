@@ -9,3 +9,4 @@ from .MktEqud import MktEqud_update
 from .MktLimit import MktLimit_update
 from .FdmtIndiRtnPit import FdmtIndiRtnPit_update
 from .FdmtIndiPSPit import FdmtIndiPSPit_update
+from .MktIdx import MktIdx_update

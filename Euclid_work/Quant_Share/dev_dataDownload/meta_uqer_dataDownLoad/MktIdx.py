@@ -24,5 +24,5 @@ def MktIdx(begin, end, **kwargs):
 
 def MktIdx_update(upDateBegin, endDate='20231231'):
     indexID = get_data("SecID_IDX_info")['secID'].to_list()
-    rolling_save(MktIdx, 'MktLimit', upDateBegin, endDate, freq='y', subPath="{}/MktIdx".format(dataBase_root_path),
+    rolling_save(MktIdx, 'MktIdx', upDateBegin, endDate, freq='q', subPath="{}/MktIdx".format(dataBase_root_path),
                  reWrite=True, monthlyStack=False, indexID=indexID)

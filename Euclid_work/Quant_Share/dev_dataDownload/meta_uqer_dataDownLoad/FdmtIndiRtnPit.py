@@ -10,10 +10,10 @@ from .rolling_save import rolling_save
 
 def FdmtIndiRtnPit(begin, end, **kwargs):
     """
-    指数日行情
+    财务指标—盈利能力 (Point in time)
     :param begin:
     :param end:
-    :param kwargs: indexID = get_data("SecID_IDX_info")['secID'].to_list()
+    :param kwargs: ticker = stockNumList
     :return:
     """
     if 'ticker' not in kwargs.keys():

@@ -89,7 +89,7 @@ class FakeDataAPI:
             outData_df = pd.DataFrame()
             for pat_ticker_list in tqdm(patList(ticker, pat_len)):
                 _, result = cls.client.getData(base_url.format(",".join(pat_ticker_list),
-                                                               kwargs.get('exchangeCD', ''),
+                                                               ",".join(kwargs.get('exchangeCD', '')),
                                                                ",".join(tradeDate),
                                                                beginDate,
                                                                endDate
@@ -103,7 +103,7 @@ class FakeDataAPI:
             return outData_df
         else:
             _, result = cls.client.getData(base_url.format(ticker,
-                                                           kwargs.get('exchangeCD', ''),
+                                                           ",".join(kwargs.get('exchangeCD', '')),
                                                            ",".join(tradeDate),
                                                            beginDate,
                                                            endDate
@@ -119,6 +119,34 @@ class FakeDataAPI:
         """
         无权限
         """
+        beginDate, endDate, tradeDate = cls.assert_format_data(beginDate, endDate, '')
+        base_url = '/api/market/getMktIdxd.json?field=&indexID={}&ticker=&exchangeCD={}&tradeDate={}&beginDate={}&endDate={}'
+        pat_len = kwargs.get("pat_len", 5)
+        if isinstance(indexID, list):
+            outData_df = pd.DataFrame()
+            for pat_indexID_list in tqdm(patList(indexID, pat_len)):
+                _, result = cls.client.getData(base_url.format(",".join(pat_indexID_list),
+                                                               ",".join(kwargs.get('exchangeCD', '')),
+                                                               ",".join(tradeDate),
+                                                               beginDate,
+                                                               endDate
+                                                               )
+                                               )
+                try:
+                    outData_df = pd.concat([outData_df, pd.DataFrame(eval(result)["data"])])
+                except KeyError:
+                    print(eval(result)["retMsg"])
+                    break
+            return outData_df
+        else:
+            _, result = cls.client.getData(base_url.format(indexID,
+                                                           ",".join(kwargs.get('exchangeCD', '')),
+                                                           ",".join(tradeDate),
+                                                           beginDate,
+                                                           endDate
+                                                           )
+                                           )
+            return pd.DataFrame(eval(result)["data"])
 
     @classmethod
     def FdmtIndiRtnPitGet(cls, ticker: Union[list, str],
