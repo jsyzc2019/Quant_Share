@@ -18,3 +18,6 @@ with open(os.path.join(current_dir, 'token.txt'), 'rt', encoding='utf-8') as f:
     token = f.read().strip()
 set_token(token)
 symbolList = list(stock_info.symbol.unique())
+
+# config
+update_exit_limit = 3  # 多少轮更新无数据则退出

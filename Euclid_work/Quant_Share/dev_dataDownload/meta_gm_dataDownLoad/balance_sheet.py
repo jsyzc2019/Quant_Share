@@ -20,14 +20,26 @@ def balance_sheet(begin, end, **kwargs):
     symbol = kwargs['symbol']
     balance_sheet_fields = kwargs['balance_sheet_fields']
     outData = pd.DataFrame()
+    errors_num = 0
+    update_exit = 0
     with tqdm(patList(symbol, 30)) as t:
         t.set_description("begin:{} -- end:{}".format(begin, end))
         for patSymbol in t:
             try:
                 tmpData = get_fundamentals(table='balance_sheet', symbols=patSymbol, limit=1000,
                                            start_date=begin, end_date=end, fields=balance_sheet_fields, df=True)
-                t.set_postfix({"状态": "已成功获取{}条数据".format(len(tmpData))})  # 进度条右边显示信息
+                _len = len(tmpData)
+                t.set_postfix({"状态": "已成功获取{}条数据".format(_len)})  # 进度条右边显示信息
                 errors_num = 0
+
+                if _len > 0:
+                    update_exit = 0
+                    outData = pd.concat([outData, tmpData], ignore_index=True)
+                else:
+                    update_exit += 1
+                if update_exit >= update_exit_limit:
+                    print("no data return, exit update")
+                    break
 
             except GmError:
                 errors_num += 1
@@ -36,7 +48,6 @@ def balance_sheet(begin, end, **kwargs):
                 time.sleep(60)
                 t.set_postfix({"状态": "GmError:{}, 将第{}次重试".format(GmError, errors_num)})
 
-            outData = pd.concat([outData, tmpData], ignore_index=True)
     return outData
 
 

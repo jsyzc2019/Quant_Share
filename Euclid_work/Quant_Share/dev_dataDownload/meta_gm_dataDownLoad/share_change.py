@@ -17,12 +17,22 @@ def share_change(begin, end, **kwargs):
     symbol = kwargs['symbol']
 
     outData = pd.DataFrame()
+    update_exit = 0
     with tqdm(symbol) as t:
         t.set_description(("begin:{} -- end:{}".format(begin, end)))
         for symbol_i in t:
             tmpData = stk_get_share_change(symbol=symbol_i, start_date=begin, end_date=end)
-            outData = pd.concat([outData, tmpData], ignore_index=True)
-            t.set_postfix({"状态": "已成功获取{}条数据".format(len(tmpData))})
+            _len = len(tmpData)
+            t.set_postfix({"状态": "已成功获取{}条数据".format(_len)})
+            if _len > 0:
+                update_exit = 0
+                outData = pd.concat([outData, tmpData], ignore_index=True)
+            else:
+                update_exit += 1
+            if update_exit >= update_exit_limit:
+                print("no data return, exit update")
+                break
+
     return outData
 
 

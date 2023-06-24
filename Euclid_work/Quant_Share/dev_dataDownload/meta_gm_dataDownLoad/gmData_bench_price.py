@@ -15,14 +15,32 @@ def gmData_bench_price(begin, end, **kwargs):
     end = format_date(end).strftime("%Y-%m-%d")
 
     outData = pd.DataFrame()
+    errors_num = 0
+    update_exit = 0
     with tqdm(kwargs['symbol']) as t:
         for symbol_i in t:
             try:
                 data = get_history_symbol(symbol_i, start_date=begin, end_date=end, df=True)
-                t.set_postfix({"状态": "已写入{}数据".format(symbol_i)})  # 进度条右边显示信息
+                _len = len(data)
+                t.set_postfix({"状态": "已写入{}的{}条数据".format(symbol_i, _len)})  # 进度条右边显示信息
+                errors_num = 0
+
+                if _len > 0:
+                    update_exit = 0
+                    outData = pd.concat([outData, data], axis=0, ignore_index=True)
+                else:
+                    update_exit += 1
+                if update_exit >= update_exit_limit:
+                    print("no data return, exit update")
+                    break
+
             except GmError:
-                t.set_postfix({"状态": "GmError{}".format(GmError)})  # 进度条右边显示信息
-            outData = pd.concat([outData, data], axis=0, ignore_index=True)
+                errors_num += 1
+                if errors_num > 5:
+                    raise RuntimeError("重试五次后，仍旧GmError")
+                time.sleep(60)
+                t.set_postfix({"状态": "GmError:{}, 将第{}次重试".format(GmError, errors_num)})
+
     return outData
 
 

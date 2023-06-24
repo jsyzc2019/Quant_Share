@@ -22,14 +22,23 @@ def fundamentals_income(begin, end, **kwargs):
     fundamentals_income_fields = kwargs['fundamentals_income_fields']
 
     outData = pd.DataFrame()
+    update_exit = 0
     with tqdm(symbol) as t:
         t.set_description(("begin:{} -- end:{}".format(begin, end)))
         for symbol_i in t:
             tmpData = stk_get_fundamentals_income(symbol=symbol_i, rpt_type=None, data_type=None,
                                                   start_date=begin, end_date=end,
                                                   fields=fundamentals_income_fields, df=True)
-            outData = pd.concat([outData, tmpData], ignore_index=True)
-            t.set_postfix({"状态": "已成功获取{}条数据".format(len(tmpData))})
+            _len = len(tmpData)
+            t.set_postfix({"状态": "已成功获取{}条数据".format(_len)})
+            if _len > 0:
+                update_exit = 0
+                outData = pd.concat([outData, tmpData], ignore_index=True)
+            else:
+                update_exit += 1
+            if update_exit >= update_exit_limit:
+                print("no data return, exit update")
+                break
     return outData
 
 

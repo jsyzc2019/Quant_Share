@@ -4,7 +4,7 @@
 # @Author  : Euclid-Jie
 # @File    : dev_uqerUpdate.py
 """
-from Euclid_work.Quant_Share import get_tradeDate, get_table_info
+from Euclid_work.Quant_Share import get_tradeDate, get_table_info, printJson
 from meta_uqer_dataDownLoad import *
 from datetime import datetime
 
@@ -22,3 +22,4 @@ for tableName in tableNameList:
     if begin < get_tradeDate(datetime.now(), -5):
         print("{} update from {} start!".format(tableName, begin.strftime('%Y%m%d')))
         eval(tableName + '_update(upDateBegin=begin)')
+    # printJson(get_table_info(tableName))

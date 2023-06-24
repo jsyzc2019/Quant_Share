@@ -22,14 +22,23 @@ def fundamentals_balance(begin, end, **kwargs):
     fundamentals_balance_fields = kwargs['fundamentals_balance_fields']
 
     outData = pd.DataFrame()
+    update_exit = 0
     with tqdm(symbol) as t:
         for symbol_i in t:
             t.set_description(("begin:{} -- end:{}".format(begin, end)))
             tmpData = stk_get_fundamentals_balance(symbol=symbol_i, rpt_type=None, data_type=None,
                                                    start_date=begin, end_date=end,
                                                    fields=fundamentals_balance_fields, df=True)
-            t.set_postfix({"状态": "已成功获取{}条数据".format(len(tmpData))})
-            outData = pd.concat([outData, tmpData], ignore_index=True)
+            _len = len(tmpData)
+            t.set_postfix({"状态": "已成功获取{}条数据".format(_len)})
+            if _len > 0:
+                update_exit = 0
+                outData = pd.concat([outData, tmpData], ignore_index=True)
+            else:
+                update_exit += 1
+            if update_exit >= update_exit_limit:
+                print("no data return, exit update")
+                break
     return outData
 
 

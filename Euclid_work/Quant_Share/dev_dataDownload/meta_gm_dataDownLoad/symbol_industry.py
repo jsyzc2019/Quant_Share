@@ -16,14 +16,24 @@ def run_thread_pool_sub(target, args, max_work_count):
 
 def get_industry_info(date):
     res = pd.DataFrame()
+    update_exit = 0
     symbols = get_symbols(sec_type1=1010, df=True, trade_date=date)['symbol'].tolist()
     # t.set_description(f"正在获取{td}的数据")
     for i, s in enumerate(symbols):
         try:
             df = stk_get_symbol_industry(symbols=s, source="sw2021", level=1, date=date)
             # t.set_postfix({"状态": "symbol {}成功获取, total {:.2f}%".format(s, (i+1)/len(symbols)*100)})
-            res = pd.concat([res, df], axis=0, ignore_index=True)
-            sleep(0.5)
+            _len = len(df)
+            if _len > 0:
+                update_exit = 0
+                res = pd.concat([res, df], axis=0, ignore_index=True)
+                sleep(0.5)
+            else:
+                update_exit += 1
+            if update_exit >= update_exit_limit:
+                print("no data return, exit update")
+                break
+
         except GmError:
             # t.set_postfix({"状态": "symbol {}无效, total {:.2f}%".format(s, (i+1)/len(symbols)*100)})
             continue
@@ -84,6 +94,6 @@ def symbol_industry(begin='20150101', end=None):
     return res
 
 
-def symbol_industry_update(begin='20150101', end=None):
-    data = symbol_industry(begin=begin, end=end)
+def symbol_industry_update(upDateBegin='20150101', end=None):
+    data = symbol_industry(begin=upDateBegin, end=end)
     save_data_Y(data, 'query_date', 'symbol_industry', reWrite=True, _dataBase_root_path=dataBase_root_path_gmStockFactor)

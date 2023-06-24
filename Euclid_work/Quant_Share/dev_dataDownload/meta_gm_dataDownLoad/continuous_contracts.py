@@ -15,6 +15,8 @@ def continuous_contracts(begin, end, **kwargs):
     end = format_date(end).strftime("%Y-%m-%d")
     csymbol = kwargs['csymbol']
     outData = pd.DataFrame()
+    errors_num = 0
+    update_exit = 0
     with tqdm(csymbol) as t:
         t.set_description("begin:{} -- end:{}".format(begin, end))
         for patSymbol in t:
@@ -24,19 +26,28 @@ def continuous_contracts(begin, end, **kwargs):
                     start_date=begin,
                     end_date=end,
                 )
-                t.set_postfix({"状态": "已成功获取{}条数据".format(len(tmpData))})  # 进度条右边显示信息
+                _len = len(tmpData)
+                t.set_postfix({"状态": "已成功获取{}条数据".format(_len)})  # 进度条右边显示信息
                 errors_num = 0
-                if len(tmpData) == 0:
-                    continue
+
+                if _len > 0:
+                    update_exit = 0
+                    tmpData = pd.DataFrame(tmpData)
+                    tmpData.trade_date = tmpData.trade_date.dt.strftime('%Y-%m-%d')
+                    outData = pd.concat([outData, tmpData], ignore_index=True, axis=0)
+                else:
+                    update_exit += 1
+                if update_exit >= update_exit_limit:
+                    print("no data return, exit update")
+                    break
+
             except GmError:
                 errors_num += 1
                 if errors_num > 5:
                     raise RuntimeError("重试五次后，仍旧GmError")
                 time.sleep(60)
                 t.set_postfix({"状态": "GmError:{}, 将第{}次重试".format(GmError, errors_num)})
-            tmpData = pd.DataFrame(tmpData)
-            tmpData.trade_date = tmpData.trade_date.dt.strftime('%Y-%m-%d')
-            outData = pd.concat([outData, tmpData], ignore_index=True, axis=0)
+
     return outData
 
 
