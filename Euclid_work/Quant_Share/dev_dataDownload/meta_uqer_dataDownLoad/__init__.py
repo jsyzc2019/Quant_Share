@@ -10,3 +10,4 @@ from .MktLimit import MktLimit_update
 from .FdmtIndiRtnPit import FdmtIndiRtnPit_update
 from .FdmtIndiPSPit import FdmtIndiPSPit_update
 from .MktIdx import MktIdx_update
+from .mIdxCloseWeight import mIdxCloseWeight_update

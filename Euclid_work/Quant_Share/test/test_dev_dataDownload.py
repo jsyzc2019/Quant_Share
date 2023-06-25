@@ -26,6 +26,10 @@ class MyTestCase(unittest.TestCase):
         data = DataAPI.FdmtIndiPSPitGet(ticker='000001', beginDate=20200101, endDate=20220110, reportType=["A"])
         self.assertEqual(True, isinstance(data, pd.DataFrame) and len(data) > 0)
 
+    def test_FakeDataAPI_mIdxCloseWeightGet(self):
+        data = DataAPI.mIdxCloseWeightGet(ticker='000300', beginDate='20220101', endDate='20230110')
+        self.assertEqual(True, isinstance(data, pd.DataFrame) and len(data) > 0)
+
 
 if __name__ == '__main__':
     unittest.main()

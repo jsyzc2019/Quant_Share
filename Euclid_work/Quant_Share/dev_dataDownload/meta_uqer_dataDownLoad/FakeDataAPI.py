@@ -66,6 +66,39 @@ class FakeDataAPI:
             return pd.DataFrame(eval(result)["data"])
 
     @classmethod
+    def mIdxCloseWeightGet(cls, ticker: Union[list, str],
+                   beginDate: Union[pd.datetime, str, int] = None, endDate: Union[pd.datetime, str, int] = None,
+                   **kwargs):
+        """
+        doc: https://mall.datayes.com/datapreview/1905
+        demoUrl: /api/idx/getmIdxCloseWeight.json?field=&ticker=000300&secID=&beginDate=20151101&endDate=20151130
+        :param ticker: default=[000300,000905,000852]
+        :param tradeDate:
+        :param beginDate:
+        :param endDate:
+        :param kwargs:
+        :return:
+        """
+        beginDate, endDate, _ = cls.assert_format_data(beginDate, endDate)
+        base_url = '/api/idx/getmIdxCloseWeight.json?field=&ticker={}&secID=&beginDate={}&endDate={}'
+        if isinstance(ticker, list):
+            outData_df = pd.DataFrame()
+            for ti in tqdm(ticker):
+                _, result = cls.client.getData(base_url.format(ti, beginDate, endDate))
+                try:
+                    outData_df = pd.concat([outData_df, pd.DataFrame(eval(result)["data"])])
+                except KeyError:
+                    print(eval(result)["retMsg"])
+                    break
+            return outData_df
+        else:
+            _, result = cls.client.getData(base_url.format(
+                ticker,
+                beginDate,
+                endDate))
+            return pd.DataFrame(eval(result)["data"])
+
+    @classmethod
     def MktLimitGet(cls, ticker: Union[list, str],
                     tradeDate: Union[list[Union[pd.datetime, str]], pd.datetime, str] = '',
                     beginDate: Union[pd.datetime, str, int] = None, endDate: Union[pd.datetime, str, int] = None,
@@ -246,7 +279,7 @@ class FakeDataAPI:
             return pd.DataFrame(eval(result)["data"])
 
     @staticmethod
-    def assert_format_data(beginDate, endDate, tradeDate):
+    def assert_format_data(beginDate, endDate, tradeDate=''):
         if beginDate is None and endDate is None and tradeDate == '':
             raise AttributeError("begin + end or tradeDate should be param in")
 

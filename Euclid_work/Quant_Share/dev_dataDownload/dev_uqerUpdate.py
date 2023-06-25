@@ -15,7 +15,8 @@ tableNameList = [
     "MktLimit",
     "FdmtIndiRtnPit",
     "FdmtIndiPSPit",
-    "MktIdx"
+    "MktIdx",
+    'mIdxCloseWeight'
 ]
 for tableName in tableNameList:
     begin = get_tradeDate(get_table_info(tableName)['Modify Time'], -1)
