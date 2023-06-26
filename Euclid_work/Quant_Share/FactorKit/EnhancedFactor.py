@@ -46,24 +46,26 @@ class EnhancingDividend(BARRA):
     @cached_property
     def bool_perCashDiv(self):
         df = self.perCashDiv
-        df = df.groupby(pd.Grouper(freq='y')).sum()
-        df = (df - df.shift(1))/df.shift(1)
-        df = df.loc[df.index.year != pd.to_datetime(self.endDate).year]
-        df = df.rolling(window=3).apply(lambda x:np.nanmean(x) >= 0.05)
-        df = df.fillna(0)
+        # 归化到每一季度
+        df = df.groupby(pd.Grouper(freq='Q')).sum()
+        # 求和最近一年的分红
+        df = df.rolling(window=4).sum()
+        df = df.rolling(window=9).apply(lambda x: np.nanmean(x[[-1,-5,0]]) >= 0.05, raw=True).fillna(0)
         res = pd.DataFrame(data=0, columns=df.columns, index=pd.date_range(self.beginDate, self.endDate))
         res = res.loc[res.index.intersection(pd.to_datetime(tradeDateList))]
-        years = np.unique(res.index.year)
-        for y in years:
-            res.loc[res.index.year == y, :] = df.loc[df.index.year == y-1, :].values
+        inter_index = df.index.intersection(res.index)
+        res.loc[inter_index] = df.loc[inter_index]
+        res = res.fillna(method='ffill')
         return res
 
     @cached_property
     def bool_EPS(self):
         df = self.EPS
         df = df.resample('Q').mean()
+        # 计算最近一年的增长率
         df = (df - df.shift(4)) / df.shift(4)
-        df = df.rolling(window=12).apply(lambda x:(x[-1]-x[0])/3, raw=True).fillna(0)
+        # 取三年增长率之和
+        df = df.rolling(window=9).apply(lambda x:np.nansum(x[[-1,-5,0]]), raw=True).fillna(0)
         df = df.rolling(window=2).apply(lambda x: any(x > 0)).fillna(0)
         df = df.resample('D').asfreq().fillna(method='ffill')
         res = pd.DataFrame(data=0, columns=df.columns, index=pd.date_range(self.beginDate, self.endDate))

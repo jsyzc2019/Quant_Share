@@ -1,5 +1,5 @@
 import os
-from Euclid_work.Quant_Share.Utils import dataBase_root_path_JointQuant_Factor
+from Euclid_work.Quant_Share.Utils import dataBase_root_path_JointQuant_Factor, save_data_Y, printJson
 from Euclid_work.Quant_Share.EuclidGetData import get_data
 from .JointQuant_utils import *
 from datetime import datetime
@@ -79,7 +79,7 @@ def change_frequency(stock_file, Mean_day_list):
     return df1
 
 
-def original_data():
+def original_data(**kwargs):
     '''
     读入数据-日期全部为datetime格式
     财务数据：需要把数据补齐并且现金流量表和利润表计算为季度值（非累计值）
@@ -195,14 +195,16 @@ def original_data():
     share_number_sheet = share_number_sheet[['symbol', 'rpt_date', 'share_total', 'share_circ']]
     stock_unique = np.unique(list(share_number_sheet['symbol']))
     share_number2 = pd.DataFrame()
-    for i in stock_unique:
-        share_number = share_number_sheet[share_number_sheet['symbol'] == i].copy()
-        if str(share_number['rpt_date'].max()) < str(datetime.now().date()):
-            a = pd.DataFrame({'rpt_date': [str(datetime.now().date())]})
-            share_number = pd.concat([a, share_number], axis=0)
-        share_number['rpt_date'] = pd.to_datetime(share_number['rpt_date']).dt.to_period('D')
-        share_number = share_number.set_index('rpt_date').resample('D').asfreq().reset_index().ffill()
-        share_number2 = pd.concat([share_number, share_number2], axis=0)
+    with tqdm(stock_unique) as t:
+        for i in t:
+            t.set_postfix_str(f'Dealing stock {i}')
+            share_number = share_number_sheet[share_number_sheet['symbol'] == i].copy()
+            if share_number['rpt_date'].max() < datetime.now().date():
+                a = pd.DataFrame({'rpt_date': [str(datetime.now().date())]})
+                share_number = pd.concat([a, share_number], axis=0)
+            share_number['rpt_date'] = pd.to_datetime(share_number['rpt_date']).dt.to_period('D')
+            share_number = share_number.set_index('rpt_date').resample('D').asfreq().reset_index().ffill()
+            share_number2 = pd.concat([share_number, share_number2], axis=0)
     share_number_sheet = share_number2.reset_index(drop=True)
     share_number_sheet["rpt_date"] = share_number_sheet["rpt_date"].dt.to_timestamp()
 
@@ -284,30 +286,6 @@ def data(factor_name, financial_data, market_sheet, market_financial_sheet, ResC
     else:
         return ResConSecCorederi
 
-
-# 保存数据
-# date_column_name时间列名
-# save_file_name储存文件名
-def save_data(df, date_column_name, save_file_name):
-    df = df.copy()
-    df["year"] = df[date_column_name].dt.year
-    # 储存数据
-    # 创建因子文件夹
-    file_path = os.path.join(dataBase_root_path_JointQuant_Factor, save_file_name)
-    if os.path.exists(file_path):
-        pass
-    else:
-        os.mkdir(file_path)
-    for i in range(df["year"].min(), df["year"].max() + 1):
-        file_path1 = os.path.join(file_path, save_file_name + '_Y' + str(i) + '.h5')
-        df1 = df[df["year"] == i]
-        df1 = df1.dropna(axis=0)
-        df1 = df1.drop(['year'], axis=1)
-        df1 = df1.sort_values(['symbol', date_column_name])
-        df1 = df1.reset_index(drop=True)
-        df1.to_hdf(file_path1, key="a", mode='a')
-
-
 # 获取储存因子数据中的最大值
 def factor_max_rpt(factor_name):
     file_path = os.path.join(dataBase_root_path_JointQuant_Factor, factor_name)
@@ -328,36 +306,52 @@ def renew():
     df = pd.read_excel(os.path.join(os.path.dirname(__file__), '../../dev_files/jointquant_factor.xlsx'))
     factor_list = list(df['factor_name'])
     financial_data, market_sheet, market_financial_sheet, ResConSecCorederi = original_data()
-    for i in factor_list:
-        file_path = os.path.join(dataBase_root_path_JointQuant_Factor, i)
-        if os.path.exists(file_path):
-            max_rpt = factor_max_rpt(i)
-            df = data(i, financial_data, market_sheet, market_financial_sheet, ResConSecCorederi)
-            max_rpt1 = df['rpt_date'].max()
-            if max_rpt >= max_rpt1:
-                print('根据quant_share中的数据，' + i + '因子不需要更新')
-            else:
-                if 'close' in df.columns:
-                    start_date = str(int(str(max_rpt.date())[:4]) - 3) + '-01-01'
-                    start_date = datetime.strptime(start_date, '%Y-%m-%d')
-                    df = df[df['rpt_date'] >= start_date]
-                    df = df.copy()
-                    factor = globals()[i](df)
-                    start_date1 = str(int(str(max_rpt.date())[:4])) + '-01-01'
-                    start_date1 = datetime.strptime(start_date1, '%Y-%m-%d')
-                    factor = factor[factor['rpt_date'] >= start_date1]
-                    save_data(factor, 'rpt_date', i)
-                    print(i + '因子更新完毕')
+    Wrong = {}
+    with tqdm(factor_list) as t:
+        for i in t:
+            t.set_description(f"Calculating {i}")
+            file_path = os.path.join(dataBase_root_path_JointQuant_Factor, i)
+            if os.path.exists(file_path):
+                max_rpt = factor_max_rpt(i)
+                df = data(i, financial_data, market_sheet, market_financial_sheet, ResConSecCorederi)
+                max_rpt1 = df['rpt_date'].max()
+                if max_rpt >= max_rpt1:
+                    print('根据quant_share中的数据，' + i + '因子不需要更新')
                 else:
+                    if 'close' in df.columns:
+                        start_date = str(int(str(max_rpt.date())[:4]) - 3) + '-01-01'
+                        start_date = datetime.strptime(start_date, '%Y-%m-%d')
+                        df = df[df['rpt_date'] >= start_date]
+                        try:
+                            factor = globals()[i](df)
+                        except KeyError as e:
+                            Wrong[i] = str(e)
+                            continue
+                        start_date1 = str(int(str(max_rpt.date())[:4])) + '-01-01'
+                        start_date1 = datetime.strptime(start_date1, '%Y-%m-%d')
+                        factor = factor[factor['rpt_date'] >= start_date1]
+                        save_data_Y(df=factor, date_column_name='rpt_date', tableName=i, _dataBase_root_path=dataBase_root_path_JointQuant_Factor, reWrite=True)
+                        print(i + '因子更新完毕')
+                    else:
+                        try:
+                            factor = globals()[i](df)
+                        except KeyError as e:
+                            Wrong[i] = str(e)
+                            continue
+                        start_date1 = str(int(str(max_rpt.date())[:4])) + '-01-01'
+                        start_date1 = datetime.strptime(start_date1, '%Y-%m-%d')
+                        factor = factor[factor['rpt_date'] >= start_date1]
+                        save_data_Y(df=factor, date_column_name='rpt_date', tableName=i, _dataBase_root_path=dataBase_root_path_JointQuant_Factor, reWrite=True)
+                        print(i + '因子更新完毕')
+            else:
+                df = data(i, financial_data, market_sheet, market_financial_sheet, ResConSecCorederi)
+                df = df.copy()
+                try:
                     factor = globals()[i](df)
-                    start_date1 = str(int(str(max_rpt.date())[:4])) + '-01-01'
-                    start_date1 = datetime.strptime(start_date1, '%Y-%m-%d')
-                    factor = factor[factor['rpt_date'] >= start_date1]
-                    save_data(factor, 'rpt_date', i)
-                    print(i + '因子更新完毕')
-        else:
-            df = data(i, financial_data, market_sheet, market_financial_sheet, ResConSecCorederi)
-            df = df.copy()
-            factor = globals()[i](df)
-            save_data(factor, 'rpt_date', i)
-            print(i + '因子更新完毕')
+                except KeyError:
+                    Wrong[i] = str(e)
+                    continue
+                save_data_Y(df=factor, date_column_name='rpt_date', tableName=i, _dataBase_root_path=dataBase_root_path_JointQuant_Factor, reWrite=True)
+                print(i + '因子更新完毕')
+
+    printJson(Wrong)

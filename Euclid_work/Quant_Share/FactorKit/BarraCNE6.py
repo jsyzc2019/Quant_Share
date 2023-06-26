@@ -49,7 +49,10 @@ class DividendYield(FactorBase):
     @lazyproperty
     def DTOP(self):
         perCashDiv = self.perCashDiv
+        perCashDiv = perCashDiv.groupby(pd.Grouper(freq='Q')).sum()
+        perCashDiv = perCashDiv.rolling(window = 4).sum()
         perCashDiv = perCashDiv.resample('D').asfreq().fillna(method='ffill')
+        # perCashDiv = perCashDiv.resample('D').asfreq().fillna(method='ffill')
         # tds = pd.to_datetime(get_tradeDates(get_tradeDate(self.beginDate, -365*3), self.endDate))
         # tds = perCashDiv.index.intersection(tds)
         # perCashDiv = perCashDiv.loc[tds]
