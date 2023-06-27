@@ -310,7 +310,11 @@ def renew():
     with tqdm(factor_list) as t:
         for i in t:
             t.set_description(f"Calculating {i}")
-            file_path = os.path.join(dataBase_root_path_JointQuant_Factor, i)
+            try:
+                file_path = os.path.join(dataBase_root_path_JointQuant_Factor, i)
+            except TypeError:
+                Wrong['typeerror'] = Wrong.get('typeerror', []).append(i)
+                continue
             if os.path.exists(file_path):
                 max_rpt = factor_max_rpt(i)
                 df = data(i, financial_data, market_sheet, market_financial_sheet, ResConSecCorederi)

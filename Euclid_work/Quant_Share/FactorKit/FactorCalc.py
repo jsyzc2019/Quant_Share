@@ -1,4 +1,4 @@
-from ..Utils import lazyproperty, stockList, get_tradeDate, time_decorator, get_tradeDates
+from ..Utils import lazyproperty, stockList, get_tradeDate, time_decorator, get_tradeDates, tradeDateList
 from ..BackTest import DataPrepare, reindex, info_lag, simpleBT, data2score
 from ..EuclidGetData import get_data
 import pandas as pd
@@ -16,6 +16,7 @@ from pyfinance.utils import rolling_windows
 from dask import dataframe as dd
 import re
 import inspect
+from functools import cached_property
 
 def varname(p):
     for line in inspect.getframeinfo(inspect.currentframe().f_back)[3]:
@@ -30,7 +31,108 @@ class FactorData():
         for k, v in kwargs.items():
             setattr(self, k, v)
 
-    @lazyproperty
+
+    @cached_property
+    def cf_out_inv(self):
+        """
+        投资活动现金流出
+        :return:
+        """
+
+        df = get_data(tableName='fundamentals_cashflow',
+                      begin=get_tradeDate(self.beginDate, -365*2),
+                      end=self.endDate,
+                      fields=['symbol', 'cf_out_inv', 'pub_date'])
+        df['pub_date'] = pd.to_datetime(df['pub_date'])
+        df = df.sort_values(by='pub_date')
+        df = df.drop_duplicates(subset=['symbol', 'pub_date'], keep='last')
+        df = df.pivot(values='cf_out_inv', index='pub_date', columns='symbol')
+        return df
+
+    @cached_property
+    def net_cf_oper(self):
+        """
+        经营活动产生的现金流量净值
+        :return:
+        """
+
+        df = get_data(tableName='fundamentals_cashflow',
+                      begin=get_tradeDate(self.beginDate, -365*2),
+                      end=self.endDate,
+                      fields=['symbol', 'net_cf_oper', 'pub_date'])
+        df['pub_date'] = pd.to_datetime(df['pub_date'])
+        df = df.sort_values(by='pub_date')
+        df = df.drop_duplicates(subset=['symbol', 'pub_date'], keep='last')
+        df = df.pivot(values='net_cf_oper', index='pub_date', columns='symbol')
+        return df
+
+    @cached_property
+    def SP(self):
+        df = 1/self.PS
+        return df
+
+    @cached_property
+    def PS(self):
+        """
+        市销率TTM = 总市值 / 营业收入TTM
+        :return:
+        """
+        df = get_data(tableName='MktEqudEval',
+                      begin=self.beginDate, end=self.endDate,
+                      fields=['ticker', 'PS', 'tradeDate'])
+        df = df.pivot(values='PS', index='tradeDate', columns='ticker')
+        return df
+
+
+    @cached_property
+    def BP(self):
+        """
+        净资产/总市值
+        :return:
+        """
+        PB = self.PB
+        return 1/PB
+
+
+    @cached_property
+    def PB(self):
+        df = get_data(tableName='MktEqud',
+                      begin=self.beginDate, end=self.endDate,
+                      fields=['ticker', 'PB', 'tradeDate'])
+        df = df.pivot(values='PB', index='tradeDate', columns='ticker')
+        return df
+
+    @cached_property
+    def EPTTM(self):
+        df = self.PETTM
+        df[df == 0] == 1/np.Inf
+        df = 1/df
+        return
+
+    @cached_property
+    def PETTM(self):
+        df = get_data(tableName='trading_derivative_indicator',
+                      begin=self.beginDate, end=self.endDate,
+                      fields=['symbol', 'PETTM', 'pub_date'])
+        df['pub_date'] = pd.to_datetime(df['pub_date'])
+        df = df.sort_values(by='pub_date')
+        df = df.drop_duplicates(subset=['symbol', 'pub_date'], keep='last')
+        df = df.pivot(values='PETTM', index='pub_date', columns='symbol')
+        return df
+
+    @cached_property
+    def NPCUT(self):
+        """
+        扣除非经常性损益的净利润
+        :return:
+        """
+        NPCUT = get_data(tableName='deriv_finance_indicator',
+                      begin=self.beginDate, end=self.endDate,
+                      fields=['symbol', 'NPCUT', 'pub_date'])
+        NPCUT = NPCUT.pivot(values='NPCUT', index='pub_date', columns='symbol')
+        return NPCUT
+
+    @cached_property
     def perCashDiv(self):
         df = get_data(tableName='EquDiv_info', verbose=False)
         df = df.sort_values(by='publishDate')
@@ -160,6 +262,14 @@ class FactorBase(FactorData):
         for k, v in kwargs.items():
             setattr(self, k, v)
 
+    def adjust(self, df:pd.DataFrame):
+        res = pd.DataFrame(data=0, columns=df.columns, index=pd.date_range(self.beginDate, self.endDate))
+        res = res.loc[res.index.intersection(pd.to_datetime(tradeDateList))]
+        inter_index = df.index.intersection(res.index)
+        res.loc[inter_index] = df.loc[inter_index]
+        res = res.fillna(method='ffill')
+        return res
+
     @staticmethod
     def regress(y, X, intercept: bool = True, weight: int = 1, verbose: bool = True):
         '''
@@ -191,7 +301,7 @@ class FactorBase(FactorData):
             else:
                 return params
 
-    def align_data(self, data_lst: list[pd.DataFrame] = [], *args):
+    def align_data(self, data_lst: list[pd.DataFrame] = [], clean:bool = True, *args):
         '''
         基于index和columns进行表格的对齐
         :param data_lst: 以列表形式传入需要对齐的表格
@@ -199,6 +309,8 @@ class FactorBase(FactorData):
         :return:
         '''
         data_lst = list(chain(data_lst, args))
+        if clean:
+            data_lst = [reindex(df) for df in data_lst]
         dims = 1 if any(len(df.shape) == 1 or 1 in df.shape for df in data_lst) else 2
         if len(data_lst) > 2:
             mut_date_range = sorted(reduce(lambda x, y: x.intersection(y), (df.index for df in data_lst)))

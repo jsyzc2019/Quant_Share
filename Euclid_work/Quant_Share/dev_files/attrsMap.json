@@ -5,6 +5,7 @@
         "EquDiv_info",
         "HKshszHold",
         "MktEqud",
+        "mIdxCloseWeight",
         "MktLimit",
         "SecST",
         "SecHalt",
@@ -20,6 +21,7 @@
         "EquDiv_info",
         "HKshszHold",
         "MktEqud",
+        "mIdxCloseWeight",
         "MktIdx",
         "MktLimit",
         "SecST",
@@ -36,6 +38,7 @@
         "EquDiv_info",
         "HKshszHold",
         "MktEqud",
+        "mIdxCloseWeight",
         "MktIdx",
         "MktLimit",
         "SecHalt",
@@ -197,6 +200,7 @@
         "bench_info",
         "bench_price",
         "stock_price",
+        "Price_Volume_Data/main",
         "Price_Volume_Data/submain",
         "ACCA",
         "accounts_payable_turnover_days",
@@ -319,7 +323,8 @@
         "deriv_finance_indicator",
         "balance_sheet",
         "continuous_contracts",
-        "future_daily"
+        "future_daily",
+        "symbol_industry"
     ],
     "sec_type1": [
         "bench_info",
@@ -350,7 +355,8 @@
         "bench_price",
         "stock_price",
         "gmData_bench_price",
-        "future_daily"
+        "future_daily",
+        "symbol_industry"
     ],
     "sec_abbr": [
         "bench_info",
@@ -563,6 +569,7 @@
     "position": [
         "bench_price",
         "stock_price",
+        "Price_Volume_Data/main",
         "Price_Volume_Data/submain",
         "gmData_history",
         "gmData_bench_price",
@@ -674,7 +681,27 @@
         "MktLimit",
         "SecST",
         "RMExposureDay",
-        "MktEqudEval"
+        "MktEqudEval",
+        "SHCOMP_daily",
+        "Shanghai_scale_index_daily",
+        "SHCOMP_financial",
+        "Shanghai_scale_index_financial",
+        "Shanghai_strategic_index_daily",
+        "Shanghai_style_index_daily",
+        "Shanghai_strategic_index_financial",
+        "Shanghai_style_index_financial",
+        "CSI_300_industry_index_daily",
+        "CSI_300_industry_index_financial",
+        "Global_broad_market_index_financial",
+        "Global_broad_market_index_daily",
+        "Shanghai_future_daily",
+        "Stock_A_daily",
+        "Domestic_main_contract_daily",
+        "Stock_B_daily",
+        "CITIC_primary_industry_index_daily",
+        "CITIC_primary_industry_index_financial",
+        "SW_primary_industry_index_daily",
+        "SW_primary_industry_index_financial"
     ],
     "preClosePrice": [
         "MktEqud"
@@ -738,6 +765,24 @@
     ],
     "vwap": [
         "MktEqud"
+    ],
+    "effDate": [
+        "mIdxCloseWeight"
+    ],
+    "consID": [
+        "mIdxCloseWeight"
+    ],
+    "consShortName": [
+        "mIdxCloseWeight"
+    ],
+    "consTickerSymbol": [
+        "mIdxCloseWeight"
+    ],
+    "consExchangeCD": [
+        "mIdxCloseWeight"
+    ],
+    "weight": [
+        "mIdxCloseWeight"
     ],
     "indexID": [
         "MktIdx",
@@ -1463,7 +1508,15 @@
         "FdmtIndiRtnPit"
     ],
     "ROE": [
-        "FdmtIndiRtnPit"
+        "FdmtIndiRtnPit",
+        "SHCOMP_financial",
+        "Shanghai_scale_index_financial",
+        "Shanghai_strategic_index_financial",
+        "Shanghai_style_index_financial",
+        "CSI_300_industry_index_financial",
+        "Global_broad_market_index_financial",
+        "CITIC_primary_industry_index_financial",
+        "SW_primary_industry_index_financial"
     ],
     "ROEA": [
         "FdmtIndiRtnPit"
@@ -1472,9 +1525,6 @@
         "FdmtIndiRtnPit"
     ],
     "ROECut": [
-        "FdmtIndiRtnPit"
-    ],
-    "ROECutW": [
         "FdmtIndiRtnPit"
     ],
     "ROA": [
@@ -1487,6 +1537,9 @@
     "ROIC": [
         "FdmtIndiRtnPit",
         "deriv_finance_indicator"
+    ],
+    "ROECutW": [
+        "FdmtIndiRtnPit"
     ],
     "PE2": [
         "MktEqudEval"
@@ -1582,6 +1635,7 @@
     ],
     "volume": [
         "Broker_Data",
+        "Price_Volume_Data/main",
         "Price_Volume_Data/submain",
         "Index_Market_data",
         "Market_data",
@@ -1597,39 +1651,46 @@
         "Broker_Data"
     ],
     "open": [
+        "Price_Volume_Data/main",
         "Price_Volume_Data/submain",
         "Market_data",
         "gmData_history"
     ],
     "high": [
+        "Price_Volume_Data/main",
         "Price_Volume_Data/submain",
         "Index_Market_data",
         "Market_data",
         "gmData_history"
     ],
     "low": [
+        "Price_Volume_Data/main",
         "Price_Volume_Data/submain",
         "Index_Market_data",
         "Market_data",
         "gmData_history"
     ],
     "close": [
+        "Price_Volume_Data/main",
         "Price_Volume_Data/submain",
         "Index_Market_data",
         "Market_data",
         "gmData_history"
     ],
     "amount": [
+        "Price_Volume_Data/main",
         "Price_Volume_Data/submain",
         "Index_Market_data",
         "Market_data",
         "gmData_history"
     ],
     "bob": [
+        "Price_Volume_Data/main",
         "Price_Volume_Data/submain",
         "gmData_history"
     ],
     "eob": [
+        "Price_Volume_Data/main",
         "Price_Volume_Data/submain",
         "gmData_history"
     ],
@@ -3514,6 +3575,9 @@
     "share_a_unl": [
         "share_change"
     ],
+    "share_h_unl": [
+        "share_change"
+    ],
     "share_list_date": [
         "share_change"
     ],
@@ -3572,9 +3636,6 @@
         "share_change"
     ],
     "share_b_unl": [
-        "share_change"
-    ],
-    "share_h_unl": [
         "share_change"
     ],
     "share_oth_unl": [
@@ -3651,52 +3712,52 @@
         "gmData_bench_price",
         "future_daily"
     ],
-    "PSTTM": [
-        "trading_derivative_indicator"
-    ],
-    "DY": [
-        "trading_derivative_indicator"
-    ],
-    "TCLOSE": [
-        "trading_derivative_indicator"
-    ],
-    "PELFY": [
-        "trading_derivative_indicator"
-    ],
-    "EVPS": [
-        "trading_derivative_indicator"
-    ],
-    "PSLFY": [
-        "trading_derivative_indicator"
-    ],
-    "PELFYNPAAEI": [
-        "trading_derivative_indicator"
-    ],
-    "TURNRATE": [
-        "trading_derivative_indicator"
-    ],
-    "PEMRQNPAAEI": [
-        "trading_derivative_indicator"
-    ],
-    "PETTM": [
-        "trading_derivative_indicator"
-    ],
-    "PEMRQ": [
-        "trading_derivative_indicator"
-    ],
-    "PETTMNPAAEI": [
+    "PCLFY": [
         "trading_derivative_indicator"
     ],
     "PCTTM": [
         "trading_derivative_indicator"
     ],
-    "LYDY": [
+    "DY": [
+        "trading_derivative_indicator"
+    ],
+    "PETTM": [
+        "trading_derivative_indicator"
+    ],
+    "PEMRQNPAAEI": [
+        "trading_derivative_indicator"
+    ],
+    "PELFYNPAAEI": [
+        "trading_derivative_indicator"
+    ],
+    "PSTTM": [
+        "trading_derivative_indicator"
+    ],
+    "EVPS": [
         "trading_derivative_indicator"
     ],
     "PSMRQ": [
         "trading_derivative_indicator"
     ],
-    "PCLFY": [
+    "PELFY": [
+        "trading_derivative_indicator"
+    ],
+    "PSLFY": [
+        "trading_derivative_indicator"
+    ],
+    "PEMRQ": [
+        "trading_derivative_indicator"
+    ],
+    "TURNRATE": [
+        "trading_derivative_indicator"
+    ],
+    "TCLOSE": [
+        "trading_derivative_indicator"
+    ],
+    "PETTMNPAAEI": [
+        "trading_derivative_indicator"
+    ],
+    "LYDY": [
         "trading_derivative_indicator"
     ],
     "CASHCONVCYCLE": [
@@ -4457,5 +4518,370 @@
     ],
     "SHORTTERMBDSPAYA": [
         "balance_sheet"
+    ],
+    "industry_code": [
+        "symbol_industry"
+    ],
+    "industry_name": [
+        "symbol_industry"
+    ],
+    "date_in": [
+        "symbol_industry"
+    ],
+    "date_out": [
+        "symbol_industry"
+    ],
+    "query_date": [
+        "symbol_industry"
+    ],
+    "codes": [
+        "SHCOMP_daily",
+        "Shanghai_scale_index_daily",
+        "SHCOMP_financial",
+        "Shanghai_scale_index_financial",
+        "Shanghai_strategic_index_daily",
+        "Shanghai_style_index_daily",
+        "Shanghai_strategic_index_financial",
+        "Shanghai_style_index_financial",
+        "CSI_300_industry_index_daily",
+        "CSI_300_industry_index_financial",
+        "Global_broad_market_index_financial",
+        "Global_broad_market_index_daily",
+        "Shanghai_future_daily",
+        "Stock_A_daily",
+        "Domestic_main_contract_daily",
+        "Stock_B_daily",
+        "CITIC_primary_industry_index_daily",
+        "CITIC_primary_industry_index_financial",
+        "SW_primary_industry_index_daily",
+        "SW_primary_industry_index_financial"
+    ],
+    "OPEN": [
+        "SHCOMP_daily",
+        "Shanghai_scale_index_daily",
+        "Shanghai_strategic_index_daily",
+        "Shanghai_style_index_daily",
+        "CSI_300_industry_index_daily",
+        "Global_broad_market_index_daily",
+        "Shanghai_future_daily",
+        "Stock_A_daily",
+        "Domestic_main_contract_daily",
+        "Stock_B_daily",
+        "CITIC_primary_industry_index_daily",
+        "SW_primary_industry_index_daily"
+    ],
+    "CLOSE": [
+        "SHCOMP_daily",
+        "Shanghai_scale_index_daily",
+        "Shanghai_strategic_index_daily",
+        "Shanghai_style_index_daily",
+        "CSI_300_industry_index_daily",
+        "Global_broad_market_index_daily",
+        "Shanghai_future_daily",
+        "000300SH",
+        "Stock_A_daily",
+        "000802SH",
+        "Domestic_main_contract_daily",
+        "Stock_B_daily",
+        "CITIC_primary_industry_index_daily",
+        "SW_primary_industry_index_daily"
+    ],
+    "HIGH": [
+        "SHCOMP_daily",
+        "Shanghai_scale_index_daily",
+        "Shanghai_strategic_index_daily",
+        "Shanghai_style_index_daily",
+        "CSI_300_industry_index_daily",
+        "Global_broad_market_index_daily",
+        "Shanghai_future_daily",
+        "Stock_A_daily",
+        "Domestic_main_contract_daily",
+        "Stock_B_daily",
+        "CITIC_primary_industry_index_daily",
+        "SW_primary_industry_index_daily"
+    ],
+    "LOW": [
+        "SHCOMP_daily",
+        "Shanghai_scale_index_daily",
+        "Shanghai_strategic_index_daily",
+        "Shanghai_style_index_daily",
+        "CSI_300_industry_index_daily",
+        "Global_broad_market_index_daily",
+        "Shanghai_future_daily",
+        "Stock_A_daily",
+        "Domestic_main_contract_daily",
+        "Stock_B_daily",
+        "CITIC_primary_industry_index_daily",
+        "SW_primary_industry_index_daily"
+    ],
+    "PRECLOSE": [
+        "SHCOMP_daily",
+        "Shanghai_scale_index_daily",
+        "Shanghai_strategic_index_daily",
+        "Shanghai_style_index_daily",
+        "CSI_300_industry_index_daily",
+        "Global_broad_market_index_daily",
+        "Shanghai_future_daily",
+        "Stock_A_daily",
+        "Domestic_main_contract_daily",
+        "Stock_B_daily",
+        "CITIC_primary_industry_index_daily",
+        "SW_primary_industry_index_daily"
+    ],
+    "CHANGE": [
+        "SHCOMP_daily",
+        "Shanghai_scale_index_daily",
+        "Shanghai_strategic_index_daily",
+        "Shanghai_style_index_daily",
+        "CSI_300_industry_index_daily",
+        "Global_broad_market_index_daily",
+        "Shanghai_future_daily",
+        "Stock_A_daily",
+        "Domestic_main_contract_daily",
+        "Stock_B_daily",
+        "CITIC_primary_industry_index_daily",
+        "SW_primary_industry_index_daily"
+    ],
+    "PCTCHANGE": [
+        "SHCOMP_daily",
+        "Shanghai_scale_index_daily",
+        "Shanghai_strategic_index_daily",
+        "Shanghai_style_index_daily",
+        "CSI_300_industry_index_daily",
+        "Global_broad_market_index_daily",
+        "Shanghai_future_daily",
+        "000300SH",
+        "Stock_A_daily",
+        "000802SH",
+        "Domestic_main_contract_daily",
+        "Stock_B_daily",
+        "CITIC_primary_industry_index_daily",
+        "SW_primary_industry_index_daily"
+    ],
+    "VOLUME": [
+        "SHCOMP_daily",
+        "Shanghai_scale_index_daily",
+        "Shanghai_strategic_index_daily",
+        "Shanghai_style_index_daily",
+        "CSI_300_industry_index_daily",
+        "Global_broad_market_index_daily",
+        "Shanghai_future_daily",
+        "Stock_A_daily",
+        "Domestic_main_contract_daily",
+        "Stock_B_daily",
+        "CITIC_primary_industry_index_daily",
+        "SW_primary_industry_index_daily"
+    ],
+    "AMOUNT": [
+        "SHCOMP_daily",
+        "Shanghai_scale_index_daily",
+        "Shanghai_strategic_index_daily",
+        "Shanghai_style_index_daily",
+        "CSI_300_industry_index_daily",
+        "Global_broad_market_index_daily",
+        "Shanghai_future_daily",
+        "Stock_A_daily",
+        "Domestic_main_contract_daily",
+        "Stock_B_daily",
+        "CITIC_primary_industry_index_daily",
+        "SW_primary_industry_index_daily"
+    ],
+    "TURN": [
+        "SHCOMP_daily",
+        "Shanghai_scale_index_daily",
+        "Shanghai_strategic_index_daily",
+        "Shanghai_style_index_daily",
+        "CSI_300_industry_index_daily",
+        "Global_broad_market_index_daily",
+        "Stock_A_daily",
+        "Stock_B_daily",
+        "CITIC_primary_industry_index_daily",
+        "SW_primary_industry_index_daily"
+    ],
+    "AMPLITUDE": [
+        "SHCOMP_daily",
+        "Shanghai_scale_index_daily",
+        "Shanghai_strategic_index_daily",
+        "Shanghai_style_index_daily",
+        "CSI_300_industry_index_daily",
+        "Global_broad_market_index_daily",
+        "Shanghai_future_daily",
+        "Stock_A_daily",
+        "Domestic_main_contract_daily",
+        "Stock_B_daily",
+        "CITIC_primary_industry_index_daily",
+        "SW_primary_industry_index_daily"
+    ],
+    "EPSTTM": [
+        "SHCOMP_financial",
+        "Shanghai_scale_index_financial",
+        "Shanghai_strategic_index_financial",
+        "Shanghai_style_index_financial",
+        "CSI_300_industry_index_financial",
+        "Global_broad_market_index_financial",
+        "CITIC_primary_industry_index_financial",
+        "SW_primary_industry_index_financial"
+    ],
+    "LIQSHARE": [
+        "SHCOMP_financial",
+        "Shanghai_scale_index_financial",
+        "Shanghai_strategic_index_financial",
+        "Shanghai_style_index_financial",
+        "CSI_300_industry_index_financial",
+        "Global_broad_market_index_financial",
+        "CITIC_primary_industry_index_financial",
+        "SW_primary_industry_index_financial"
+    ],
+    "BPS": [
+        "SHCOMP_financial",
+        "Shanghai_scale_index_financial",
+        "Shanghai_strategic_index_financial",
+        "Shanghai_style_index_financial",
+        "CSI_300_industry_index_financial",
+        "Global_broad_market_index_financial",
+        "CITIC_primary_industry_index_financial",
+        "SW_primary_industry_index_financial"
+    ],
+    "AVERAGE": [
+        "Shanghai_future_daily",
+        "Stock_A_daily",
+        "Domestic_main_contract_daily",
+        "Stock_B_daily"
+    ],
+    "SPREAD": [
+        "Shanghai_future_daily",
+        "Domestic_main_contract_daily"
+    ],
+    "CLEAR": [
+        "Shanghai_future_daily",
+        "Domestic_main_contract_daily"
+    ],
+    "PRECLEAR": [
+        "Shanghai_future_daily",
+        "Domestic_main_contract_daily"
+    ],
+    "PCTCHANGECLEAR": [
+        "Shanghai_future_daily",
+        "Domestic_main_contract_daily"
+    ],
+    "CHANGECLEAR": [
+        "Shanghai_future_daily",
+        "Domestic_main_contract_daily"
+    ],
+    "HQOI": [
+        "Shanghai_future_daily",
+        "Domestic_main_contract_daily"
+    ],
+    "CHANGEOI": [
+        "Shanghai_future_daily",
+        "Domestic_main_contract_daily"
+    ],
+    "MAINFORCE": [
+        "Shanghai_future_daily",
+        "Domestic_main_contract_daily"
+    ],
+    "UNIVOLUME": [
+        "Shanghai_future_daily",
+        "Domestic_main_contract_daily"
+    ],
+    "UNIAMOUNT": [
+        "Shanghai_future_daily",
+        "Domestic_main_contract_daily"
+    ],
+    "UNIHQOI": [
+        "Shanghai_future_daily",
+        "Domestic_main_contract_daily"
+    ],
+    "UNICHANGEOI": [
+        "Shanghai_future_daily",
+        "Domestic_main_contract_daily"
+    ],
+    "CHANGECLOSE": [
+        "Shanghai_future_daily",
+        "Domestic_main_contract_daily"
+    ],
+    "PCTCHANGECLOSE": [
+        "Shanghai_future_daily",
+        "Domestic_main_contract_daily"
+    ],
+    "INDEXCODE": [
+        "000300SH",
+        "000802SH"
+    ],
+    "SECUCODE": [
+        "000300SH",
+        "000802SH"
+    ],
+    "TRADEDATE": [
+        "000300SH",
+        "000802SH"
+    ],
+    "NAME": [
+        "000300SH",
+        "000802SH"
+    ],
+    "WEIGHT": [
+        "000300SH",
+        "000802SH"
+    ],
+    "CONTRIBUTEPT": [
+        "000300SH",
+        "000802SH"
+    ],
+    "SHRMARKETVALUE": [
+        "000300SH",
+        "000802SH"
+    ],
+    "MV": [
+        "000300SH",
+        "000802SH"
+    ],
+    "TOTALTRADABLE": [
+        "000300SH",
+        "000802SH"
+    ],
+    "SHARETOTAL": [
+        "000300SH",
+        "000802SH"
+    ],
+    "HIGHLIMIT": [
+        "Stock_A_daily",
+        "Stock_B_daily"
+    ],
+    "TRADESTATUS": [
+        "Stock_A_daily",
+        "Stock_B_daily"
+    ],
+    "TNUM": [
+        "Stock_A_daily",
+        "Stock_B_daily"
+    ],
+    "LOWLIMIT": [
+        "Stock_A_daily",
+        "Stock_B_daily"
+    ],
+    "BUYVOL": [
+        "Stock_A_daily",
+        "Stock_B_daily"
+    ],
+    "SELLVOL": [
+        "Stock_A_daily",
+        "Stock_B_daily"
+    ],
+    "TAFACTOR": [
+        "Stock_A_daily",
+        "Stock_B_daily"
+    ],
+    "FRONTTAFACTOR": [
+        "Stock_A_daily",
+        "Stock_B_daily"
+    ],
+    "ISSTSTOCK": [
+        "Stock_A_daily",
+        "Stock_B_daily"
+    ],
+    "ISXSTSTOCK": [
+        "Stock_A_daily",
+        "Stock_B_daily"
     ]
 }
