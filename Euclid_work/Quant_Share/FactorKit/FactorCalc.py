@@ -31,9 +31,18 @@ class FactorData():
         for k, v in kwargs.items():
             setattr(self, k, v)
 
+    @cached_property
+    def industry(self):
+        df = get_data('IndustryID_Sw21',
+                      begin=self.beginDate,
+                      end=self.endDate,
+                      fields=['date', 'winCode', 'industryName1'])
+        df['date'] = pd.to_datetime(df['date'])
+        df = reindex(df.pivot(index='date', values='industryName1', columns='winCode'))
+        return df
 
     @cached_property
-    def cf_out_inv(self):
+    def net_cf_inv(self):
         """
         投资活动现金流出
         :return:
@@ -42,11 +51,11 @@ class FactorData():
         df = get_data(tableName='fundamentals_cashflow',
                       begin=get_tradeDate(self.beginDate, -365*2),
                       end=self.endDate,
-                      fields=['symbol', 'cf_out_inv', 'pub_date'])
+                      fields=['symbol', 'net_cf_inv', 'pub_date'])
         df['pub_date'] = pd.to_datetime(df['pub_date'])
         df = df.sort_values(by='pub_date')
         df = df.drop_duplicates(subset=['symbol', 'pub_date'], keep='last')
-        df = df.pivot(values='cf_out_inv', index='pub_date', columns='symbol')
+        df = df.pivot(values='net_cf_inv', index='pub_date', columns='symbol')
         return df
 
     @cached_property
@@ -107,7 +116,7 @@ class FactorData():
         df = self.PETTM
         df[df == 0] == 1/np.Inf
         df = 1/df
-        return
+        return df
 
     @cached_property
     def PETTM(self):
@@ -121,14 +130,34 @@ class FactorData():
         return df
 
     @cached_property
+    def net_prof(self):
+        """
+        净利润
+        :return:
+        """
+        df = get_data(tableName='fundamentals_cashflow',
+                         begin=get_tradeDate(self.beginDate, -2 * 365),
+                         end=self.endDate,
+                         fields=['symbol', 'net_prof', 'pub_date'])
+        df['pub_date'] = pd.to_datetime(df['pub_date'])
+        df = df.sort_values(by='pub_date')
+        df = df.drop_duplicates(subset=['symbol', 'pub_date'], keep='last')
+        df = df.pivot(values='net_prof', index='pub_date', columns='symbol')
+        return df
+
+    @cached_property
     def NPCUT(self):
         """
         扣除非经常性损益的净利润
         :return:
         """
         NPCUT = get_data(tableName='deriv_finance_indicator',
-                      begin=self.beginDate, end=self.endDate,
-                      fields=['symbol', 'NPCUT', 'pub_date'])
+                        begin=get_tradeDate(self.beginDate, -2*365),
+                        end=self.endDate,
+                        fields=['symbol', 'NPCUT', 'pub_date'])
+        NPCUT['pub_date'] = pd.to_datetime(NPCUT['pub_date'])
+        NPCUT = NPCUT.sort_values(by='pub_date')
+        NPCUT = NPCUT.drop_duplicates(subset=['symbol', 'pub_date'], keep='last')
         NPCUT = NPCUT.pivot(values='NPCUT', index='pub_date', columns='symbol')
         return NPCUT
 
@@ -262,12 +291,13 @@ class FactorBase(FactorData):
         for k, v in kwargs.items():
             setattr(self, k, v)
 
-    def adjust(self, df:pd.DataFrame):
+    def adjust(self, df:pd.DataFrame, method:str = None):
         res = pd.DataFrame(data=0, columns=df.columns, index=pd.date_range(self.beginDate, self.endDate))
         res = res.loc[res.index.intersection(pd.to_datetime(tradeDateList))]
         inter_index = df.index.intersection(res.index)
         res.loc[inter_index] = df.loc[inter_index]
-        res = res.fillna(method='ffill')
+        if method:
+            res = res.fillna(method=method)
         return res
 
     @staticmethod
@@ -282,24 +312,28 @@ class FactorBase(FactorData):
         '''
 
         if len(X.shape) == 1: X = X.reshape((-1, 1))
+        # if len(y.shape) == 1: y = y.reshape((-1, 1))
         if intercept:
             const = np.ones(len(X))
             X = np.insert(X, 0, const, axis=1)
-
-        model = sm.WLS(y, X, weights=weight, missing='drop')
-        result = model.fit()
-        params = result.params
-        if verbose:
-            resid = y - np.dot(X, params)
-            if intercept:
-                return params[1:], params[0], resid
+        try:
+            model = sm.WLS(y, X, weights=weight, missing='drop')
+            result = model.fit()
+            params = result.params
+            if verbose:
+                resid = y - np.dot(X, params)
+                if intercept:
+                    return params[1:], params[0], resid
+                else:
+                    return params, None, resid
             else:
-                return params, None, resid
-        else:
-            if intercept:
-                return params[1:], params[0]
-            else:
-                return params
+                if intercept:
+                    return params[1:], params[0]
+                else:
+                    return params
+        except ValueError as e:
+            print(e)
+            print(X.shape, y.shape, X.size, y.size)
 
     def align_data(self, data_lst: list[pd.DataFrame] = [], clean:bool = True, *args):
         '''
@@ -405,14 +439,18 @@ class FactorBase(FactorData):
     @staticmethod
     def round_up_to_hundred(num):
         return int(np.ceil(num / 100) * 100)
+
     @staticmethod
     @time_decorator
     def pandas_parallelcal(dat, myfunc, args=None, window=None):
-        ncores = len(dat)//window
+        if window:
+            ncores = len(dat)//window
+        else:
+            ncores = 6
         print(f'Try with npartitions={ncores}')
         res = dd.from_pandas(dat, npartitions=ncores)
         if window:
-            res = res.rolling(window=window)
+            res = res.rolling(window=window, axis=0)
             if args is None:
                 res = res.apply(myfunc, raw=True)
             else:
@@ -445,6 +483,7 @@ class FactorBase(FactorData):
                         window=5,
                         half_life=None,
                         fill_na: str or (int, float) = 0):
+
         fill_args = {'method': fill_na} if isinstance(fill_na, str) else {'value': fill_na}
 
         stocks = y.columns
