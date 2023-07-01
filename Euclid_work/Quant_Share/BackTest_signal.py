@@ -28,11 +28,12 @@ class simpleBT_signal(simpleBT):
         # assert "con_code" in benchData.keys() and "pct_chg" in benchData.keys()
 
     @staticmethod
-    def getGroupTargPost(Score, group=None):
+    def getGroupTargPost(Score, group=None, ascending=True):
         """
         仅根据因子值大小设置仓位
         :param Score: 评分
         :param group: 评分分组
+        :param ascending: if true, the score bigger, the pos bigger, default True
         :return: 目标仓位
         """
         # 清理Score
@@ -42,6 +43,7 @@ class simpleBT_signal(simpleBT):
         ] = 0
 
         # 调整仓位和为1
+        assert Score.sum() > 0
         TargPost = Score / Score.sum()
         return TargPost
 
@@ -50,7 +52,7 @@ class simpleBT_signal(simpleBT):
         metric_begin = get_tradeDate(kwargs.get("metric_begin", Score.index[0]), 0)
         plot_begin = get_tradeDate(kwargs.get("plot_begin", Score.index[0]), 0)
         # 传入的group参数为None
-        (nav, pos_out, alpha_nav, result) = self.backTest(
+        (nav, pos_out, alpha_nav, result, daily_rtn) = self.backTest(
             Score.loc[metric_begin:], dealPrice="vwap", **kwargs
         )
 
@@ -62,4 +64,4 @@ class simpleBT_signal(simpleBT):
         self.get_nav_data_2_plot(bench_nav.loc[plot_begin:]).plot()  # bench
         axis.legend(["nav", "bench_nav"])
 
-        return fig, result, nav, pos_out, alpha_nav
+        return fig, result, nav, pos_out, alpha_nav, daily_rtn

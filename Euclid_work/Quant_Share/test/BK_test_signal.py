@@ -12,9 +12,13 @@ DataClass.get_Tushare_data()
 
 # group beck test
 BTClass = simpleBT_signal(DataClass.TICKER, DataClass.BENCH, negValueAdjust=False)
+# 市值越小因子越大
+Score = 1 - DataClass.Score
+# 仅取top pct 10因子
+Score[Score < Score.quantile(0.9)] = np.nan
 
-fig, result, nav, pos_out, alpha_nav = BTClass.main_back_test(
-    DataClass.Score, plot_begin=20200101, fee_rate=0.001
+fig, result, nav, pos_out, alpha_nav, daily_rtn = BTClass.main_back_test(
+    Score, plot_begin=20200101, fee_rate=0.001, daily_rtn=True
 )
 fig.show()
 printJson(result)

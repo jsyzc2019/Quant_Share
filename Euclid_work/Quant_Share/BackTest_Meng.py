@@ -139,7 +139,7 @@ class simpleBT:
         start_dt = Score.index[0]
         self.tickerData["Rtn"] = self.tickerData["Rtn"].loc[start_dt:]
 
-        # init position, index is code, columns is tradeDate
+        # init position, index is tradeDate, columns is code
         temp_pos = pd.Series(
             data=np.zeros(len(self.tickerData["Rtn"].columns)),
             index=self.tickerData["Rtn"].columns,
@@ -149,12 +149,16 @@ class simpleBT:
             index=self.tickerData["Rtn"].index,
             columns=self.tickerData["Rtn"].columns,
         )
+        # init daily each ticker return with zeros
+        zeros_rtn_each_ticker = temp_pos.copy()
+        daily_rtn = pos_out.copy()
+
         # init empty fee、daily_rtn、turnover to store info, index is tradeDate
         fee = pd.Series(
             np.zeros(len(self.tickerData["Rtn"].index)),
             index=self.tickerData["Rtn"].index,
         )
-        daily_rtn = fee.copy()
+
         turnover = fee.copy()
 
         for date in tqdm(self.tickerData["Rtn"].index.to_list()):
@@ -163,7 +167,7 @@ class simpleBT:
                 continue
 
             # calc the position holding rtn
-            pos_rtn = (temp_pos * self.tickerData["Rtn"].loc[date]).sum()
+            pos_rtn_each_ticker = temp_pos * self.tickerData["Rtn"].loc[date]
             # init the rtn after trade as 0
             trade_rtn = 0
 
@@ -243,8 +247,9 @@ class simpleBT:
                             )
                     break
                 diff[~tradable] = 0
-                fee.loc[date] = np.abs(diff).sum() * fee_rate  # 计算费用=(买入+卖出)*手续费率
-                trade_rtn = (diff * rtn_after_trade.loc[date]).sum()  # 使用交易后的收益率更新收益
+                fee_each_ticker = np.abs(diff) * fee_rate  # 计算费用=(买入+卖出)*手续费率
+                fee.loc[date] = fee_each_ticker.sum()
+                trade_rtn_each_ticker = diff * rtn_after_trade.loc[date]  # 使用交易后的收益率更新收益
                 temp_pos += diff  # 更新仓位
                 turnover.loc[date] = np.abs(diff).sum()  # 存储当日的交易额
 
@@ -254,17 +259,19 @@ class simpleBT:
                 )  # 直接使用close/close_pre - 1收益率进行更新
                 temp_pos = temp_pos / temp_pos.sum()
                 temp_pos.fillna(0, inplace=True)
+                trade_rtn_each_ticker = zeros_rtn_each_ticker
+                fee_each_ticker = zeros_rtn_each_ticker
 
             pos_out.loc[date] = temp_pos  # 记录个股仓位
             daily_rtn.loc[date] = (
-                pos_rtn + trade_rtn - fee.loc[date]
+                pos_rtn_each_ticker + trade_rtn_each_ticker - fee_each_ticker
             )  # 每日收益=持仓收益+交易后的收益-手续费
 
         print(">>> Back Test done")
         print("-*" * 30)
         print(">>> calc and display risk metrics")
         # calc nav
-        nav = (1 + daily_rtn).cumprod()  # 净值
+        nav = (1 + daily_rtn.sum(axis=1)).cumprod()  # 净值
         nav_out = nav.copy()  # 组合净值
 
         # 指数相关
@@ -303,8 +310,10 @@ class simpleBT:
             axis[1].set_title("alpha nav")
 
             result["fig"] = fig
-
-        return nav_out, pos_out, alpha_out, result
+        if kwargs.get("daily_rtn", False):
+            return nav_out, pos_out, alpha_out, result, daily_rtn
+        else:
+            return nav_out, pos_out, alpha_out, result
 
     @staticmethod
     def curveanalysis(cls, nav):
