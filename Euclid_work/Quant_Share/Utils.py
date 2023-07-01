@@ -152,8 +152,8 @@ def data2score(data, neg=False, ascending=True, axis=1):
     """
     use rank as score
     :param data:
-    :param neg: if Ture, score span [-1, 1], default FALSE
-    :param ascending:
+    :param neg: if Ture, score span [-1, 1]; default FALSE, score span [0, 1]
+    :param ascending: if Ture, the data value bigger, the score will bigger, default True
     :param axis:
     :return:
     """

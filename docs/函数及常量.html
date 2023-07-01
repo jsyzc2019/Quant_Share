@@ -57,7 +57,7 @@
     <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="已支持的表.html" />
+    <link rel="next" href="BARRA因子.html" />
     
     
     <link rel="prev" href="快速使用.html" />
@@ -128,7 +128,20 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4" data-path="已支持的表.html">
+        <li class="chapter " data-level="1.4" data-path="BARRA因子.html">
+            
+                <a href="BARRA因子.html">
+            
+                    
+                    因子计算
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="已支持的表.html">
             
                 <a href="已支持的表.html">
             
@@ -142,7 +155,7 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="1.4.1" data-path="balance_sheet.html">
+        <li class="chapter " data-level="1.5.1" data-path="balance_sheet.html">
             
                 <a href="balance_sheet.html">
             
@@ -155,7 +168,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4.2" data-path="deriv_finance_indicator.html">
+        <li class="chapter " data-level="1.5.2" data-path="deriv_finance_indicator.html">
             
                 <a href="deriv_finance_indicator.html">
             
@@ -168,7 +181,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4.3" data-path="fundamentals_balance.html">
+        <li class="chapter " data-level="1.5.3" data-path="fundamentals_balance.html">
             
                 <a href="fundamentals_balance.html">
             
@@ -181,7 +194,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4.4" data-path="fundamentals_cashflow.html">
+        <li class="chapter " data-level="1.5.4" data-path="fundamentals_cashflow.html">
             
                 <a href="fundamentals_cashflow.html">
             
@@ -194,7 +207,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4.5" data-path="fundamentals_income.html">
+        <li class="chapter " data-level="1.5.5" data-path="fundamentals_income.html">
             
                 <a href="fundamentals_income.html">
             
@@ -207,7 +220,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4.6" data-path="share_change.html">
+        <li class="chapter " data-level="1.5.6" data-path="share_change.html">
             
                 <a href="share_change.html">
             
@@ -220,7 +233,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4.7" data-path="trading_derivative_indicator.html">
+        <li class="chapter " data-level="1.5.7" data-path="trading_derivative_indicator.html">
             
                 <a href="trading_derivative_indicator.html">
             
@@ -238,7 +251,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.5" data-path="项目说明.html">
+        <li class="chapter " data-level="1.6" data-path="项目说明.html">
             
                 <a href="项目说明.html">
             
@@ -251,7 +264,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.6" >
+        <li class="chapter " data-level="1.7" >
             
                 <span>
             
@@ -265,7 +278,7 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="1.6.1" data-path="参与项目开发/添加函数.html">
+        <li class="chapter " data-level="1.7.1" data-path="参与项目开发/添加函数.html">
             
                 <a href="参与项目开发/添加函数.html">
             
@@ -278,7 +291,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.6.2" data-path="参与项目开发/添加数据表.html">
+        <li class="chapter " data-level="1.7.2" data-path="参与项目开发/添加数据表.html">
             
                 <a href="参与项目开发/添加数据表.html">
             
@@ -344,53 +357,58 @@
                                 <h1 id="&#x51FD;&#x6570;&#x3001;&#x5E38;&#x91CF;&#x8BF4;&#x660E;">&#x51FD;&#x6570;&#x3001;&#x5E38;&#x91CF;&#x8BF4;&#x660E;</h1>
 <p>&#x9664;<code>get_data</code>&#x5916;&#xFF0C;&#x672C;&#x9879;&#x76EE;&#x5185;&#x7F6E;&#x5927;&#x91CF;&#x5E38;&#x91CF;&#x548C;&#x51FD;&#x6570;&#xFF0C;&#x65B9;&#x4FBF;&#x6295;&#x7814;&#x8FC7;&#x7A0B;&#x4E2D;&#x8C03;&#x7528;&#xFF0C;&#x73B0;&#x8FDB;&#x884C;&#x8BF4;&#x660E;</p>
 <h2 id="&#x51FD;&#x6570;">&#x51FD;&#x6570;</h2>
-<h3 id="formatdate"><code>format_date</code></h3>
+<h3 id="&#x65E5;&#x671F;&#x7C7B;&#x51FD;&#x6570;">&#x65E5;&#x671F;&#x7C7B;&#x51FD;&#x6570;</h3>
+<h4 id="-isdate">- <code>isdate</code></h4>
+<p>&#x5224;&#x65AD;&#x5B57;&#x7B26;&#x4E32;&#x662F;&#x5426;&#x4E3A;&#x65E5;&#x671F;&#x7684;&#x683C;&#x5F0F;&#xFF0C;&#x5185;&#x7F6E;&#x9650;&#x91CF;&#x7684;&#x6A21;&#x677F;&#x3002;&#x53EF;&#x901A;&#x8FC7;&#x5173;&#x952E;&#x5B57;<code>pattern</code>&#x8FDB;&#x884C;&#x6DFB;&#x52A0;&#x3002;</p>
+<pre><code class="lang-python">isdate(<span class="hljs-string">&apos;2013/01/01&apos;</span>) <span class="hljs-comment"># return True</span>
+</code></pre>
+<h4 id="-formatdate">- <code>format_date</code></h4>
 <p>&#x5C06;<code>str</code>&#x6216;<code>int</code>&#x683C;&#x5F0F;&#x7684;&#x65E5;&#x671F;&#x8F6C;&#x4E3A;<code>datetime</code>&#x683C;&#x5F0F;</p>
 <pre><code class="lang-python"><span class="hljs-keyword">from</span> Utils <span class="hljs-keyword">import</span> *
 format_date(<span class="hljs-string">&apos;20210101&apos;</span>)  <span class="hljs-comment"># return Timestamp(&apos;2021-01-01 00:00:00&apos;)</span>
 </code></pre>
-<h3 id="formatstockcode"><code>format_stockCode</code></h3>
+<h4 id="-gettradedate">- <code>get_tradeDate</code></h4>
+<p>&#x83B7;&#x53D6;&#x4EA4;&#x6613;&#x65E5;&#x4FE1;&#x606F;&#xFF0C;&#x6839;&#x636E;&#x4F20;&#x5165;&#x4E0D;&#x540C;&#x7684;n&#xFF0C;&#x83B7;&#x53D6;&#x4E0D;&#x540C;&#x7684;&#x4EA4;&#x6613;&#x65E5;&#x4FE1;&#x606F;&#xFF0C;n&#x4E3A;&#x8D1F;&#x6570;&#x8868;&#x793A;&#x5411;&#x524D;n&#x5929;&#x7684;&#x4EA4;&#x6613;&#x65E5;</p>
+<blockquote>
+<p><em>def</em> get_tradeDate(InputDate, lag=0):
+*    <em>Returns the date related to date based on the setting of n
+\</em>    <em>if n = 0, will return the future the nearest trade date, if date is trade date, will return itself
+\</em>    <em>if n = -1, will return the backward the nearest trade date, if date is trade date, will return itself
+\</em>    <em>else will returns information from the delay n days (calendar, tradeDate_fore and tradeDate_back&#xFF09;
+\</em>    <strong>:param</strong>  <em>InputDate:
+\</em>    <strong>:param</strong> <em>lag: default 0
+\</em>    <strong>:return</strong> *:</p>
+</blockquote>
+<h4 id="-gettradedates">- <code>get_tradeDates</code></h4>
+<p>&#x83B7;&#x53D6;&#x4E00;&#x6BB5;&#x65F6;&#x95F4;&#x5185;&#x7684;&#x4EA4;&#x6613;&#x65E5;&#x5217;&#x8868;&#xFF0C;&#x4E5F;&#x53EF;&#x4EE5;&#x5DF2;begin&#x5411;&#x540E;&#x83B7;&#x53D6;&#x591A;&#x5C11;&#x4E2A;&#x4EA4;&#x6613;&#x65E5;&#x5217;&#x8868;</p>
+<blockquote>
+<p><em>def</em> get_tradeDates(begin, end=<em>None</em>, n: <em>int</em> = <em>None</em>):</p>
+<p>*    <em>&#x83B7;&#x53D6;&#x6307;&#x5B9A;&#x65F6;&#x95F4;&#x6BB5;&#x5185;&#x7684;&#x4EA4;&#x6613;&#x65E5;&#x5217;&#x8868;
+\</em>    <strong>:param</strong> <em>begin:
+\</em>    <strong>:param</strong> <em>end:
+\</em>    <strong>:param</strong> <em>n:
+\</em>    <strong>:return*</strong>:</p>
+</blockquote>
+<h3 id="&#x683C;&#x5F0F;&#x5316;&#x7C7B;&#x51FD;&#x6570;">&#x683C;&#x5F0F;&#x5316;&#x7C7B;&#x51FD;&#x6570;</h3>
+<h4 id="-formatdate">- <code>format_date</code></h4>
+<p>&#x89C1; <a href="####format_date"><code>format_date</code></a></p>
+<h4 id="-formatstockcode">- <code>format_stockCode</code></h4>
 <p>&#x517C;&#x5BB9;&#x5404;&#x79CD;&#x80A1;&#x7968;&#x4EE3;&#x7801;&#x683C;&#x5F0F;&#xFF0C;&#x6807;&#x51C6;&#x5316;&#x4E3A;<code>wind</code>&#x683C;&#x5F0F;&#xFF0C;&#x5373;<code>000001.SZ</code>&#x5F62;&#x5F0F;</p>
 <pre><code class="lang-python"><span class="hljs-keyword">from</span> Utils <span class="hljs-keyword">import</span> *
 format_stockCode(<span class="hljs-string">&apos;000001&apos;</span>)  <span class="hljs-comment"># return &apos;000001.sz&apos;</span>
 format_stockCode(<span class="hljs-string">&apos;000001.XSHE&apos;</span>)  <span class="hljs-comment"># return &apos;000001.sz&apos;</span>
 </code></pre>
-<h3 id="formatfutures"><code>format_futures</code></h3>
+<h4 id="-formatfutures">- <code>format_futures</code></h4>
 <p>&#x517C;&#x5BB9;&#x5404;&#x79CD;&#x671F;&#x8D27;&#x4EE3;&#x7801;&#xFF0C;&#x7B80;&#x5316;&#x4E3A;&#x7B80;&#x79F0;&#xFF0C;&#x5373;<code>IC</code>&#x683C;&#x5F0F;</p>
 <pre><code class="lang-python"><span class="hljs-keyword">from</span> Utils <span class="hljs-keyword">import</span> *
 format_futures(<span class="hljs-string">&apos;CFFEX.IC&apos;</span>)  <span class="hljs-comment"># return &apos;IC&apos;</span>
 </code></pre>
-<h3 id="readpkl"><code>readPkl</code></h3>
+<h3 id="&#x6587;&#x4EF6;&#x5B58;&#x50A8;&#x7C7B;">&#x6587;&#x4EF6;&#x5B58;&#x50A8;&#x7C7B;</h3>
+<h4 id="-readpkl">- <code>readPkl</code></h4>
 <p>&#x8BFB;&#x53D6;<code>PKL</code>&#x6587;&#x4EF6;</p>
-<h3 id="savepkl"><code>savePkl</code></h3>
+<h4 id="-savepkl">- <code>savePkl</code></h4>
 <p>&#x50A8;&#x5B58;<code>PKL</code>&#x6587;&#x4EF6;</p>
-<h3 id="data2score"><code>data2score</code></h3>
-<p>&#x5C06;&#x5BBD;&#x8868;&#x683C;&#x5F0F;&#x7684;&#x6570;&#x636E;&#xFF0C;&#x6839;&#x636E;<code>rank</code>&#x8F6C;&#x5316;&#x4E3A;&#x5206;&#x6570;</p>
-<pre><code class="lang-python">data2score(data, neg=<span class="hljs-keyword">False</span>, ascending=<span class="hljs-keyword">True</span>, axis=<span class="hljs-number">1</span>)
-<span class="hljs-string">&quot;&quot;&quot;
-use rank as score
-:param data:
-:param neg: if Ture, score span [-1, 1], default FALSE
-:param ascending:
-:param axis:
-:return:
-&quot;&quot;&quot;</span>
-</code></pre>
-<h3 id="reindex"><code>reindex</code></h3>
-<p>&#x5C06;&#x5BBD;&#x8868;&#x6570;&#x636E;&#x8F6C;&#x5316;&#x4E3A;&#x7EDF;&#x4E00;&#x683C;&#x5F0F;&#xFF0C;&#x5373;<code>index</code>&#x4E3A;<code>datetime</code>&#xFF0C;<code>column</code>&#x4E3A;<code>wind</code>&#x683C;&#x5F0F;&#x7684;&#x80A1;&#x7968;&#x4EE3;&#x7801;</p>
-<p>&#x9700;&#x8981;&#x6CE8;&#x610F;&#x7684;&#x662F;&#xFF0C;&#x65E0;&#x8BBA;&#x4F20;&#x5165;&#x7684;<code>column</code>&#x6709;&#x591A;&#x5C11;&#xFF0C;&#x7EDF;&#x4E00;&#x4F7F;&#x7528;<code>stockList</code>&#x8FDB;&#x884C;<code>reindex</code>&#xFF0C;&#x5373;&#x53D8;&#x4E3A;5219&#x5217;</p>
-<p>&#x800C;<code>index</code>&#x662F;&#x6839;&#x636E;&#xFF0C;&#x4F20;&#x5165;&#x6570;&#x636E;&#x7684;&#x8303;&#x56F4;&#xFF0C;&#x8FDB;&#x884C;&#x586B;&#x8865;&#x3002;&#x5982;&#x679C;&#x6709;&#x7F3A;&#x5931;&#xFF0C;&#x5219;&#x8865;&#x5168;&#x4E3A;<code>np.NAN</code></p>
-<h3 id="infolag"><code>info_lag</code></h3>
-<p>&#x5C06;&#x5BBD;&#x8868;&#x6570;&#x636E;&#x8FDB;&#x884C;&#x6EDE;&#x540E;&#xFF0C;&#x4E0E;&#x4F20;&#x7EDF;<code>shift</code>&#x4E0D;&#x540C;&#xFF0C;&#x76F4;&#x63A5;&#x5BF9;<code>index</code>&#x8FDB;&#x884C;&#x64CD;&#x4F5C;&#xFF0C;&#x4E0D;&#x4F1A;&#x635F;&#x5931;&#x6570;&#x636E;</p>
-<pre><code class="lang-python">info_lag(data, n_lag)
-<span class="hljs-string">&quot;&quot;&quot;
-Delay the time corresponding to the data by n trading days
-:param data:
-:param n_lag:
-:return:
-&quot;&quot;&quot;</span>
-</code></pre>
-<h3 id="savedatah5"><code>save_data_h5</code></h3>
+<h4 id="-savedatah5">- <code>save_data_h5</code></h4>
 <p>&#x5C06;&#x6570;&#x636E;&#x5B58;&#x50A8;&#x4E3A;<code>.h5</code>&#x6587;&#x4EF6;&#xFF0C;&#x4EC5;&#x652F;&#x6301;&#x4F20;&#x5165;<code>DataFrame</code></p>
 <pre><code class="lang-python">save_data_h5(toSaveData, name, subPath=<span class="hljs-string">&apos;dataFile&apos;</span>, reWrite=<span class="hljs-keyword">False</span>)
 <span class="hljs-string">&quot;&quot;&quot;
@@ -402,16 +420,36 @@ Store the pd.Data Frame data as a file in .h5 format
 :return:
 &quot;&quot;&quot;</span>
 </code></pre>
-<h3 id="gettradedate"><code>get_tradeDate</code></h3>
-<p>&#x83B7;&#x53D6;&#x4EA4;&#x6613;&#x65E5;&#x4FE1;&#x606F;&#xFF0C;&#x6839;&#x636E;&#x4F20;&#x5165;&#x4E0D;&#x540C;&#x7684;n&#xFF0C;&#x83B7;&#x53D6;&#x4E0D;&#x540C;&#x7684;&#x4EA4;&#x6613;&#x65E5;&#x4FE1;&#x606F;</p>
-<pre><code class="lang-python">get_tradeDate(date, n=<span class="hljs-number">0</span>)
+<h3 id="&#x56DE;&#x6D4B;&#x76F8;&#x5173;&#x51FD;&#x6570;">&#x56DE;&#x6D4B;&#x76F8;&#x5173;&#x51FD;&#x6570;</h3>
+<h4 id="-data2score">- <code>data2score</code></h4>
+<p>&#x5C06;&#x5BBD;&#x8868;&#x683C;&#x5F0F;&#x7684;&#x6570;&#x636E;&#xFF0C;&#x6839;&#x636E;<code>rank</code>&#x8F6C;&#x5316;&#x4E3A;&#x5206;&#x6570;</p>
+<pre><code class="lang-python">data2score(data, neg=<span class="hljs-keyword">False</span>, ascending=<span class="hljs-keyword">True</span>, axis=<span class="hljs-number">1</span>)
 <span class="hljs-string">&quot;&quot;&quot;
-Returns the date related to date based on the setting of n
-if n = 0, will return the future the nearest trade date, if date is trade date, will return itself
-if n = -1, will return the backward the nearest trade date, if date is trade date, will return itself
-else will returns information from the delay n days (calendar, tradeDate_fore and tradeDate_back&#xFF09;
-:param date:
-:param n: default 0
+use rank as score
+:param data:
+:param neg: if Ture, score span [-1, 1], default FALSE
+:param ascending:
+:param axis:
+:return:
+&quot;&quot;&quot;</span>
+</code></pre>
+<h4 id="-reindex">- <code>reindex</code></h4>
+<blockquote>
+<p>reindex(data, tradeDate=<em>True</em>, **kwargs)</p>
+<p>data: &#x5BBD;&#x8868;&#x683C;&#x5F0F;&#x7684;&#x6570;&#x636E;&#xFF0C;index&#x4E3A;&#x65E5;&#x671F;&#xFF0C;column&#x4E3A;ticker</p>
+<p>tradeDate: &#x4E3A;True&#x65F6;, &#x8F93;&#x51FA;&#x7684;index&#x5168;&#x4E3A;&#x4EA4;&#x6613;&#x65E5;, &#x4E3A;FALSE&#x5219;&#x4E3A;&#x5168;&#x90E8;&#x65E5;&#x671F;</p>
+<p>**kwargs: &#x53EF;&#x4F20;&#x5165;begin&#x548C;end&#xFF0C;&#x4EE5;&#x8BBE;&#x7F6E;&#x8F93;&#x51FA;&#x7684;index</p>
+</blockquote>
+<p>&#x5C06;&#x5BBD;&#x8868;&#x6570;&#x636E;&#x8F6C;&#x5316;&#x4E3A;&#x7EDF;&#x4E00;&#x683C;&#x5F0F;&#xFF0C;&#x5373;<code>index</code>&#x4E3A;<code>datetime</code>&#xFF0C;<code>column</code>&#x4E3A;<code>wind</code>&#x683C;&#x5F0F;&#x7684;&#x80A1;&#x7968;&#x4EE3;&#x7801;</p>
+<p>&#x9700;&#x8981;&#x6CE8;&#x610F;&#x7684;&#x662F;&#xFF0C;&#x65E0;&#x8BBA;&#x4F20;&#x5165;&#x7684;<code>column</code>&#x6709;&#x591A;&#x5C11;&#xFF0C;&#x7EDF;&#x4E00;&#x4F7F;&#x7528;<code>stockList</code>&#x8FDB;&#x884C;<code>reindex</code>&#xFF0C;&#x5373;&#x53D8;&#x4E3A;5219&#x5217;</p>
+<p>&#x800C;<code>index</code>&#x662F;&#x6839;&#x636E;&#xFF0C;&#x4F20;&#x5165;&#x6570;&#x636E;&#x7684;&#x8303;&#x56F4;&#xFF0C;&#x8FDB;&#x884C;&#x586B;&#x8865;&#x3002;&#x5982;&#x679C;&#x6709;&#x7F3A;&#x5931;&#xFF0C;&#x5219;&#x8865;&#x5168;&#x4E3A;<code>np.NAN</code></p>
+<h4 id="-infolag">- <code>info_lag</code></h4>
+<p>&#x5C06;&#x5BBD;&#x8868;&#x6570;&#x636E;&#x8FDB;&#x884C;&#x6EDE;&#x540E;&#xFF0C;&#x4E0E;&#x4F20;&#x7EDF;<code>shift</code>&#x4E0D;&#x540C;&#xFF0C;&#x76F4;&#x63A5;&#x5BF9;<code>index</code>&#x8FDB;&#x884C;&#x64CD;&#x4F5C;&#xFF0C;&#x4E0D;&#x4F1A;&#x635F;&#x5931;&#x6570;&#x636E;</p>
+<pre><code class="lang-python">info_lag(data, n_lag)
+<span class="hljs-string">&quot;&quot;&quot;
+Delay the time corresponding to the data by n trading days
+:param data:
+:param n_lag:
 :return:
 &quot;&quot;&quot;</span>
 </code></pre>
@@ -497,7 +535,7 @@ quarter_end
                 </a>
                 
                 
-                <a href="已支持的表.html" class="navigation navigation-next " aria-label="Next page: 已支持的表">
+                <a href="BARRA因子.html" class="navigation navigation-next " aria-label="Next page: 因子计算">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -508,7 +546,7 @@ quarter_end
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"函数及常量","level":"1.3","depth":1,"next":{"title":"已支持的表","level":"1.4","depth":1,"path":"已支持的表.md","ref":"已支持的表.md","articles":[{"title":"balance_sheet","level":"1.4.1","depth":2,"path":"balance_sheet.md","ref":"balance_sheet.md","articles":[]},{"title":"deriv_finance_indicator","level":"1.4.2","depth":2,"path":"deriv_finance_indicator.md","ref":"deriv_finance_indicator.md","articles":[]},{"title":"fundamentals_balance","level":"1.4.3","depth":2,"path":"fundamentals_balance.md","ref":"fundamentals_balance.md","articles":[]},{"title":"fundamentals_cashflow","level":"1.4.4","depth":2,"path":"fundamentals_cashflow.md","ref":"fundamentals_cashflow.md","articles":[]},{"title":"fundamentals_income","level":"1.4.5","depth":2,"path":"fundamentals_income.md","ref":"fundamentals_income.md","articles":[]},{"title":"share_change","level":"1.4.6","depth":2,"path":"share_change.md","ref":"share_change.md","articles":[]},{"title":"trading_derivative_indicator","level":"1.4.7","depth":2,"path":"trading_derivative_indicator.md","ref":"trading_derivative_indicator.md","articles":[]}]},"previous":{"title":"快速使用","level":"1.2","depth":1,"path":"快速使用.md","ref":"快速使用.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"函数及常量.md","mtime":"2023-04-14T07:38:28.131Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2023-05-27T11:23:50.798Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"函数及常量","level":"1.3","depth":1,"next":{"title":"因子计算","level":"1.4","depth":1,"path":"BARRA因子.md","ref":"BARRA因子.md","articles":[]},"previous":{"title":"快速使用","level":"1.2","depth":1,"path":"快速使用.md","ref":"快速使用.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"函数及常量.md","mtime":"2023-06-02T08:05:09.021Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2023-07-01T05:15:14.464Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>
