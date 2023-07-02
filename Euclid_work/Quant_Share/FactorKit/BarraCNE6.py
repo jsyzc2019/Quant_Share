@@ -21,6 +21,7 @@ class SizeFactor(FactorBase):
         df = np.log(self.marketValue) if not fill else np.log(self.marketValue).fillna(method='ffill')
         setattr(df, 'name', 'LNCAP')
         return df
+
     def _calc_MIDCAP(self, x: pd.Series or np.ndarray) -> pd.DataFrame:
         if isinstance(x, pd.Series):
             x = x.values

@@ -32,7 +32,6 @@ table_MAP = {
     'emData': dataBase_root_path_EM_data,
 }
 
-
 # 并行加速
 def applyParallel(dfGrouped, function):
     retLst = Parallel(n_jobs=multiprocessing.cpu_count())(delayed(function)(group) for name, group in tqdm(dfGrouped))
@@ -76,7 +75,7 @@ def get_data(tableName, begin='20150101', end=None, sources='gm', fields: list =
     if tableName not in list(tableInfo.keys()):
         raise KeyError("{} is not ready for use!".format(tableName))
 
-    if not end:
+    if end is None:
         end = datetime.today().now().strftime('%Y%m%d')
 
     if begin: begin = format_date(begin)
@@ -93,7 +92,6 @@ def get_data(tableName, begin='20150101', end=None, sources='gm', fields: list =
         return get_data_future(tableName, begin, end, sources, fields, ticker)
     elif tableAssets == 'gmStockFactor':
         return get_data_gmStockFactor(tableName, begin, end, fields, ticker)
-
 
 def get_data_Base(tableName, begin, end, fields, ticker, path, **kwargs):
     tableFoldPath = os.path.join(path, tableName)
@@ -113,7 +111,8 @@ def get_data_Base(tableName, begin, end, fields, ticker, path, **kwargs):
             for fileName in ["{}_Y{}_Q{:.0f}.h5".format(tableName, QuarterEnd.year, QuarterEnd.month / 3) for QuarterEnd in
                              pd.date_range(load_begin, load_end, freq='q')]:
                 if fileName not in h5_file_name_list:
-                    raise AttributeError("{} is not exit!".format(fileName))
+                    warnings.warn("{} is not exit!".format(fileName))
+                    # raise AttributeError("{} is not exit!".format(fileName))
                 else:
                     filePath = os.path.join(tableFoldPath, fileName)
                     toLoadList.append(filePath)
