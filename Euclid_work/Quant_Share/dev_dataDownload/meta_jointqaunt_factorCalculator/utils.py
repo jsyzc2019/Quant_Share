@@ -94,12 +94,14 @@ def change_frequency(stock_file, Mean_day_list):
     stock_file = stock_file.sort_values(by=['symbol', 'pub_date', 'rpt_date'])
     stock_file.drop_duplicates(subset=['symbol', 'pub_date'], keep='last', inplace=True)
     res = pd.DataFrame()
+
     tmp_res = run_thread(stock_file, stock_unique, deal, 20)
     for df in as_completed(tmp_res):
         tmp = df.result()
         res = pd.concat([tmp, res], axis=0)
-    # for i in stock_unique:
-    #     df = stock_file[stock_file['symbol'] == i].copy()
+
+    # for i in tqdm(stock_unique, mininterval=100, leave=False):
+    #     df = stock_file[stock_file['symbol'] == i]
     #     df['pub_date'] = pd.to_datetime(df['pub_date']).dt.to_period('D')
     #     df = df.set_index('pub_date').resample('D').asfreq().reset_index().ffill()
     #     res = pd.concat([df, res], axis=0)

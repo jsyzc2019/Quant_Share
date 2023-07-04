@@ -9,9 +9,12 @@ class MyMultiprocess(object):
     @time_decorator
     def work(self, func, _vars, constant, callback):
         for arg in _vars:
-            self.pool.apply_async(func, (arg, *constant, ), callback=callback)
+            self.pool.apply_async(func, args=(arg, *constant, ), callback=callback)
         self.pool.close()
         self.pool.join()
+
+    # def __del__(self):
+    #     self.pool.close()
 
 def log_result(result):
     global result_dict

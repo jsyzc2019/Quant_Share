@@ -1,7 +1,8 @@
+import os.path
+
 import pandas as pd
 import numpy as np
-from Euclid_work.Quant_Share import get_data, get_tradeDate
-import os
+from Euclid_work.Quant_Share import get_data, get_tradeDate, time_decorator, save_data_Y
 from tqdm import tqdm
 from .utils import useful_field, fill_quarter, change_frequency, to_datatime
 from .base_package import *
@@ -9,10 +10,28 @@ from datetime import datetime
 
 __all__ = ['GetOringinalData', 'get_joint_quant_factor']
 
+
 def get_joint_quant_factor() -> pd.DataFrame:
     return pd.read_excel(os.path.join(os.path.dirname(__file__), "../../dev_files/jointquant_factor.xlsx"))
 
-def GetOringinalData(beginDate:str=None, **kwargs):
+
+def original_data_local():
+    saved_data = {}
+    saved_files = os.listdir(saved_folder)
+    saved_file_paths = [os.path.join(saved_folder, i) for i in saved_files]
+    with tqdm(range(len(saved_files))) as t_update:
+        for idx in t_update:
+            t_update.set_description(f"Reading files {saved_files[idx]}")
+            k = saved_files[idx][:-4]
+            tmp_df = pd.read_csv(saved_file_paths[idx])
+            for date_col in ['rpt_date', 'pub_date', 'end_date']:
+                if date_col in tmp_df.columns:
+                    tmp_df[date_col] = pd.to_datetime(tmp_df[date_col])
+            saved_data[k] = tmp_df
+    return saved_data
+
+@time_decorator
+def GetOringinalData(beginDate: str = None, endDate: str = None, save: bool = True, read_only: bool = False, **kwargs):
     """
     读入数据-日期全部为datetime格式
     财务数据：需要把数据补齐并且现金流量表和利润表计算为季度值（非累计值）
@@ -27,9 +46,15 @@ def GetOringinalData(beginDate:str=None, **kwargs):
     股本数据 share_change
     """
 
-    if beginDate is None:
-        beginDate = get_tradeDate(datetime.today(), -365*5)
+    if read_only:
+        saved_data = original_data_local()
+        return saved_data
 
+    if beginDate is None:
+        beginDate = get_tradeDate(datetime.today(), -365 * 5)
+
+    if endDate is None:
+        endDate = datetime.today()
 
     filenames = ['fundamentals_balance', 'balance_sheet', 'fundamentals_income',
                  'fundamentals_cashflow', 'deriv_finance_indicator', 'gmData_history', 'trading_derivative_indicator',
@@ -37,11 +62,11 @@ def GetOringinalData(beginDate:str=None, **kwargs):
 
     replace_lst = ['deriv_finance_indicator', 'balance_sheet', 'trading_derivative_indicator']
 
-
     datas = {}
     jointquant_factor = get_joint_quant_factor()
     with tqdm(filenames, leave=True) as t:
         for file in t:
+            # continue
             t.set_description(f"处理{file}中...")
             if file == 'financial_data':
                 financial_process(datas)
@@ -53,7 +78,7 @@ def GetOringinalData(beginDate:str=None, **kwargs):
                 market_financial_process(jointquant_factor, datas)
                 continue
 
-            df = get_data(file, begin=beginDate)
+            df = get_data(file, begin=beginDate, end=endDate)
 
             if file not in ['share_change', 'ResConSecCorederi']:
                 df = df.reset_index(drop=True)
@@ -111,7 +136,26 @@ def GetOringinalData(beginDate:str=None, **kwargs):
                 ResConSecCorederi_process(df, datas)
 
     res = ['financial_data', 'market_sheet', 'market_financial_sheet', 'ResConSecCorederi']
-    return [datas[i]['df'] for i in res]
+    print(f'Collecting datas ...')
+    return_data = {}
+    # if kwargs.get('merge', False):
+    #     saved_data = original_data_local()
+    #     for k in res:
+    #         if not read_only:
+    #             merge_df = pd.concat([saved_data[k], datas[k]['df']], axis=0)
+    #             merge_df = merge_df.drop_duplicates()
+    #             return_data[k] = merge_df
+    #             if save:
+                    # merge_df.to_csv(os.path.join(saved_folder, k+'.csv'), index=False)
+                    # print(f"File {k} is saved!")
+    # else:
+    for k in res:
+        tmp_df = datas[k]['df']
+        return_data[k] = tmp_df
+        save_data_Y(tmp_df, date_column_name='rpt_date', tableName=k, _dataBase_root_path=saved_folder, reWrite=True)
+            # tmp_df.to_csv(os.path.join(saved_folder, k+'.csv'))
+    return return_data
+
 
 def financial_process(datas: dict):
     # 财务报表进行合并
@@ -128,7 +172,8 @@ def financial_process(datas: dict):
     financial_data.drop_duplicates(subset=['symbol', 'rpt_date'], keep='last', inplace=True)
     datas['financial_data'] = {'df': financial_data}
 
-def ResConSecCorederi_process(df:pd.DataFrame, datas:dict):
+
+def ResConSecCorederi_process(df: pd.DataFrame, datas: dict):
     # 预期数据-日度
     df = df[
         ['secCode', 'repForeDate', 'foreYear', 'updateTime', 'conPe', 'conProfitYoy']]
@@ -148,7 +193,8 @@ def ResConSecCorederi_process(df:pd.DataFrame, datas:dict):
     df = pd.merge(pre_data, df, on=['ticker', 'rpt_date'], how='outer')
     df.drop(['symbol', 'year', 'a'], axis=1, inplace=True)
     df.rename(columns={'ticker': 'symbol', 'updateTime': 'pub_date'}, inplace=True)
-    datas['ResConSecCorederi'] = {'df':df, 'file':'ResConSecCorederi'}
+    datas['ResConSecCorederi'] = {'df': df, 'file': 'ResConSecCorederi'}
+
 
 def fundamentals_process(df, jointquant_factor, file, datas):
     name = useful_field(jointquant_factor, file)
@@ -160,6 +206,7 @@ def fundamentals_process(df, jointquant_factor, file, datas):
     change_list.remove('rpt_date')
     df = fill_quarter(df, change_list)
     datas[file] = {'df': df, 'file': file}
+
 
 def share_change_process(df, datas):
     df = to_datatime(df, time_cols=['pub_date', 'chg_date'], format_str='')
@@ -180,6 +227,7 @@ def share_change_process(df, datas):
     share_number_sheet = res.reset_index(drop=True)
     share_number_sheet["rpt_date"] = share_number_sheet["rpt_date"].dt.to_timestamp()
     datas['share_number_sheet'] = {'df': share_number_sheet, 'file': 'share_change'}
+
 
 def market_sheet_process(datas):
     # 市场数据改变日期格式
@@ -209,6 +257,7 @@ def market_sheet_process(datas):
     datas['market_sheet']['df'] = market_sheet
     datas['market_sheet2']['df'] = market_sheet2
 
+
 def market_financial_process(jointquant_factor, datas):
     # 市场数据和财务数据进行合并
     financial_data = datas['financial_data']['df']
@@ -222,5 +271,4 @@ def market_financial_process(jointquant_factor, datas):
     market_financial_sheet.drop(['share_total_x', 'share_total_y'], axis=1, inplace=True)
     market_financial_sheet['share_circ'] = market_financial_sheet['share_circ_x']
     market_financial_sheet.drop(['share_circ_x', 'share_circ_y'], axis=1, inplace=True)
-    datas['market_financial_sheet'] = {'df':market_financial_sheet}
-
+    datas['market_financial_sheet'] = {'df': market_financial_sheet}
