@@ -87,9 +87,11 @@ with open(os.path.join(current_dir, 'dev_files/gmStockData_tableInfo.json'), 'r'
     gmStockData = json.load(f)
 with open(os.path.join(current_dir, 'dev_files/emData_tableInfo.json'), 'r') as f:
     emData = json.load(f)
+with open(os.path.join(current_dir, 'dev_files/jointquant_tableInfo.json'), 'r') as f:
+    jointquant = json.load(f)
 
 tableInfo = {}
-for table in ['InfoTable', 'gmStock', 'dataYesStock', 'gmFuture', 'gmStockFactor', 'gmStockData', 'emData']:
+for table in ['InfoTable', 'gmStock', 'dataYesStock', 'gmFuture', 'gmStockFactor', 'gmStockData', 'emData', 'jointquant']:
     _table = eval(table)
     for key, value in _table.items():
         _table[key]['tableSource'] = table

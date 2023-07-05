@@ -11,7 +11,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import multiprocessing
 from joblib import Parallel, delayed
 from .Utils import format_date, format_stockCode, format_futures, futures_list, dataBase_root_path, \
-    dataBase_root_path_future, dataBase_root_path_gmStockFactor, extend_date_span, isdate
+    dataBase_root_path_future, dataBase_root_path_gmStockFactor, extend_date_span, isdate, dataBase_root_path_JointQuant_prepare
 from .Utils import dataBase_root_path_EM_data
 from .TableInfo import tableInfo
 import json
@@ -21,7 +21,7 @@ from pandas.errors import ParserError
 import warnings
 
 warnings.filterwarnings('ignore')
-__all__ = ['get_data', 'get_table_info', 'search_keyword']
+__all__ = ['get_data', 'get_table_info', 'search_keyword', 'get_data_Base']
 
 table_MAP = {
     'info': dataBase_root_path,
@@ -30,6 +30,7 @@ table_MAP = {
     'gmStockFactor': dataBase_root_path_gmStockFactor,
     'gmStockData': dataBase_root_path_gmStockFactor,
     'emData': dataBase_root_path_EM_data,
+    'jointquant': dataBase_root_path_JointQuant_prepare
 }
 
 # 并行加速
@@ -86,7 +87,7 @@ def get_data(tableName, begin='20150101', end=None, sources='gm', fields: list =
             ticker = [ticker]
 
     tableAssets = tableInfo[tableName]['assets']
-    if tableAssets in ['stock', 'info', 'emData', 'gmStockData']:
+    if tableAssets in ['stock', 'info', 'emData', 'gmStockData', 'jointquant']:
         return get_data_Base(tableName, begin, end, fields, ticker, table_MAP[tableAssets], **kwargs)
     elif tableAssets == 'future':
         return get_data_future(tableName, begin, end, sources, fields, ticker)

@@ -1,11 +1,14 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
-
+import traceback
 from Euclid_work.Quant_Share.Utils import dataBase_root_path_JointQuant_Factor, save_data_Y, printJson
 from datetime import datetime
 from .base_package import *
 from tqdm import tqdm
 import pandas as pd
 import numpy as np
+
+from Euclid_work.Quant_Share import get_data
+
 
 def quarter_net(stock_file, factor_name):
     stock_file = stock_file.sort_values(['symbol', 'rpt_date']).reset_index(drop=True)
@@ -29,10 +32,10 @@ def fill_quarter(stock_file, factor_list=None):
     stock_unique = np.unique(stock_file['symbol'])
     res = pd.DataFrame()
     for i in stock_unique:
-        df = stock_file[stock_file['symbol'] == i].copy()
+        df = stock_file[stock_file['symbol'] == i]
         df['quarter'] = pd.to_datetime(df['rpt_date']).dt.to_period('Q')
         df = df.sort_values(['rpt_date'])
-        df.drop_duplicates(subset=['quarter'], keep='last', inplace=True)
+        df = df.drop_duplicates(subset=['quarter'], keep='last')
         df = df.set_index('quarter').resample('Q').asfreq().reset_index()
         df['symbol'] = df['symbol'].ffill()
         for m in range(len(df.index)):
@@ -95,23 +98,23 @@ def change_frequency(stock_file, Mean_day_list):
     stock_file.drop_duplicates(subset=['symbol', 'pub_date'], keep='last', inplace=True)
     res = pd.DataFrame()
 
-    tmp_res = run_thread(stock_file, stock_unique, deal, 20)
-    for df in as_completed(tmp_res):
-        tmp = df.result()
-        res = pd.concat([tmp, res], axis=0)
+    # tmp_res = run_thread(stock_file, stock_unique, deal, 20)
+    # for df in as_completed(tmp_res):
+    #     tmp = df.result()
+    #     res = pd.concat([tmp, res], axis=0)
 
-    # for i in tqdm(stock_unique, mininterval=100, leave=False):
-    #     df = stock_file[stock_file['symbol'] == i]
-    #     df['pub_date'] = pd.to_datetime(df['pub_date']).dt.to_period('D')
-    #     df = df.set_index('pub_date').resample('D').asfreq().reset_index().ffill()
-    #     res = pd.concat([df, res], axis=0)
+    for i in tqdm(stock_unique, mininterval=100, leave=False):
+        df = stock_file[stock_file['symbol'] == i]
+        df['pub_date'] = pd.to_datetime(df['pub_date']).dt.to_period('D')
+        df = df.set_index('pub_date').resample('D').asfreq().reset_index().ffill()
+        res = pd.concat([df, res], axis=0)
     res = res.reset_index(drop=True)
     res['pub_date'] = res["pub_date"].dt.to_timestamp()
     res.drop(['rpt_date'], axis=1, inplace=True)
     return res
 
 # 获取因子需要的数据
-def choose_data(factor_name, joint_quant_factor, financial_data, market_sheet, market_financial_sheet, ResConSecCorederi):
+def choose_data(factor_name, joint_quant_factor):
     df = joint_quant_factor.copy()
     df = df[df['factor_name'] == factor_name].reset_index(drop=True).T
     if pd.isnull(df.loc['pre', 0]):
@@ -119,13 +122,13 @@ def choose_data(factor_name, joint_quant_factor, financial_data, market_sheet, m
                 or not pd.isnull(df.loc['income_sheet', 0]) or not pd.isnull(df.loc['deriv_finance_indicator', 0]) \
                 or not pd.isnull(df.loc['balance_old', 0]):
             if pd.isnull(df.loc['market_sheet', 0]) and pd.isnull(df.loc['trading_derivative_indicator', 0]):
-                return financial_data
+                return 'financial_sheet'
             else:
-                return market_financial_sheet
+                return 'market_financial_sheet'
         else:
-            return market_sheet
+            return 'market_sheet'
     else:
-        return ResConSecCorederi
+        return 'ResConSecCorederi_sheet'
 
 # 获取储存因子数据中的最大值
 def factor_max_rpt(factor_name):
@@ -142,35 +145,35 @@ def factor_max_rpt(factor_name):
         max_rpt = datetime.strptime(max_rpt, '%Y-%m-%d')
     return max_rpt
 
-def update(func, factor_name, joint_quant_factor, datas):
+def update(func, factor_name, joint_quant_factor, data_prepare):
     Wrong = {}
     try:
-        # factor_name = factor_name.strip()
         file_path = os.path.join(dataBase_root_path_JointQuant_Factor, factor_name)
-    except TypeError:
-        Wrong['TypeError'] = Wrong.get('TypeError', []).append(factor_name)
-        return Wrong
-    except Exception:
-        Wrong['Exception'] = Wrong.get('Exception', []).append(factor_name)
-        return Wrong
-    df = choose_data(factor_name, joint_quant_factor, *datas)
-    if os.path.exists(file_path):
-        max_rpt = factor_max_rpt(file_path)
-        max_rpt1 = df['rpt_date'].max()
-        if max_rpt >= max_rpt1:
-            print('根据quant_share中的数据，' + factor_name + '因子不需要更新')
-            return
-        else:
-            if 'close' in df.columns:
-                start_date = str(max_rpt.date().year - 3) + '-01-01'
-                start_date = datetime.strptime(start_date, '%Y-%m-%d')
-                df = df[df['rpt_date'] >= start_date]
-    try:
+
+        data_name = choose_data(factor_name, joint_quant_factor)
+        df = get_data(data_name,
+                      begin=data_prepare.beginDate,
+                      end=data_prepare.endDate
+                      )
+        if os.path.exists(file_path):
+            max_rpt = factor_max_rpt(file_path)
+            max_rpt1 = df['rpt_date'].max()
+            if max_rpt >= max_rpt1:
+                print('根据quant_share中的数据，' + factor_name + '因子不需要更新')
+                return Wrong
+            else:
+                if 'close' in df.columns:
+                    start_date = str(max_rpt.date().year - 3) + '-01-01'
+                    start_date = datetime.strptime(start_date, '%Y-%m-%d')
+                    df = df[df['rpt_date'] >= start_date]
+        # func = globals()[factor_name]
+        if 'pub_date' not in df.columns:
+            df['pub_date'] = df['rpt_date']
         factor = func(df)
-    except:
-        Wrong['Exception'] = Wrong.get('Exception', []).append(factor_name)
+        save_data_Y(df=factor, date_column_name='rpt_date', tableName=factor_name,
+                    _dataBase_root_path=dataBase_root_path_JointQuant_Factor, reWrite=True)
+        print(factor_name + '更新完毕')
         return Wrong
-    save_data_Y(df=factor, date_column_name='rpt_date', tableName=factor_name,
-                _dataBase_root_path=dataBase_root_path_JointQuant_Factor, reWrite=True)
-    print(factor_name + '更新完毕')
-    return Wrong
+    except:
+        Wrong[factor_name] = traceback.format_exc()
+        return Wrong

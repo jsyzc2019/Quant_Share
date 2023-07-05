@@ -20,6 +20,7 @@ dataBase_root_path_future = r"E:\Share\Fut_Data"
 dataBase_root_path_gmStockFactor = r"E:\Share\Stk_Data\gm"
 dataBase_root_path_EM_data = r"E:\Share\EM_Data"
 dataBase_root_path_JointQuant_Factor = r"E:\Share\JointQuant_Factor"
+dataBase_root_path_JointQuant_prepare = r'E:\Share\JointQuant_prepare'
 
 # dataBase_root_path = r'D:\Share\Euclid_work\dataFile'
 # dataBase_root_path_future = r"D:\Share\Fut_Data"
@@ -33,7 +34,7 @@ __all__ = ['readPkl', 'savePkl', 'save_data_h5',  # files operation
            'stock_info', 'stockList', 'stockNumList', 'bench_info', 'tradeDate_info', 'tradeDateList', 'quarter_begin',
            'quarter_end',
            'futures_list', 'dataBase_root_path', 'dataBase_root_path_future', 'dataBase_root_path_gmStockFactor',
-           'dataBase_root_path_EM_data', 'dataBase_root_path_JointQuant_Factor',
+           'dataBase_root_path_EM_data', 'dataBase_root_path_JointQuant_Factor', 'dataBase_root_path_JointQuant_prepare',
            # decorator
            'time_decorator', 'lazyproperty']
 

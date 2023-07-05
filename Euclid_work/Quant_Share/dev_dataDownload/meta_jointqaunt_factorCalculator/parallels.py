@@ -16,11 +16,6 @@ class MyMultiprocess(object):
     # def __del__(self):
     #     self.pool.close()
 
-def log_result(result):
-    global result_dict
-    for k, v in result.items():
-        result_dict[k].append(v)
-
 
 def push_job(factor_name, joint_quant_factor, datas):
     factor_name = factor_name.strip()
