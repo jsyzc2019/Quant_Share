@@ -115,16 +115,23 @@ class FactorScore(BARRA):
         # _,_,resid = self.regress(y.values, X.values, intercept=True, verbose=True)
         y = y.fillna(0)
         X = X.fillna(0)
-        model = LinearRegression().fit(X.values, y.values)
-        resid = y - model.predict(X.values)
+        try:
+            model = LinearRegression().fit(X.values, y.values)
+            resid = y - model.predict(X.values)
+        except ValueError:
+            print(y.values.max())
         return resid
 
-    def neutralization(self, factor:Union[pd.DataFrame, str], industry=True, market=True):
+    def neutralization(self, factor:Union[pd.DataFrame, str], industry=True, market=False, normalize=False):
         if isinstance(factor, str):
             factor = getattr(self, factor)
         factor = reindex(factor).dropna(axis=0, how='all')
         factor = factor.replace(np.inf, np.nan)
+        if normalize:
+            factor = self.nomalize_zscore(factor)
+        # factor[factor >= 1e8] = np.nan
         factor = factor.fillna(factor.mean(skipna=True))
+
 
         assert industry or market
         if industry:

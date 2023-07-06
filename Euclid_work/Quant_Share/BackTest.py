@@ -74,9 +74,10 @@ class DataPrepare:
 
 
 class simpleBT:
-    def __init__(self, tickerData: dict, benchData: dict):
+    def __init__(self, tickerData: dict, benchData: dict, **kwargs):
         self.benchData = benchData
         self.tickerData = tickerData
+        self.ascending = kwargs.get('ascending', False)
 
     def backTest(self, Score, fee_rate=0.0008, group=1, dealPrice='close', plot=False):
         # format confirm
@@ -130,7 +131,8 @@ class simpleBT:
 
                 # calc target position
                 try:
-                    this_pos = self.getGroupTargPost(Score=Score.loc[date], group=group)
+                    this_pos = self.getGroupTargPost(Score=Score.loc[date], group=group, ascending=self.ascending)
+
                 except ValueError:
                     this_pos = temp_pos
 
@@ -239,13 +241,16 @@ class simpleBT:
         return result
 
     @staticmethod
-    def getGroupTargPost(Score, group):
+    def getGroupTargPost(Score, group, ascending=True):
         """
         :param Score: 评分
         :param group: 评分分组
         :return: 目标仓位
         """
-        TargPost = (pd.qcut(Score, 5, labels=['1', '2', '3', '4', '5'], duplicates='drop') == str(group)).astype(int)
+        labels = ['1', '2', '3', '4', '5']
+        if not ascending:
+            labels = labels[::-1]
+        TargPost = (pd.qcut(Score, 5, labels=labels, duplicates='drop') == str(group)).astype(int)
         TargPost = TargPost / TargPost.sum()
         return TargPost
 

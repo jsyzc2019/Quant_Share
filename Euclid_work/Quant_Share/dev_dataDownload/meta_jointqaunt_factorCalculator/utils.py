@@ -103,7 +103,7 @@ def change_frequency(stock_file, Mean_day_list):
     #     tmp = df.result()
     #     res = pd.concat([tmp, res], axis=0)
 
-    for i in tqdm(stock_unique, mininterval=100, leave=False):
+    for i in tqdm(stock_unique, mininterval=10, leave=False):
         df = stock_file[stock_file['symbol'] == i]
         df['pub_date'] = pd.to_datetime(df['pub_date']).dt.to_period('D')
         df = df.set_index('pub_date').resample('D').asfreq().reset_index().ffill()
@@ -149,7 +149,6 @@ def update(func, factor_name, joint_quant_factor, data_prepare):
     Wrong = {}
     try:
         file_path = os.path.join(dataBase_root_path_JointQuant_Factor, factor_name)
-
         data_name = choose_data(factor_name, joint_quant_factor)
         df = get_data(data_name,
                       begin=data_prepare.beginDate,
@@ -157,6 +156,7 @@ def update(func, factor_name, joint_quant_factor, data_prepare):
                       )
         if os.path.exists(file_path):
             max_rpt = factor_max_rpt(file_path)
+
             max_rpt1 = df['rpt_date'].max()
             if max_rpt >= max_rpt1:
                 print('根据quant_share中的数据，' + factor_name + '因子不需要更新')
@@ -167,8 +167,8 @@ def update(func, factor_name, joint_quant_factor, data_prepare):
                     start_date = datetime.strptime(start_date, '%Y-%m-%d')
                     df = df[df['rpt_date'] >= start_date]
         # func = globals()[factor_name]
-        if 'pub_date' not in df.columns:
-            df['pub_date'] = df['rpt_date']
+        # if 'pub_date' not in df.columns:
+        #     df['pub_date'] = df['rpt_date']
         factor = func(df)
         save_data_Y(df=factor, date_column_name='rpt_date', tableName=factor_name,
                     _dataBase_root_path=dataBase_root_path_JointQuant_Factor, reWrite=True)

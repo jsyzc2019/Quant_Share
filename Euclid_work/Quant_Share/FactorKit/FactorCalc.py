@@ -384,7 +384,6 @@ class FactorBase(FactorData):
             min_range = median - n * mad_e
             return np.clip(series, min_range, max_range)
         elif mode == 'tile':
-
             return winsorize(np.arange(8), limits=kwargs.get('limits', [0.1, 0.1]), nan_policy='omit')
 
     @staticmethod
@@ -393,10 +392,19 @@ class FactorBase(FactorData):
         :param series:
         :return:
         '''
-        mu = np.nanmean(series)
-        sigma = np.nanstd(series)
-        norm = (series - mu) / sigma
-        return norm
+        if isinstance(series, (list, pd.Series, np.ndarray)):
+            mu = np.nanmean(series)
+            sigma = np.nanstd(series)
+            norm = (series - mu) / sigma
+            return norm
+        elif isinstance(series, pd.DataFrame):
+            mu = np.nanmean(series, axis=1).reshape((-1,1))
+            sigma = np.nanstd(series, axis=1).reshape((-1,1))
+            norm = (series.values - mu) / sigma
+            return pd.DataFrame(norm, index=series.index, columns=series.columns)
+        else:
+            raise NotImplementedError
+
 
 
 
@@ -533,7 +541,7 @@ class FactorBase(FactorData):
         dc.get_Tushare_data()
         return dc
 
-    def BackTest(self, data: pd.DataFrame, DataClass=None):
+    def BackTest(self, data: pd.DataFrame, DataClass=None, **kwargs):
         '''
         :param data:
         :param DataClass:
@@ -543,7 +551,7 @@ class FactorBase(FactorData):
         data_reindex = reindex(data)
         score = info_lag(data2score(data_reindex), n_lag=1)
         # group beck test
-        BTClass = simpleBT(DataClass.TICKER, DataClass.BENCH)
+        BTClass = simpleBT(DataClass.TICKER, DataClass.BENCH, **kwargs)
         fig, outMetrics, group_res = BTClass.groupBT(score)
         fig.show()  # 绘图
         print(outMetrics)  # 输出指标

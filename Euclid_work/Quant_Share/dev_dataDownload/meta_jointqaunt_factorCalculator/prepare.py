@@ -10,8 +10,10 @@ from .base_package import *
 from datetime import date, datetime
 from functools import cached_property
 
+
 def get_joint_quant_factor() -> pd.DataFrame:
     return pd.read_excel(os.path.join(os.path.dirname(__file__), "../../dev_files/jointquant_factor.xlsx"))
+
 
 class DataPrepare():
 
@@ -39,18 +41,18 @@ class DataPrepare():
     def income_sheet(self):
         # 利润表填充缺失值并改变日期格式并改为非累计
         df = get_data('fundamentals_income',
-                 begin=self.beginDate,
-                 end=self.endDate,
-                fields=useful_field(self.joint_quant_factor, 'income_sheet'))
+                      begin=self.beginDate,
+                      end=self.endDate,
+                      fields=useful_field(self.joint_quant_factor, 'income_sheet'))
 
         return self.income_cashflow_process(df)
 
     @cached_property
     def cashflow_sheet(self):
         df = get_data('fundamentals_cashflow',
-                 begin=self.beginDate,
-                 end=self.endDate,
-                fields=useful_field(self.joint_quant_factor, 'cashflow_sheet'))
+                      begin=self.beginDate,
+                      end=self.endDate,
+                      fields=useful_field(self.joint_quant_factor, 'cashflow_sheet'))
         return self.income_cashflow_process(df)
 
     @cached_property
@@ -129,11 +131,12 @@ class DataPrepare():
         df = get_data('share_change',
                       begin=self.beginDate,
                       end=self.endDate,
-                      fields=['symbol', 'chg_date', 'pub_date','share_total', 'share_circ'])
+                      fields=['symbol', 'chg_date', 'pub_date', 'share_total', 'share_circ'])
         df = to_datatime(df, time_cols=['pub_date', 'chg_date'], format_str='')
         df['rpt_date'] = df[['pub_date', 'chg_date']].max(axis=1)
         df = df.sort_values(['symbol', 'rpt_date', 'pub_date'])
         df = df.drop_duplicates(['symbol', 'rpt_date'], keep='last')
+        df = df.drop(['pub_date'], axis=1)
         stock_unique = np.unique(df['symbol'])
         res = pd.DataFrame()
         for stock in tqdm(stock_unique):
@@ -171,8 +174,9 @@ class DataPrepare():
         financial_data = pd.merge(financial_data, share_number_sheet, on=['symbol', 'rpt_date'],
                                   how='left')
         financial_data = financial_data.drop_duplicates(subset=['symbol', 'rpt_date'], keep='last')
-        if 'pub_date' not in financial_data.columns:
-            financial_data['pub_date'] = financial_data['rpt_date']
+        # if 'pub_date' not in financial_data.columns:
+        #     financial_data['pub_date'] = financial_data['rpt_date']
+        assert 'pub_date' in financial_data.columns
         return financial_data
 
     @cached_property
@@ -181,7 +185,7 @@ class DataPrepare():
                       begin=self.beginDate,
                       end=self.endDate,
                       fields=['secCode', 'repForeDate', 'foreYear', 'updateTime', 'conPe', 'conProfitYoy']
-                     )
+                      )
         df["repForeDate"] = pd.to_datetime(df['repForeDate'])
         df = df.rename(columns={'repForeDate': 'rpt_date', 'secCode': 'ticker'})
         df['year'] = df["rpt_date"].dt.year
@@ -225,12 +229,12 @@ class DataPrepare():
         # SH300 = SH300.rename(columns={'close': 'index_close', 'pre_close': 'pre_index_close'})
 
         SH300 = get_data(tableName='gmData_bench_price',
-                      begin=self.beginDate,
-                      end=self.endDate,
-                      ticker=['000300'],
-                      fields=['pre_close', 'trade_date'])
+                         begin=self.beginDate,
+                         end=self.endDate,
+                         ticker=['000300'],
+                         fields=['pre_close', 'trade_date'])
         SH300['close'] = SH300['pre_close'].shift(-1)
-        SH300 = SH300.rename(columns={'close': 'index_close', 'pre_close': 'pre_index_close', 'trade_date':'rpt_date'})
+        SH300 = SH300.rename(columns={'close': 'index_close', 'pre_close': 'pre_index_close', 'trade_date': 'rpt_date'})
         SH300['rpt_date'] = SH300['rpt_date'].dt.strftime('%Y-%m-%d')
         SH300["rpt_date"] = pd.to_datetime(SH300['rpt_date'])
         SH300 = SH300.reset_index(drop=True)
@@ -247,8 +251,17 @@ class DataPrepare():
 
     @cached_property
     def market_financial_sheet(self):
-        financial_sheet = self.financial_sheet.copy()
-        market_sheet = self.market_sheet
+        # financial_sheet = self.financial_sheet
+        # market_sheet = self.market_sheet
+
+        financial_sheet = get_data('financial_sheet',
+                                   begin=self.beginDate,
+                                   end=self.endDate)
+
+        market_sheet = get_data('market_sheet',
+                                begin=self.beginDate,
+                                end=self.endDate)
+
         fields = useful_field(self.joint_quant_factor, 'income_sheet')[3:] + \
                  useful_field(self.joint_quant_factor, 'cashflow_sheet')[3:]
         financial_sheet = change_frequency(financial_sheet, fields)
