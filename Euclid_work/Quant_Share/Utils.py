@@ -238,7 +238,7 @@ def info_lag(data, n_lag):
     return out
 
 
-def save_data_h5(toSaveData, name, subPath='dataFile', reWrite=False):
+def save_data_h5(toSaveData, name, subPath='dataFile', reWrite=False, append=False):
     """
     Store the pd.Data Frame data as a file in .h5 format
     :param toSaveData:
@@ -260,16 +260,24 @@ def save_data_h5(toSaveData, name, subPath='dataFile', reWrite=False):
     if isinstance(toSaveData, pd.DataFrame):
         if reWrite:
             if os.path.exists(fullPath):
-                existsData = pd.read_hdf(fullPath)
-                allData = pd.concat([existsData, toSaveData]).drop_duplicates()
-                if len(allData) > len(existsData):
-                    print("{} has Updated!".format(fullPath))
+                if append:
+                    toSaveData.to_hdf(fullPath, 'a', append=True)
+                    print("{} has appended!".format(fullPath))
                 else:
-                    print("{} has none Updated!".format(fullPath))
-                toSaveData.to_hdf(fullPath, 'a', 'w')
+                    existsData = pd.read_hdf(fullPath)
+                    allData = pd.concat([existsData, toSaveData]).drop_duplicates()
+                    if len(allData) > len(existsData):
+                        print("{} has Updated!".format(fullPath))
+                        allData.to_hdf(fullPath, 'a', 'w')
+                    else:
+                        print("{} has none Updated!".format(fullPath))
             else:
+                if append:
+                    toSaveData.to_hdf(fullPath, 'a', format='t')
+                else:
+                    toSaveData.to_hdf(fullPath, 'a', 'w')
                 print("{} has been created!".format(fullPath))
-                toSaveData.to_hdf(fullPath, 'a', 'w')
+
 
         else:
             if os.path.exists(fullPath):
@@ -295,7 +303,7 @@ def save_data_Y(df, date_column_name, tableName, _dataBase_root_path, reWrite=Fa
                      subPath="{}/{}".format(_dataBase_root_path, tableName), reWrite=reWrite)
 
 
-def save_data_Q(df, date_column_name, tableName, _dataBase_root_path, reWrite=False):
+def save_data_Q(df, date_column_name, tableName, _dataBase_root_path, reWrite=False, append=False):
     """
     对df进行拆分, 进一步存储
     """
@@ -310,7 +318,7 @@ def save_data_Q(df, date_column_name, tableName, _dataBase_root_path, reWrite=Fa
             df2 = df1[df1["quarter"] == quarteri]
             df2 = df2.drop(columns=['year', 'quarter'], axis=1)
             save_data_h5(df2, name='{}_Y{}_Q{}'.format(tableName, yeari, quarteri),
-                         subPath="{}/{}".format(_dataBase_root_path, tableName), reWrite=reWrite)
+                         subPath="{}/{}".format(_dataBase_root_path, tableName), reWrite=reWrite, append=append)
 
 
 def get_tradeDate(InputDate, lag=0):

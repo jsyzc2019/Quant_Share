@@ -33,6 +33,7 @@ table_MAP = {
     'jointquant': dataBase_root_path_JointQuant_prepare
 }
 
+
 # 并行加速
 def applyParallel(dfGrouped, function):
     retLst = Parallel(n_jobs=multiprocessing.cpu_count())(delayed(function)(group) for name, group in tqdm(dfGrouped))
@@ -46,9 +47,13 @@ def run_thread_pool_sub(target, args, max_work_count):
         return res
 
 
+def read_data_h5(h5FileFullPath, key='a'):
+    return pd.read_hdf(h5FileFullPath, key='a')
+
+
 def load_file(toLoadList):
     load_data = pd.DataFrame()
-    res = run_thread_pool_sub(pd.read_hdf, toLoadList, max_work_count=20)
+    res = run_thread_pool_sub(read_data_h5, toLoadList, max_work_count=20)
     for future in as_completed(res):
         res = future.result()
         if len(res) > 0:
@@ -79,7 +84,8 @@ def get_data(tableName, begin='20150101', end=None, sources='gm', fields: list =
     if end is None:
         end = datetime.today().now().strftime('%Y%m%d')
 
-    if begin: begin = format_date(begin)
+    if begin:
+        begin = format_date(begin)
     end = format_date(end)
 
     if not isinstance(ticker, list):
@@ -93,6 +99,7 @@ def get_data(tableName, begin='20150101', end=None, sources='gm', fields: list =
         return get_data_future(tableName, begin, end, sources, fields, ticker)
     elif tableAssets == 'gmStockFactor':
         return get_data_gmStockFactor(tableName, begin, end, fields, ticker)
+
 
 def get_data_Base(tableName, begin, end, fields, ticker, path, **kwargs):
     tableFoldPath = os.path.join(path, tableName)
@@ -109,7 +116,8 @@ def get_data_Base(tableName, begin, end, fields, ticker, path, **kwargs):
         if 'Q' in h5_file_name_list[0]:
             load_begin, load_end = extend_date_span(begin, end, 'Q')
             toLoadList = []
-            for fileName in ["{}_Y{}_Q{:.0f}.h5".format(tableName, QuarterEnd.year, QuarterEnd.month / 3) for QuarterEnd in
+            for fileName in ["{}_Y{}_Q{:.0f}.h5".format(tableName, QuarterEnd.year, QuarterEnd.month / 3) for QuarterEnd
+                             in
                              pd.date_range(load_begin, load_end, freq='q')]:
                 if fileName not in h5_file_name_list:
                     warnings.warn("{} is not exit!".format(fileName))
