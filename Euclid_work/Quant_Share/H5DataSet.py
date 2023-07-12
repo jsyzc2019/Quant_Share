@@ -4,15 +4,18 @@
 # file: H5DataSet.py
 # desc: h5文件操作
 import os
+from copy import deepcopy
+from itertools import tee
 import h5py
 import pandas as pd
 import numpy as np
 import sys
+import tempfile
 
 
 class H5DataSet:
-    def __init__(self, h5FilePath, tab_path=''):
-        self.f_object_handle = self.__get_h5handle(h5FilePath)
+    def __init__(self, h5FilePath, tab_path='', **kwargs):
+        self.f_object_handle = self.__get_h5handle(h5FilePath, mode=kwargs.get('mode', 'r'))
         self.h5FilePath = h5FilePath
         self.tab_path = tab_path
         self.known_data_map = {}
@@ -56,6 +59,7 @@ class H5DataSet:
 
         assert f_object, h5py.Dataset | h5py.Group
         Group_list = []
+
         for k in f_object.keys():
             d = f_object[k]
             if isinstance(d, h5py.Group):
@@ -185,5 +189,59 @@ class H5DataSet:
         return pd.read_hdf(self.h5FilePath, key=tableKey)
 
 
+class H5DataTS():
+
+    def __init__(self, h5FilePath: str, **kwargs):
+        self.h5FilePath = h5FilePath
+        self.h5File_Iterator = None
+        self.tmp_file_path = None
+
+    # @classmethod
+    def load_h5_data(self, chunk_size: int = 2000, key: str = 'a', path: str = '', **kwargs):
+        try:
+            if not path:
+                path = self.h5FilePath
+            h5File_Iterator = pd.read_hdf(
+                path,
+                chunksize=chunk_size,
+                key=key,
+                iterator=True
+            )
+            self.h5File_Iterator = h5File_Iterator
+        except TypeError as te:
+            self.__type_transform(chunk_size=chunk_size, key=key, **kwargs)
+
+    # @classmethod
+    def __type_transform(self, chunk_size: int = 2000, key: str = 'a', **kwargs):
+        df: pd.DataFrame = pd.read_hdf(self.h5FilePath, key='a')
+        with tempfile.NamedTemporaryFile(suffix='.h5', delete=False) as temp_file:
+            df.to_hdf(temp_file.name, index=False, format='table', key='a')
+            self.tmp_file_path = temp_file.name
+            if not kwargs.get('transform_only', False):
+                self.load_h5_data(chunk_size=chunk_size, key=key, path=temp_file.name)
+
+    def ergodic_process(self, func, *args):
+        assert callable(func)
+        # h5File_Iterator = deepcopy(self.h5File_Iterator)
+        h5File_Iterator, self.h5File_Iterator = tee(self.h5File_Iterator, 2)
+        for ck in h5File_Iterator:
+            func(ck, *args)
+    @staticmethod
+    def get_attrs(data, *args):
+        for arg in args:
+            print(getattr(data, arg))
+
+    def __del__(self):
+        if self.tmp_file_path is not None:
+            os.remove(self.tmp_file_path)
+            print(f"Delete temporary file {self.tmp_file_path}")
+
+
 if __name__ == "__main__":
-    H5DataSet(r'E:\Euclid\Quant_Share\Test\test.h5').h5dir(True)
+    ts = H5DataTS(
+        r'E:\yuankangrui\Quant_Share_Local\Euclid_work\Src_test\datasets\ResConSecCorederi_sheet_Y2022.h5'
+    )
+    ts.load_h5_data(chunk_size=10000)
+    ts.ergodic_process(H5DataTS.get_attrs, 'shape')
+    print("======================")
+    ts.ergodic_process(H5DataTS.get_attrs, 'shape')

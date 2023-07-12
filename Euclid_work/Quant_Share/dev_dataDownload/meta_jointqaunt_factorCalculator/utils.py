@@ -145,7 +145,7 @@ def factor_max_rpt(factor_name):
         max_rpt = datetime.strptime(max_rpt, '%Y-%m-%d')
     return max_rpt
 
-def update(func, factor_name, joint_quant_factor, data_prepare):
+def update(func, factor_name, joint_quant_factor, data_prepare, callback=None):
     Wrong = {}
     try:
         file_path = os.path.join(dataBase_root_path_JointQuant_Factor, factor_name)
@@ -173,7 +173,11 @@ def update(func, factor_name, joint_quant_factor, data_prepare):
         save_data_Y(df=factor, date_column_name='rpt_date', tableName=factor_name,
                     _dataBase_root_path=dataBase_root_path_JointQuant_Factor, reWrite=True)
         print(factor_name + '更新完毕')
+
+
         return Wrong
     except:
         Wrong[factor_name] = traceback.format_exc()
+        if callback is not None:
+            callback(Wrong)
         return Wrong
