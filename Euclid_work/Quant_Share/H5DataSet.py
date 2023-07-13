@@ -3,14 +3,18 @@
 # author: Euclid Jie
 # file: H5DataSet.py
 # desc: h5文件操作
+import gc
 import os
-from copy import deepcopy
-from itertools import tee
-import h5py
-import pandas as pd
-import numpy as np
 import sys
 import tempfile
+# from itertools import tee
+from typing import Optional
+
+import h5py
+import numpy as np
+import pandas as pd
+import psutil
+from psutil._common import bytes2human
 
 
 class H5DataSet:
@@ -191,57 +195,108 @@ class H5DataSet:
 
 class H5DataTS():
 
-    def __init__(self, h5FilePath: str, **kwargs):
-        self.h5FilePath = h5FilePath
+    def __init__(self, **kwargs):
+        # self.h5FilePath = h5FilePath
+        self.h5FilePath = None
         self.h5File_Iterator = None
-        self.tmp_file_path = None
+        self.transform_file_path = None
+        self.delete = False
+        self.chunk_size: int = kwargs.get('chunk_size', 2000)
+        self.key: str = kwargs.get('key', 'a')
 
     # @classmethod
-    def load_h5_data(self, chunk_size: int = 2000, key: str = 'a', path: str = '', **kwargs):
+    def load_h5_data(self, h5FilePath: str, **kwargs):
         try:
-            if not path:
-                path = self.h5FilePath
             h5File_Iterator = pd.read_hdf(
-                path,
-                chunksize=chunk_size,
-                key=key,
+                h5FilePath,
+                chunksize=self.chunk_size,
+                key=self.key,
                 iterator=True
             )
+            self.transform_file_path = h5FilePath
             self.h5File_Iterator = h5File_Iterator
         except TypeError as te:
-            self.__type_transform(chunk_size=chunk_size, key=key, **kwargs)
+            self.__type_transform(h5FilePath, **kwargs)
 
     # @classmethod
-    def __type_transform(self, chunk_size: int = 2000, key: str = 'a', **kwargs):
-        df: pd.DataFrame = pd.read_hdf(self.h5FilePath, key='a')
+    def __type_transform(self, h5FilePath: str, save_path: str = '', **kwargs):
+        print(f"Transform file type to 'table'")
+        df: pd.DataFrame = pd.read_hdf(h5FilePath, key='a')
         with tempfile.NamedTemporaryFile(suffix='.h5', delete=False) as temp_file:
-            df.to_hdf(temp_file.name, index=False, format='table', key='a')
-            self.tmp_file_path = temp_file.name
-            if not kwargs.get('transform_only', False):
-                self.load_h5_data(chunk_size=chunk_size, key=key, path=temp_file.name)
 
-    def ergodic_process(self, func, *args):
+            if save_path:
+                self.transform_file_path = save_path
+            else:
+                self.transform_file_path = temp_file.name
+                self.delete = True
+            df.to_hdf(self.transform_file_path, index=False, format='table', key='a')
+            if not kwargs.get('transform_only', False):
+                self.load_h5_data(
+                    h5FilePath=self.transform_file_path
+                )
+
+    def ergodic_process(
+            self,
+            func,
+            break_count: Optional[int] = None,
+            reload: bool = True,
+            args: Optional = ()):
         assert callable(func)
         # h5File_Iterator = deepcopy(self.h5File_Iterator)
-        h5File_Iterator, self.h5File_Iterator = tee(self.h5File_Iterator, 2)
-        for ck in h5File_Iterator:
+        # h5File_Iterator, self.h5File_Iterator = tee(self.h5File_Iterator, 2)
+        assert self.h5File_Iterator is not None
+        count = 0
+        for ck in self.h5File_Iterator:
             func(ck, *args)
+            count += 1
+            if break_count and count > break_count:
+                break
+
+        if reload:
+            # del self.h5File_Iterator
+            self.load_h5_data(self.transform_file_path)
+        # del ck
+        # del h5File_Iterator
+        # # 在处理完每个数据块后手动触发垃圾回收
+        # gc.collect()
+
     @staticmethod
     def get_attrs(data, *args):
         for arg in args:
             print(getattr(data, arg))
 
+    def to_list(self):
+        return list(self.h5File_Iterator)
+
+    @staticmethod
+    def memory_analysis(*args):
+        pid = os.getpid()
+        # 创建psutil的Process对象
+        process = psutil.Process(pid)
+        # 获取脚本当前的内存使用量（以字节为单位）
+        memory_info = process.memory_info()
+        memory_usage = memory_info.rss
+        # 将内存使用量转换为更友好的格式
+        memory_usage_readable = bytes2human(memory_usage)
+
+        print("Memory Usage:", memory_usage_readable)
+
     def __del__(self):
-        if self.tmp_file_path is not None:
-            os.remove(self.tmp_file_path)
-            print(f"Delete temporary file {self.tmp_file_path}")
+        if self.delete and self.transform_file_path is not None:
+            os.remove(self.transform_file_path)
+            print(f"Delete temporary file {self.transform_file_path}")
 
 
 if __name__ == "__main__":
-    ts = H5DataTS(
-        r'E:\yuankangrui\Quant_Share_Local\Euclid_work\Src_test\datasets\ResConSecCorederi_sheet_Y2022.h5'
-    )
-    ts.load_h5_data(chunk_size=10000)
-    ts.ergodic_process(H5DataTS.get_attrs, 'shape')
-    print("======================")
-    ts.ergodic_process(H5DataTS.get_attrs, 'shape')
+    file_path = r'E:\Share\Stk_Data\gm\gmData_history_1m\gmData_history_1m_Y2018_Q3.h5'
+    ts = H5DataTS(chunk_size=10000)
+    ts.load_h5_data(file_path)
+    ts.ergodic_process(
+        H5DataTS.get_attrs,
+        break_count=None,
+        reload=True,
+        args=('shape',))
+    # h5_lst = ts.to_list()
+    # print("======================")
+    ts.memory_analysis()
+    # ts.ergodic_process(H5DataTS.get_attrs, 'shape')
