@@ -1,11 +1,12 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import traceback
-from Euclid_work.Quant_Share.Utils import dataBase_root_path_JointQuant_Factor, save_data_Y, printJson
+from Euclid_work.Quant_Share.Utils import dataBase_root_path_JointQuant_Factor, save_data_Y
 from datetime import datetime
 from .base_package import *
 from tqdm import tqdm
 import pandas as pd
 import numpy as np
+import gc
 
 from Euclid_work.Quant_Share import get_data
 
@@ -174,10 +175,14 @@ def update(func, factor_name, joint_quant_factor, data_prepare, callback=None):
                     _dataBase_root_path=dataBase_root_path_JointQuant_Factor, reWrite=True)
         print(factor_name + '更新完毕')
 
-
+        # gc.collect()
         return Wrong
     except:
         Wrong[factor_name] = traceback.format_exc()
+
         if callback is not None:
             callback(Wrong)
+        # gc.collect()
         return Wrong
+    finally:
+        gc.collect()

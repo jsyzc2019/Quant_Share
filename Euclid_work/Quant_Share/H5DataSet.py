@@ -3,13 +3,12 @@
 # author: Euclid Jie
 # file: H5DataSet.py
 # desc: h5文件操作
-import gc
+
 import os
 import sys
 import tempfile
-# from itertools import tee
 from typing import Optional
-
+from tqdm import tqdm
 import h5py
 import numpy as np
 import pandas as pd
@@ -196,7 +195,6 @@ class H5DataSet:
 class H5DataTS():
 
     def __init__(self, **kwargs):
-        # self.h5FilePath = h5FilePath
         self.h5FilePath = None
         self.h5File_Iterator = None
         self.transform_file_path = None
@@ -204,7 +202,7 @@ class H5DataTS():
         self.chunk_size: int = kwargs.get('chunk_size', 2000)
         self.key: str = kwargs.get('key', 'a')
 
-    # @classmethod
+
     def load_h5_data(self, h5FilePath: str, **kwargs):
         try:
             h5File_Iterator = pd.read_hdf(
@@ -218,7 +216,7 @@ class H5DataTS():
         except TypeError as te:
             self.__type_transform(h5FilePath, **kwargs)
 
-    # @classmethod
+
     def __type_transform(self, h5FilePath: str, save_path: str = '', **kwargs):
         print(f"Transform file type to 'table'")
         df: pd.DataFrame = pd.read_hdf(h5FilePath, key='a')
@@ -242,28 +240,32 @@ class H5DataTS():
             reload: bool = True,
             args: Optional = ()):
         assert callable(func)
-        # h5File_Iterator = deepcopy(self.h5File_Iterator)
-        # h5File_Iterator, self.h5File_Iterator = tee(self.h5File_Iterator, 2)
+
         assert self.h5File_Iterator is not None
         count = 0
-        for ck in self.h5File_Iterator:
-            func(ck, *args)
+        res = []
+        for ck in tqdm(self.h5File_Iterator):
+            tmp = func(ck, *args)
+            res.append(tmp)
             count += 1
             if break_count and count > break_count:
                 break
 
         if reload:
-            # del self.h5File_Iterator
             self.load_h5_data(self.transform_file_path)
-        # del ck
-        # del h5File_Iterator
-        # # 在处理完每个数据块后手动触发垃圾回收
-        # gc.collect()
+
+        return res
+
+    @staticmethod
+    def extract_column(data, args: str or list[str]):
+        return data[args]
 
     @staticmethod
     def get_attrs(data, *args):
+        res = []
         for arg in args:
-            print(getattr(data, arg))
+            res.append(getattr(data, arg))
+        return res
 
     def to_list(self):
         return list(self.h5File_Iterator)
@@ -291,12 +293,16 @@ if __name__ == "__main__":
     file_path = r'E:\Share\Stk_Data\gm\gmData_history_1m\gmData_history_1m_Y2018_Q3.h5'
     ts = H5DataTS(chunk_size=10000)
     ts.load_h5_data(file_path)
-    ts.ergodic_process(
+    res = ts.ergodic_process(
         H5DataTS.get_attrs,
         break_count=None,
         reload=True,
         args=('shape',))
-    # h5_lst = ts.to_list()
-    # print("======================")
+    print(res)
+    # res = ts.ergodic_process(
+    #     H5DataTS.extract_column,
+    #     break_count=None,
+    #     reload=True,
+    #     args=('shape',))
+    # print(res)
     ts.memory_analysis()
-    # ts.ergodic_process(H5DataTS.get_attrs, 'shape')

@@ -1,11 +1,15 @@
 import json
-from meta_jointqaunt_factorCalculator.factors import *
-from meta_jointqaunt_factorCalculator.prepare import DataPrepare
-from meta_jointqaunt_factorCalculator.utils import update
+
+from tqdm import tqdm
+
+from ..factors import *
+from ..prepare import DataPrepare
+from ..utils import update
 from multiprocessing import cpu_count, Manager, Pool
 from Euclid_work.Quant_Share import printJson, patList
 from collections import defaultdict
 import time
+import gc
 
 if __name__ == '__main__':
 
@@ -23,7 +27,7 @@ if __name__ == '__main__':
     joint_quant_factor = dp.joint_quant_factor
     factor_list = joint_quant_factor['factor_name']
 
-    for fn in factor_list:
+    for fn in tqdm(factor_list):
         update(
             func=globals()[fn],
             factor_name=fn,
