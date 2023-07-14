@@ -243,12 +243,13 @@ def save_data_h5(toSaveData, name, subPath='dataFile', reWrite=False, append=Fal
     Store the pd.Data Frame data as a file in .h5 format
     :param toSaveData:
     :param name:
-    :param subPath: The path to store the file will be 'cwd/subPath/name.h5', default 'dataFile'
+    :param subPath: The full path to store the file will be 'cwd/subPath/name.h5', default 'dataFile'
     :param reWrite: if Ture, will rewrite or update file, default False
+    :param append: if True, will save as table format, which can be appended and chunk opt.
     :return:
     """
     # format confirm
-    if name[-3] != '.h5':
+    if not name.endswith(".h5"):
         name = name + '.h5'
     # save path
     if subPath:
@@ -271,18 +272,13 @@ def save_data_h5(toSaveData, name, subPath='dataFile', reWrite=False, append=Fal
                         allData.to_hdf(fullPath, 'a', 'w')
                     else:
                         print("{} has none Updated!".format(fullPath))
-            else:
-                if append:
-                    toSaveData.to_hdf(fullPath, 'a', format='t')
-                else:
-                    toSaveData.to_hdf(fullPath, 'a', 'w')
+            else:  # file not exists
+                toSaveData.to_hdf(fullPath, 'a', mode='a', format='b' if append else 'f')
                 print("{} has been created!".format(fullPath))
-
-
-        else:
+        else:  # can not rewrite
             if os.path.exists(fullPath):
                 raise FileExistsError("{} has Existed!".format(fullPath))
-            toSaveData.to_hdf(fullPath, 'a', 'w')
+            toSaveData.to_hdf(fullPath, 'a', mode='a', format='b' if append else 'f')
     else:
         raise TypeError("only save pd.DataFrame format!")
         # pd.DataFrame(toSaveData).to_hdf(name,'a','w')
