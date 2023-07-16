@@ -29,6 +29,7 @@ tableNameList = [
     'fundamentals_cashflow', 'trading_derivative_indicator', 'future_daily', 'continuous_contracts', 'symbol_industry',
     'gmData_history', 'gmData_bench_price'
 ]
+
 for tableName in tableNameList:
     print("开始导入 {}".format(tableName))
     data = get_data(tableName)
