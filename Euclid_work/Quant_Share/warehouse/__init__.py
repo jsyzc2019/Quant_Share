@@ -23,92 +23,66 @@ def pgConnect(**kwargs):
 
 def load_gmData_history(symbols: str | list[str] = None, begin=None, end=None):
     conn = pgConnect(database="QS")
-    # 将 bob 列作为 timestamp 类型进行筛
+
+    query = 'SELECT * FROM "gmData_history"'
+    params = {}
+
     if symbols is not None:
         if isinstance(symbols, str):
             symbols = [symbols]
-        if begin is not None:
-            begin = format_date(begin)
-            if end is not None:
-                end = format_date(end)
-                query = """
-                    SELECT *
-                    FROM "gmData_history"
-                    WHERE symbol IN %(symbols)s
-                    AND bob BETWEEN %(begin)s AND %(end)s;
-                """
-                params = {"symbols": tuple(symbols), "begin": begin, "end": end}
-                return pd.read_sql_query(query, conn, params=params)
-            else:
-                query = """
-                    SELECT *
-                    FROM "gmData_history"
-                    WHERE symbol IN %(symbols)s
-                    AND bob >= %(begin)s;
-                """
-                params = {"symbols": tuple(symbols), "begin": begin}
-                return pd.read_sql_query(query, conn, params=params)
+        query += " WHERE symbol IN %(symbols)s"
+        params["symbols"] = tuple(symbols)
+
+    if begin is not None:
+        begin = format_date(begin)
+        if params:
+            query += " AND"
         else:
-            query = """
-                SELECT *
-                FROM "gmData_history"
-                WHERE symbol IN %(symbols)s
-            """
-            params = {"symbols": tuple(symbols)}
-            return pd.read_sql_query(query, conn, params=params)
-    else:
-        if begin is not None:
-            begin = format_date(begin)
-            if end is not None:
-                end = format_date(end)
-                query = """
-                    SELECT *
-                    FROM "gmData_history"
-                    WHERE bob BETWEEN %(begin)s AND %(end)s;
-                """
-                params = {"begin": begin, "end": end}
-                return pd.read_sql_query(query, conn, params=params)
-            else:
-                query = """
-                    SELECT *
-                    FROM "gmData_history"
-                    WHERE bob >= %(begin)s;
-                """
-                params = {"begin": begin}
-                return pd.read_sql_query(query, conn, params=params)
+            query += " WHERE"
+        query += " bob >= %(begin)s"
+        params["begin"] = begin
+
+    if end is not None:
+        end = format_date(end)
+        if params:
+            query += " AND"
         else:
-            query = """
-                SELECT *
-                FROM "gmData_history"
-            """
-            return pd.read_sql_query(query, conn)
+            query += " WHERE"
+        query += " bob <= %(end)s"
+        params["end"] = end
+
+    return pd.read_sql_query(query, conn, params=params)
+
 
 def load_data_from_sql(
-        tableName:str,
-        ticker_column: str,
-        date_column: str,
-        symbols: str | list[str] = None,
-        begin=None,
-        end=None):
+    tableName: str,
+    ticker_column: str,
+    date_column: str,
+    symbols: str | list[str] = None,
+    begin=None,
+    end=None,
+):
     conn = pgConnect(database="QS")
     # 将 bob 列作为 timestamp 类型进行筛
 
     sql_query = [f'SELECT * FROM "{tableName}"']
     params = {}
-    date_condition = 'WHERE'
+    date_condition = "WHERE"
 
     if symbols is not None:
         if isinstance(symbols, str):
             symbols = [symbols]
         sql_query.append(f"WHERE {ticker_column} IN %(symbols)s")
         params["symbols"] = tuple(symbols)
-        date_condition = 'AND'
+        date_condition = "AND"
 
     if begin is not None:
         begin = format_date(begin)
         if end is not None:
             end = format_date(end)
-            sql_query.append(f"{date_condition} {date_column} BETWEEN %(begin)s AND %(end)s")
+            sql_query.append(
+                f"{date_condition} {date_column} BETWEEN %(begin)s AND %(end)s"
+            )
             params.update({"begin": begin, "end": end})
         else:
             sql_query.append(f"{date_condition} {date_column} >= %(begin)s")
