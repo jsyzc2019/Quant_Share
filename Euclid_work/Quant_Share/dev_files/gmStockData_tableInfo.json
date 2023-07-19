@@ -29,6 +29,12 @@
     "date_column": "bob",
     "ticker_column": "symbol"
   },
+  "gmData_history_1m": {
+    "assets": "gmStockData",
+    "description": "",
+    "date_column": "bob",
+    "ticker_column": "symbol"
+  },
   "gmData_bench_price": {
     "assets": "gmStockData",
     "description": "",
