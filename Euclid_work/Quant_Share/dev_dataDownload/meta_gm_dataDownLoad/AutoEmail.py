@@ -6,11 +6,18 @@ from email.utils import formataddr
 from datetime import datetime
 
 
-def AutoEmail(title=None, content=None, sender='2379928684@qq.com', config_path='AutoEmail_config.txt'):
+def AutoEmail(
+    title=None,
+    content=None,
+    sender="2379928684@qq.com",
+    config_path="AutoEmail_config.txt",
+):
     # header setting
     if not os.path.exists(config_path):
-        raise FileNotFoundError("should set para config_path, which contains pass & user")
-    with open(config_path, 'rt', encoding='utf-8') as f:
+        raise FileNotFoundError(
+            "should set para config_path, which contains pass & user"
+        )
+    with open(config_path, "rt", encoding="utf-8") as f:
         AutoEmail_config = [i.strip() for i in f.readlines()]
     my_pass = AutoEmail_config[0]  # 发件人邮箱授权码
     my_user = AutoEmail_config[1]  # 收件人邮箱账号
@@ -21,13 +28,15 @@ def AutoEmail(title=None, content=None, sender='2379928684@qq.com', config_path=
     if not content:
         content = "this is auto content"  # 正文内容
     if not title:
-        title = 'Auto Title for Test'
-    msg.attach(MIMEText(content, 'plain', 'utf-8'))
-    msg['Subject'] = "{}-{}".format(title, datetime.today().strftime("%Y-%m-%d %H:%M:%S"))  # 邮件主题
+        title = "Auto Title for Test"
+    msg.attach(MIMEText(content, "plain", "utf-8"))
+    msg["Subject"] = "{}-{}".format(
+        title, datetime.today().strftime("%Y-%m-%d %H:%M:%S")
+    )  # 邮件主题
 
     # 抬头
-    msg['From'] = formataddr(("Windows Remote", my_sender))  # 括号里的对应发件人邮箱昵称、发件人邮箱账号
-    msg['To'] = formataddr(("Euclid Local", my_user))  # 括号里的对应收件人邮箱昵称、收件人邮箱账号
+    msg["From"] = formataddr(("Windows Remote", my_sender))  # 括号里的对应发件人邮箱昵称、发件人邮箱账号
+    msg["To"] = formataddr(("Euclid Local", my_user))  # 括号里的对应收件人邮箱昵称、收件人邮箱账号
 
     # # 添加附件
     # fileFullPath = r'E:\Euclid\Quant_Share\Euclid_work\Quant_Share\dev_files\fundamentals_income_info.xlsx'
@@ -38,12 +47,18 @@ def AutoEmail(title=None, content=None, sender='2379928684@qq.com', config_path=
 
     server = smtplib.SMTP_SSL("smtp.qq.com", 465)  # 发件人邮箱中的SMTP服务器
     server.login(my_sender, my_pass)  # 括号中对应的是发件人邮箱账号、邮箱授权码
-    server.sendmail(my_sender, [my_user, ], msg.as_string())  # 括号中对应的是发件人邮箱账号、收件人邮箱账号、发送邮件
+    server.sendmail(
+        my_sender,
+        [
+            my_user,
+        ],
+        msg.as_string(),
+    )  # 括号中对应的是发件人邮箱账号、收件人邮箱账号、发送邮件
     server.quit()  # 关闭连接
     return True
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if AutoEmail():
         print("邮件发送成功")
     else:

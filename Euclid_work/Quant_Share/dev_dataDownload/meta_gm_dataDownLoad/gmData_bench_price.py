@@ -8,8 +8,8 @@ from .base_package import *
 
 
 def gmData_bench_price(begin, end, **kwargs):
-    if 'symbol' not in kwargs.keys():
-        raise AttributeError('symbol should in kwargs!')
+    if "symbol" not in kwargs.keys():
+        raise AttributeError("symbol should in kwargs!")
 
     begin = format_date(begin).strftime("%Y-%m-%d")
     end = format_date(end).strftime("%Y-%m-%d")
@@ -17,10 +17,12 @@ def gmData_bench_price(begin, end, **kwargs):
     outData = pd.DataFrame()
     errors_num = 0
     update_exit = 0
-    with tqdm(kwargs['symbol']) as t:
+    with tqdm(kwargs["symbol"]) as t:
         for symbol_i in t:
             try:
-                data = get_history_symbol(symbol_i, start_date=begin, end_date=end, df=True)
+                data = get_history_symbol(
+                    symbol_i, start_date=begin, end_date=end, df=True
+                )
                 _len = len(data)
                 t.set_postfix({"状态": "已写入{}的{}条数据".format(symbol_i, _len)})  # 进度条右边显示信息
                 errors_num = 0
@@ -44,10 +46,16 @@ def gmData_bench_price(begin, end, **kwargs):
     return outData
 
 
-def gmData_bench_price_update(upDateBegin, endDate='20231231'):
-    bench_symbol_list = list(set(bench_info['symbol']))
+def gmData_bench_price_update(upDateBegin, endDate="20231231"):
+    bench_symbol_list = list(set(bench_info["symbol"]))
     data = gmData_bench_price(begin=upDateBegin, end=endDate, symbol=bench_symbol_list)
     if len(data) == 0:
         print("无数据更新")
     else:
-        save_data_Y(data, 'trade_date', 'gmData_bench_price', reWrite=True, _dataBase_root_path=dataBase_root_path_gmStockFactor)
+        save_data_Y(
+            data,
+            "trade_date",
+            "gmData_bench_price",
+            reWrite=True,
+            _dataBase_root_path=dataBase_root_path_gmStockFactor,
+        )

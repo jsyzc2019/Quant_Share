@@ -10,8 +10,18 @@ from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import multiprocessing
 from joblib import Parallel, delayed
-from .Utils import format_date, format_stockCode, format_futures, futures_list, dataBase_root_path, \
-    dataBase_root_path_future, dataBase_root_path_gmStockFactor, extend_date_span, isdate, dataBase_root_path_JointQuant_prepare
+from .Utils import (
+    format_date,
+    format_stockCode,
+    format_futures,
+    futures_list,
+    dataBase_root_path,
+    dataBase_root_path_future,
+    dataBase_root_path_gmStockFactor,
+    extend_date_span,
+    isdate,
+    dataBase_root_path_JointQuant_prepare,
+)
 from .Utils import dataBase_root_path_EM_data
 from .TableInfo import tableInfo
 import json
@@ -20,23 +30,25 @@ from fuzzywuzzy import process
 from pandas.errors import ParserError
 import warnings
 
-warnings.filterwarnings('ignore')
-__all__ = ['get_data', 'get_table_info', 'search_keyword', 'get_data_Base']
+warnings.filterwarnings("ignore")
+__all__ = ["get_data", "get_table_info", "search_keyword", "get_data_Base"]
 
 table_MAP = {
-    'info': dataBase_root_path,
-    'stock': dataBase_root_path,
-    'gmFuture': dataBase_root_path_future,
-    'gmStockFactor': dataBase_root_path_gmStockFactor,
-    'gmStockData': dataBase_root_path_gmStockFactor,
-    'emData': dataBase_root_path_EM_data,
-    'jointquant': dataBase_root_path_JointQuant_prepare
+    "info": dataBase_root_path,
+    "stock": dataBase_root_path,
+    "gmFuture": dataBase_root_path_future,
+    "gmStockFactor": dataBase_root_path_gmStockFactor,
+    "gmStockData": dataBase_root_path_gmStockFactor,
+    "emData": dataBase_root_path_EM_data,
+    "jointquant": dataBase_root_path_JointQuant_prepare,
 }
 
 
 # 并行加速
 def applyParallel(dfGrouped, function):
-    retLst = Parallel(n_jobs=multiprocessing.cpu_count())(delayed(function)(group) for name, group in tqdm(dfGrouped))
+    retLst = Parallel(n_jobs=multiprocessing.cpu_count())(
+        delayed(function)(group) for name, group in tqdm(dfGrouped)
+    )
     return pd.concat(retLst)
 
 
@@ -47,8 +59,8 @@ def run_thread_pool_sub(target, args, max_work_count):
         return res
 
 
-def read_data_h5(h5FileFullPath, key='a'):
-    return pd.read_hdf(h5FileFullPath, key='a')
+def read_data_h5(h5FileFullPath, key="a"):
+    return pd.read_hdf(h5FileFullPath, key="a")
 
 
 def load_file(toLoadList):
@@ -67,7 +79,15 @@ def load_file(toLoadList):
     return load_data
 
 
-def get_data(tableName, begin='20150101', end=None, sources='gm', fields: list = None, ticker: list = None, **kwargs):
+def get_data(
+    tableName,
+    begin="20150101",
+    end=None,
+    sources="gm",
+    fields: list = None,
+    ticker: list = None,
+    **kwargs
+):
     """
     :param tableName: bench_info / bench_price / stock_info / stock_price / tradeDate_info / HKshszHold
     :param begin:
@@ -82,7 +102,7 @@ def get_data(tableName, begin='20150101', end=None, sources='gm', fields: list =
         raise KeyError("{} is not ready for use!".format(tableName))
 
     if end is None:
-        end = datetime.today().now().strftime('%Y%m%d')
+        end = datetime.today().now().strftime("%Y%m%d")
 
     if begin:
         begin = format_date(begin)
@@ -92,12 +112,14 @@ def get_data(tableName, begin='20150101', end=None, sources='gm', fields: list =
         if isinstance(ticker, (str, int)):
             ticker = [ticker]
 
-    tableAssets = tableInfo[tableName]['assets']
-    if tableAssets in ['stock', 'info', 'emData', 'gmStockData', 'jointquant']:
-        return get_data_Base(tableName, begin, end, fields, ticker, table_MAP[tableAssets], **kwargs)
-    elif tableAssets == 'future':
+    tableAssets = tableInfo[tableName]["assets"]
+    if tableAssets in ["stock", "info", "emData", "gmStockData", "jointquant"]:
+        return get_data_Base(
+            tableName, begin, end, fields, ticker, table_MAP[tableAssets], **kwargs
+        )
+    elif tableAssets == "future":
         return get_data_future(tableName, begin, end, sources, fields, ticker)
-    elif tableAssets == 'gmStockFactor':
+    elif tableAssets == "gmStockFactor":
         return get_data_gmStockFactor(tableName, begin, end, fields, ticker)
 
 
@@ -105,7 +127,7 @@ def get_data_Base(tableName, begin, end, fields, ticker, path, **kwargs):
     tableFoldPath = os.path.join(path, tableName)
     if not os.path.exists(tableFoldPath):
         try:
-            data = pd.read_hdf(tableFoldPath + '.h5')
+            data = pd.read_hdf(tableFoldPath + ".h5")
             return selectFields(data, tableName, begin, end, fields, ticker)
         except FileNotFoundError:
             print("{} no exits!".format(tableName))
@@ -113,12 +135,15 @@ def get_data_Base(tableName, begin, end, fields, ticker, path, **kwargs):
     h5_file_name_list = os.listdir(tableFoldPath)
     # 如果文件是季度组织的
     if begin:
-        if 'Q' in h5_file_name_list[0]:
-            load_begin, load_end = extend_date_span(begin, end, 'Q')
+        if "Q" in h5_file_name_list[0]:
+            load_begin, load_end = extend_date_span(begin, end, "Q")
             toLoadList = []
-            for fileName in ["{}_Y{}_Q{:.0f}.h5".format(tableName, QuarterEnd.year, QuarterEnd.month / 3) for QuarterEnd
-                             in
-                             pd.date_range(load_begin, load_end, freq='q')]:
+            for fileName in [
+                "{}_Y{}_Q{:.0f}.h5".format(
+                    tableName, QuarterEnd.year, QuarterEnd.month / 3
+                )
+                for QuarterEnd in pd.date_range(load_begin, load_end, freq="q")
+            ]:
                 if fileName not in h5_file_name_list:
                     warnings.warn("{} is not exit!".format(fileName))
                     # raise AttributeError("{} is not exit!".format(fileName))
@@ -127,10 +152,12 @@ def get_data_Base(tableName, begin, end, fields, ticker, path, **kwargs):
                     toLoadList.append(filePath)
         # 按照年组织
         elif "Y" in h5_file_name_list[0]:
-            load_begin, load_end = extend_date_span(begin, end, 'Y')
+            load_begin, load_end = extend_date_span(begin, end, "Y")
             toLoadList = []
-            for fileName in ["{}_Y{}.h5".format(tableName, YearEnd.year) for YearEnd in
-                             pd.date_range(load_begin, load_end, freq='Y')]:
+            for fileName in [
+                "{}_Y{}.h5".format(tableName, YearEnd.year)
+                for YearEnd in pd.date_range(load_begin, load_end, freq="Y")
+            ]:
                 if fileName not in h5_file_name_list:
                     raise AttributeError("{} is not exit!".format(fileName))
                 else:
@@ -139,25 +166,48 @@ def get_data_Base(tableName, begin, end, fields, ticker, path, **kwargs):
         else:
             raise KeyError("请检查{}, 文件不符合{}_Y*_Q*组织形式".format(tableFoldPath, tableName))
     else:
-        toLoadList = [os.path.join(tableFoldPath, filename) for filename in h5_file_name_list]
+        toLoadList = [
+            os.path.join(tableFoldPath, filename) for filename in h5_file_name_list
+        ]
     load_data = load_file(toLoadList)
-    return selectFields(load_data, tableName, begin, end, fields, ticker, verbose=kwargs.get('verbose', True))
+    return selectFields(
+        load_data,
+        tableName,
+        begin,
+        end,
+        fields,
+        ticker,
+        verbose=kwargs.get("verbose", True),
+    )
 
 
-def get_data_future(tableName, begin='20160101', end=None, sources='gm', fields: list = None, ticker: list = None):
+def get_data_future(
+    tableName,
+    begin="20160101",
+    end=None,
+    sources="gm",
+    fields: list = None,
+    ticker: list = None,
+):
     tableFoldPath = os.path.join(dataBase_root_path_future, tableName)
-    load_begin, load_end = extend_date_span(begin, end, 'Y')
+    load_begin, load_end = extend_date_span(begin, end, "Y")
     toLoadList = []
-    for year in [YearEnd.year for YearEnd in pd.date_range(load_begin, load_end, freq='Y')]:
+    for year in [
+        YearEnd.year for YearEnd in pd.date_range(load_begin, load_end, freq="Y")
+    ]:
         tmpFolder = os.path.join(tableFoldPath, str(year), sources)
-        tmpFileList = [tmpFile for tmpFile in os.listdir(tmpFolder) if tmpFile.endswith('.h5')]
+        tmpFileList = [
+            tmpFile for tmpFile in os.listdir(tmpFolder) if tmpFile.endswith(".h5")
+        ]
         # 已在此处进行ticker筛选，不在selectFields中进行
         if ticker:
             target = [x for x in tmpFileList if format_futures(x) in ticker]
         else:
             target = tmpFileList
         if target.__len__() > 0:
-            toLoadList.extend([os.path.join(tmpFolder, target_i) for target_i in target])
+            toLoadList.extend(
+                [os.path.join(tmpFolder, target_i) for target_i in target]
+            )
     if toLoadList.__len__() > 0:
         load_data = load_file(toLoadList)
         return selectFields(load_data, tableName, begin, end, fields, ticker=None)
@@ -165,15 +215,23 @@ def get_data_future(tableName, begin='20160101', end=None, sources='gm', fields:
         raise KeyError("未找到{}文件".format(tableName))
 
 
-def get_data_gmStockFactor(tableName, begin='20160101', end=None, fields: list = None, ticker: list = None):
+def get_data_gmStockFactor(
+    tableName, begin="20160101", end=None, fields: list = None, ticker: list = None
+):
     tableFoldPath = os.path.join(dataBase_root_path_gmStockFactor, tableName)
-    load_begin, load_end = extend_date_span(begin, end, 'Y')
+    load_begin, load_end = extend_date_span(begin, end, "Y")
     toLoadList = []
-    for year in [YearEnd.year for YearEnd in pd.date_range(load_begin, load_end, freq='Y')]:
-        tmpFolder = os.path.join(tableFoldPath, str(year))  # D:\Share\Stk_Data\gm\ACCA\2013
+    for year in [
+        YearEnd.year for YearEnd in pd.date_range(load_begin, load_end, freq="Y")
+    ]:
+        tmpFolder = os.path.join(
+            tableFoldPath, str(year)
+        )  # D:\Share\Stk_Data\gm\ACCA\2013
         target = os.listdir(tmpFolder)  # D:\Share\Stk_Data\gm\ACCA\2013\ACCA.h5
         if target.__len__() > 0:
-            toLoadList.extend([os.path.join(tmpFolder, target_i) for target_i in target])
+            toLoadList.extend(
+                [os.path.join(tmpFolder, target_i) for target_i in target]
+            )
     if toLoadList.__len__() > 0:
         load_data = load_file(toLoadList)
         return selectFields(load_data, tableName, begin, end, fields, ticker)
@@ -181,33 +239,41 @@ def get_data_gmStockFactor(tableName, begin='20160101', end=None, fields: list =
         raise KeyError("未找到{}文件".format(tableName))
 
 
-def selectFields(data, tableName, begin, end, fields: list = None, ticker: list = None, verbose: bool = False):
+def selectFields(
+    data,
+    tableName,
+    begin,
+    end,
+    fields: list = None,
+    ticker: list = None,
+    verbose: bool = False,
+):
     outData = data.copy()
     # get date_column, ticker_column
     try:
-        date_column = tableInfo[tableName]['date_column']
+        date_column = tableInfo[tableName]["date_column"]
         outData[date_column] = pd.to_datetime(outData[date_column])
     except KeyError:
         if verbose:
             print("{} 不支持时间筛选".format(tableName))
-        date_column = ''
+        date_column = ""
     try:
-        ticker_column = tableInfo[tableName]['ticker_column']
+        ticker_column = tableInfo[tableName]["ticker_column"]
     except KeyError:
         if verbose:
             print("{} 不支持ticker筛选".format(tableName))
-        ticker_column = ''
+        ticker_column = ""
 
     # data filter: date -> ticker -> fields
-    if date_column != '' and ticker_column != '':
+    if date_column != "" and ticker_column != "":
         # outData.sort_values(by=[date_column, ticker_column], ascending=[1, 1], inplace=True)
         outData = selectFields_dateSpan(outData, begin, end, date_column)
         if ticker:
             outData = selectFields_ticker(outData, ticker, ticker_column)
-    elif date_column != '':
+    elif date_column != "":
         # outData.sort_values(by=[date_column], ascending=True, inplace=True)
         outData = selectFields_dateSpan(outData, begin, end, date_column)
-    elif ticker_column != '':
+    elif ticker_column != "":
         # outData.sort_values(by=[ticker_column], ascending=True, inplace=True)
         if ticker:
             outData = selectFields_ticker(outData, ticker, ticker_column)
@@ -233,7 +299,7 @@ def selectFields_ticker(Data, ticker, ticker_column):
 
 def selectFields_dateSpan(Data, begin, end, date_column):
     if isinstance(Data[date_column][0], int):
-        Data[date_column] = pd.to_datetime(Data[date_column], format='%Y%m%d')
+        Data[date_column] = pd.to_datetime(Data[date_column], format="%Y%m%d")
     else:
         # 提速可能会报错
         # dateSpan = pd.to_datetime(Data[date_column]).apply(lambda x: x.replace(tzinfo=None))
@@ -246,13 +312,19 @@ def selectFields_dateSpan(Data, begin, end, date_column):
     return Data
 
 
-def get_all_file(folderPath, query='.h5'):
+def get_all_file(folderPath, query=".h5"):
     # 得到所有文件
     FileList = []
     file_full_path_list = []
     for path, file_dir, files in os.walk(folderPath):
         FileList.extend([file_name for file_name in files if file_name.endswith(query)])
-        file_full_path_list.extend([os.path.join(path, file_name) for file_name in files if file_name.endswith(query)])
+        file_full_path_list.extend(
+            [
+                os.path.join(path, file_name)
+                for file_name in files
+                if file_name.endswith(query)
+            ]
+        )
     return FileList, file_full_path_list
 
 
@@ -260,7 +332,7 @@ def get_tablePath_info(tablePath):
     # if table has single h5 file
     if not os.path.exists(tablePath):
         tableFolder = dataBase_root_path_future
-        tablePath = tablePath + '.h5'
+        tablePath = tablePath + ".h5"
         # file not exits!
         if not os.path.isfile(tablePath):
             raise FileNotFoundError("{} no exits!".format(tablePath))
@@ -277,10 +349,10 @@ def get_table_info(tableName):
     global table_MAP
     if tableName not in list(tableInfo.keys()):
         raise KeyError("{} is not ready for use!".format(tableName))
-    tableSource = tableInfo[tableName]['tableSource']
-    description = tableInfo[tableName]['description']
-    date_column = tableInfo[tableName]['date_column']
-    ticker_column = tableInfo[tableName]['ticker_column']
+    tableSource = tableInfo[tableName]["tableSource"]
+    description = tableInfo[tableName]["description"]
+    date_column = tableInfo[tableName]["date_column"]
+    ticker_column = tableInfo[tableName]["ticker_column"]
 
     if tableSource in table_MAP:
         tablePath = os.path.join(table_MAP[tableSource], tableName)
@@ -297,44 +369,52 @@ def get_table_info(tableName):
     """
 
     stat_list = [os.stat(file_full_path) for file_full_path in file_full_path_list]
-    st_atime = max(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(stat.st_atime)) for stat in stat_list)
-    st_ctime = max(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(stat.st_ctime)) for stat in stat_list)
-    st_mtime = max(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(stat.st_mtime)) for stat in stat_list)
+    st_atime = max(
+        time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(stat.st_atime))
+        for stat in stat_list
+    )
+    st_ctime = max(
+        time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(stat.st_ctime))
+        for stat in stat_list
+    )
+    st_mtime = max(
+        time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(stat.st_mtime))
+        for stat in stat_list
+    )
     outJson = {
-        'tableSource': tableSource,
-        'description': description,
-        'tableFolder': tableFolder,
-        'date_column': date_column,
-        'ticker_column': ticker_column,
+        "tableSource": tableSource,
+        "description": description,
+        "tableFolder": tableFolder,
+        "date_column": date_column,
+        "ticker_column": ticker_column,
         # 'tablePath': tablePath,
-        'file_name_list': file_name_list,
-        'Access Time': st_atime,
-        'Change Time': st_ctime,
-        'Modify Time': st_mtime,
-
+        "file_name_list": file_name_list,
+        "Access Time": st_atime,
+        "Change Time": st_ctime,
+        "Modify Time": st_mtime,
     }
 
     return outJson
 
 
 def search_keyword(keyword: str, fuzzy=True, limit=5, update: bool = False):
-    '''
+    """
     :param keyword: the content you want to search for
     :param fuzzy: fuzzy matching or not
     :param limit: number of the results
     :param update: forced updating
     :return:
-    '''
+    """
     # attrsMap.json check
     current_dir = os.path.abspath(os.path.dirname(__file__))
-    attrsMapPath = os.path.join(current_dir, 'dev_files/attrsMap.json')
+    attrsMapPath = os.path.join(current_dir, "dev_files/attrsMap.json")
     if not os.path.exists(attrsMapPath) or update:
         attrsMap = defaultdict(list)
         with tqdm(tableInfo.keys()) as t:
             t.set_description("attrsMap正在初始化...")
             for tableName in t:
                 try:
-                    _df = get_data(tableName, begin='20230101')
+                    _df = get_data(tableName, begin="20230101")
                     _col = list(_df.columns)
                     for c in _col:
                         attrsMap[c].append(tableName)

@@ -1,8 +1,9 @@
-
 from EmQuantAPI import *
 from installEmQuantAPI import *
 import warnings
-warnings.filterwarnings('ignore')
+
+warnings.filterwarnings("ignore")
+
 
 def mainCallback(quantdata):
     """
@@ -14,9 +15,13 @@ def mainCallback(quantdata):
     print("mainCallback", str(quantdata))
     # 登录掉线或者 登陆数达到上线（即登录被踢下线） 这时所有的服务都会停止
     if str(quantdata.ErrorCode) == "10001011" or str(quantdata.ErrorCode) == "10001009":
-        print("Your account is disconnect. You can force login automatically here if you need.")
+        print(
+            "Your account is disconnect. You can force login automatically here if you need."
+        )
     # 行情登录验证失败（每次连接行情服务器时需要登录验证）或者行情流量验证失败时，会取消所有订阅，用户需根据具体情况处理
-    elif str(quantdata.ErrorCode) == "10001021" or str(quantdata.ErrorCode) == "10001022":
+    elif (
+        str(quantdata.ErrorCode) == "10001021" or str(quantdata.ErrorCode) == "10001022"
+    ):
         print("Your all csq subscribe have stopped.")
     # 行情服务器断线自动重连连续6次失败（1分钟左右）不过重连尝试还会继续进行直到成功为止，遇到这种情况需要确认两边的网络状况
     elif str(quantdata.ErrorCode) == "10002009":
@@ -31,11 +36,14 @@ def mainCallback(quantdata):
     elif str(quantdata.ErrorCode) == "10002013":
         print("cnq subscribe break on some error, reconnect and request automatically.")
     # 资讯登录验证失败（每次连接资讯服务器时需要登录验证）或者资讯流量验证失败时，会取消所有订阅，用户需根据具体情况处理
-    elif str(quantdata.ErrorCode) == "10001024" or str(quantdata.ErrorCode) == "10001025":
+    elif (
+        str(quantdata.ErrorCode) == "10001024" or str(quantdata.ErrorCode) == "10001025"
+    ):
         print("Your all cnq subscribe have stopped.")
     else:
         pass
 
-def log(handle:str='ForceLogin=1', options='', callback=mainCallback):
+
+def log(handle: str = "ForceLogin=1", options="", callback=mainCallback):
     loginResult = c.start(handle, options, callback)
     return loginResult

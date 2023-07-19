@@ -5,17 +5,26 @@ from datetime import datetime
 # from gm.api import *  # 接口文档 https://www.myquant.cn/docs/python/python_select_api
 # 根据数据表最后写入的时间做增量更新
 tableNameList = [
-    'share_change', 'balance_sheet', 'deriv_finance_indicator', 'fundamentals_balance', 'fundamentals_income',
-    'fundamentals_cashflow', 'trading_derivative_indicator', 'future_daily', 'continuous_contracts', 'symbol_industry',
-    'gmData_history', 'gmData_bench_price'
+    "share_change",
+    "balance_sheet",
+    "deriv_finance_indicator",
+    "fundamentals_balance",
+    "fundamentals_income",
+    "fundamentals_cashflow",
+    "trading_derivative_indicator",
+    "future_daily",
+    "continuous_contracts",
+    "symbol_industry",
+    "gmData_history",
+    "gmData_bench_price",
 ]
 for tableName in tableNameList:
-    begin = get_tradeDate(get_table_info(tableName)['Modify Time'], -1)
+    begin = get_tradeDate(get_table_info(tableName)["Modify Time"], -1)
     if begin < get_tradeDate(datetime.now(), -5):
-        print("*-*-"*35)
-        print("{} update from {} start!".format(tableName, begin.strftime('%Y%m%d')))
-        eval(tableName + '_update(upDateBegin=begin)')
+        print("*-*-" * 35)
+        print("{} update from {} start!".format(tableName, begin.strftime("%Y%m%d")))
+        eval(tableName + "_update(upDateBegin=begin)")
     else:
         print("*-*-" * 35)
-        print("{} has been updated at {}".format(tableName, begin.strftime('%Y%m%d')))
+        print("{} has been updated at {}".format(tableName, begin.strftime("%Y%m%d")))
 # AutoEmail('GM数据, 自动更新完成!')

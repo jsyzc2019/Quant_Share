@@ -8,12 +8,12 @@ from .base_package import *
 
 
 def continuous_contracts(begin, end, **kwargs):
-    if 'csymbol' not in kwargs.keys():
-        raise AttributeError('csymbol should in kwargs!')
+    if "csymbol" not in kwargs.keys():
+        raise AttributeError("csymbol should in kwargs!")
 
     begin = format_date(begin).strftime("%Y-%m-%d")
     end = format_date(end).strftime("%Y-%m-%d")
-    csymbol = kwargs['csymbol']
+    csymbol = kwargs["csymbol"]
     outData = pd.DataFrame()
     errors_num = 0
     update_exit = 0
@@ -33,7 +33,7 @@ def continuous_contracts(begin, end, **kwargs):
                 if _len > 0:
                     update_exit = 0
                     tmpData = pd.DataFrame(tmpData)
-                    tmpData.trade_date = tmpData.trade_date.dt.strftime('%Y-%m-%d')
+                    tmpData.trade_date = tmpData.trade_date.dt.strftime("%Y-%m-%d")
                     outData = pd.concat([outData, tmpData], ignore_index=True, axis=0)
                 else:
                     update_exit += 1
@@ -51,11 +51,19 @@ def continuous_contracts(begin, end, **kwargs):
     return outData
 
 
-def continuous_contracts_update(upDateBegin, endDate='20231231'):
-    continuous_contracts_info = pd.read_excel(os.path.join(dev_files_dir, 'continuous_contracts_csymbol.xlsx'))
+def continuous_contracts_update(upDateBegin, endDate="20231231"):
+    continuous_contracts_info = pd.read_excel(
+        os.path.join(dev_files_dir, "continuous_contracts_csymbol.xlsx")
+    )
     csymbol = continuous_contracts_info.csymbol.tolist()
     data = continuous_contracts(begin=upDateBegin, end=endDate, csymbol=csymbol)
     if len(data) == 0:
         print("无数据更新")
     else:
-        save_data_Y(data, 'trade_date', 'continuous_contracts', reWrite=True, _dataBase_root_path=dataBase_root_path_gmStockFactor)
+        save_data_Y(
+            data,
+            "trade_date",
+            "continuous_contracts",
+            reWrite=True,
+            _dataBase_root_path=dataBase_root_path_gmStockFactor,
+        )

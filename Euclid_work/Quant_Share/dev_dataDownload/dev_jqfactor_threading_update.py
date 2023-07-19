@@ -10,19 +10,23 @@ import concurrent.futures
 
 result_dict = dict()
 
+
 def log_result(result):
     result_dict.update(result)
 
+
 def main():
     start = time.perf_counter()
-    dp = DataPrepare('20200101')
+    dp = DataPrepare("20200101")
 
     result_dict = dict()
 
     joint_quant_factor = dp.joint_quant_factor
-    factor_list = joint_quant_factor['factor_name']
+    factor_list = joint_quant_factor["factor_name"]
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=cpu_count() // 4) as executor:
+    with concurrent.futures.ThreadPoolExecutor(
+        max_workers=cpu_count() // 4
+    ) as executor:
         futures = []
         for fn in tqdm(factor_list):
             future = executor.submit(
@@ -31,7 +35,7 @@ def main():
                 factor_name=fn,
                 joint_quant_factor=joint_quant_factor,
                 data_prepare=dp,
-                callback=log_result
+                callback=log_result,
             )
             futures.append(future)
 
@@ -39,11 +43,12 @@ def main():
         concurrent.futures.wait(futures)
 
     printJson(result_dict)
-    with open('./meta_jointqaunt_factorCalculator/error.json', 'w') as fp:
+    with open("./meta_jointqaunt_factorCalculator/error.json", "w") as fp:
         json.dump(result_dict, fp, indent=4)
 
     end = time.perf_counter()
-    print(f'程序运行时间:{end - start}秒')
+    print(f"程序运行时间:{end - start}秒")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

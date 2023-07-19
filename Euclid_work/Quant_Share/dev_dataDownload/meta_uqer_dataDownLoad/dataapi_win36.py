@@ -11,15 +11,17 @@ HTTP_AUTHORIZATION_ERROR = 401
 
 
 class Client:
-    domain = 'api.wmcloud.com'
+    domain = "api.wmcloud.com"
     port = 443
-    token = ''
+    token = ""
     # 设置因网络连接，重连的次数
     reconnectTimes = 2
     httpClient = None
 
     def __init__(self):
-        self.httpClient = http.client.HTTPSConnection(self.domain, self.port, timeout=60)
+        self.httpClient = http.client.HTTPSConnection(
+            self.domain, self.port, timeout=60
+        )
 
     def __del__(self):
         if self.httpClient is not None:
@@ -29,28 +31,28 @@ class Client:
         # 转换参数的编码
         start = 0
         n = len(path)
-        re = ''
-        i = path.find('=', start)
+        re = ""
+        i = path.find("=", start)
         while i != -1:
-            re += path[start:i + 1]
+            re += path[start : i + 1]
             start = i + 1
-            i = path.find('&', start)
-            if (i >= 0):
+            i = path.find("&", start)
+            if i >= 0:
                 for j in range(start, i):
-                    if (path[j] > '~'):
+                    if path[j] > "~":
                         re += urllib.parse.quote(path[j])
                     else:
                         re += path[j]
-                re += '&'
+                re += "&"
                 start = i + 1
             else:
                 for j in range(start, n):
-                    if (path[j] > '~'):
+                    if path[j] > "~":
                         re += urllib.parse.quote(path[j])
                     else:
                         re += path[j]
                 start = n
-            i = path.find('=', start)
+            i = path.find("=", start)
         return re
 
     def init(self, token):
@@ -58,13 +60,19 @@ class Client:
 
     def getData(self, path):
         result = None
-        path = '/data/v1' + path
+        path = "/data/v1" + path
         path = self.encodepath(path)
         for i in range(self.reconnectTimes):
             try:
                 # set http header here
-                self.httpClient.request('GET', path, headers={"Authorization": "Bearer " + self.token,
-                                                              "Accept-Encoding": "gzip, deflate"})
+                self.httpClient.request(
+                    "GET",
+                    path,
+                    headers={
+                        "Authorization": "Bearer " + self.token,
+                        "Accept-Encoding": "gzip, deflate",
+                    },
+                )
                 # make request
                 response = self.httpClient.getresponse()
                 result = response.read()
@@ -80,5 +88,7 @@ class Client:
                     raise e
                 if self.httpClient is not None:
                     self.httpClient.close()
-                self.httpClient = http.client.HTTPSConnection(self.domain, self.port, timeout=60)
+                self.httpClient = http.client.HTTPSConnection(
+                    self.domain, self.port, timeout=60
+                )
         return -1, result

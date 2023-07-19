@@ -27,24 +27,38 @@ def rolling_save(func, tableName, begin, end, freq, subPath, **kwargs):
     spanList = get_span_list(begin, end, freq=freq)
 
     # reWrite or not
-    reWrite = kwargs.get('reWrite', False)
+    reWrite = kwargs.get("reWrite", False)
 
     # monthly Stack or not
-    monthlyStack = kwargs.get('monthlyStack', False)
+    monthlyStack = kwargs.get("monthlyStack", False)
 
-    if monthlyStack and freq in ['Q', 'q', 'Y', 'y']:
+    if monthlyStack and freq in ["Q", "q", "Y", "y"]:
         with tqdm(spanList) as t:
             for begin_day, end_day, tag in t:
                 t.set_postfix({"span": "{}-{}".format(begin_day, end_day)})
                 data = pd.DataFrame()
-                for _begin, _end, __ in get_span_list(begin_day, end_day, freq='m'):
-                    tmpData = func(_begin.strftime("%Y%m%d"), _end.strftime("%Y%m%d"), **kwargs)
+                for _begin, _end, __ in get_span_list(begin_day, end_day, freq="m"):
+                    tmpData = func(
+                        _begin.strftime("%Y%m%d"), _end.strftime("%Y%m%d"), **kwargs
+                    )
                     data = pd.concat([data, tmpData], axis=0, ignore_index=True)
-                save_data_h5(data, name='{}_{}'.format(tableName, tag), subPath=subPath, reWrite=reWrite)
+                save_data_h5(
+                    data,
+                    name="{}_{}".format(tableName, tag),
+                    subPath=subPath,
+                    reWrite=reWrite,
+                )
 
     else:  # (monthlyStack=Ture and freq in ['M', 'm'])  or monthlyStack=False
         with tqdm(spanList) as t:
             for begin_day, end_day, tag in t:
                 t.set_postfix({"span": "{}-{}".format(begin_day, end_day)})
-                data = func(begin_day.strftime("%Y%m%d"), end_day.strftime("%Y%m%d"), **kwargs)
-                save_data_h5(data, name='{}_{}'.format(tableName, tag), subPath=subPath, reWrite=reWrite)
+                data = func(
+                    begin_day.strftime("%Y%m%d"), end_day.strftime("%Y%m%d"), **kwargs
+                )
+                save_data_h5(
+                    data,
+                    name="{}_{}".format(tableName, tag),
+                    subPath=subPath,
+                    reWrite=reWrite,
+                )

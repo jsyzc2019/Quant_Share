@@ -6,46 +6,51 @@ import pyecharts.options as opts
 from funcs import get_nav_data_2_plot
 import streamlit as st
 
+
 def nav_plot(_group_res, _plot_begin, _plot_end, _bench_code):
     _plot_begin = get_tradeDate(_plot_begin, 0)
     _plot_end = get_tradeDate(_plot_end, -1)
 
-    bench_nav = _group_res['4'][0] / _group_res['4'][2]
+    bench_nav = _group_res["4"][0] / _group_res["4"][2]
 
     # 回测累计收益率图
     x_data = bench_nav.loc[_plot_begin:_plot_end].index.strftime("%Y%m%d").tolist()
     line = (
-        Line(
-            init_opts=opts.InitOpts(
-                width='1000px',
-                height='600px',
-                theme="white"
-            )
-        )
+        Line(init_opts=opts.InitOpts(width="1000px", height="600px", theme="white"))
         .add_xaxis(xaxis_data=x_data)
         .add_yaxis(
             series_name="group 1",
-            y_axis=get_nav_data_2_plot(_group_res['{}'.format(1)][0].loc[_plot_begin:_plot_end]).tolist(),
+            y_axis=get_nav_data_2_plot(
+                _group_res["{}".format(1)][0].loc[_plot_begin:_plot_end]
+            ).tolist(),
             label_opts=opts.LabelOpts(is_show=False),
         )
         .add_yaxis(
             series_name="group 2",
-            y_axis=get_nav_data_2_plot(_group_res['{}'.format(2)][0].loc[_plot_begin:_plot_end]).tolist(),
+            y_axis=get_nav_data_2_plot(
+                _group_res["{}".format(2)][0].loc[_plot_begin:_plot_end]
+            ).tolist(),
             label_opts=opts.LabelOpts(is_show=False),
         )
         .add_yaxis(
             series_name="group 3",
-            y_axis=get_nav_data_2_plot(_group_res['{}'.format(3)][0].loc[_plot_begin:_plot_end]).tolist(),
+            y_axis=get_nav_data_2_plot(
+                _group_res["{}".format(3)][0].loc[_plot_begin:_plot_end]
+            ).tolist(),
             label_opts=opts.LabelOpts(is_show=False),
         )
         .add_yaxis(
             series_name="group 4",
-            y_axis=get_nav_data_2_plot(_group_res['{}'.format(4)][0].loc[_plot_begin:_plot_end]).tolist(),
+            y_axis=get_nav_data_2_plot(
+                _group_res["{}".format(4)][0].loc[_plot_begin:_plot_end]
+            ).tolist(),
             label_opts=opts.LabelOpts(is_show=False),
         )
         .add_yaxis(
             series_name="group 5",
-            y_axis=get_nav_data_2_plot(_group_res['{}'.format(5)][0].loc[_plot_begin:_plot_end]).tolist(),
+            y_axis=get_nav_data_2_plot(
+                _group_res["{}".format(5)][0].loc[_plot_begin:_plot_end]
+            ).tolist(),
             label_opts=opts.LabelOpts(is_show=False),
         )
         .add_yaxis(
@@ -72,24 +77,20 @@ def nav_plot(_group_res, _plot_begin, _plot_end, _bench_code):
     )
     return line
 
+
 def ICIR_plot(rankIC, IR, _plot_begin, _plot_end):
     _plot_begin = get_tradeDate(_plot_begin, 0)
     _plot_end = get_tradeDate(_plot_end, -1)
     rankIC_lim = rankIC.loc[_plot_begin:_plot_end]
     st.write(f"IC数据量为{len(rankIC_lim)}")
     bar = (
-        Bar(
-            init_opts=opts.InitOpts(
-                width='1000px',
-                height='600px',
-                theme="white"
-            )
-        )
+        Bar(init_opts=opts.InitOpts(width="1000px", height="600px", theme="white"))
         .add_xaxis(xaxis_data=rankIC_lim.index.strftime("%Y%m%d").tolist())
         .add_yaxis(
             series_name="IC",
-            y_axis=rankIC_lim['rankIC'].tolist(),
-            itemstyle_opts=opts.ItemStyleOpts(color="#00CD96"))
+            y_axis=rankIC_lim["rankIC"].tolist(),
+            itemstyle_opts=opts.ItemStyleOpts(color="#00CD96"),
+        )
         .set_global_opts(
             title_opts={"text": f"IR={float(IR)}"},
             brush_opts=opts.BrushOpts(),  # 设置操作图表的画笔功能
@@ -97,7 +98,6 @@ def ICIR_plot(rankIC, IR, _plot_begin, _plot_end):
             yaxis_opts=opts.AxisOpts(name="IC"),
             # 设置Y轴名称、定制化刻度单位
             xaxis_opts=opts.AxisOpts(name="日期"),  # 设置X轴名称
-
         )
         .set_series_opts(label_opts=opts.LabelOpts(is_show=False))
     )

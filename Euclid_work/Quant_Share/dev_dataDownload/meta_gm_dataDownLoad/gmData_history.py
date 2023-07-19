@@ -8,17 +8,19 @@ from .base_package import *
 
 
 def gmData_history(begin, end, **kwargs):
-    if 'symbol' not in kwargs.keys():
-        raise AttributeError('symbol should in kwargs!')
+    if "symbol" not in kwargs.keys():
+        raise AttributeError("symbol should in kwargs!")
 
     begin = format_date(begin).strftime("%Y-%m-%d")
     end = format_date(end).strftime("%Y-%m-%d")
 
     outData = pd.DataFrame()
-    with tqdm(kwargs['symbol']) as t:
+    with tqdm(kwargs["symbol"]) as t:
         for symbol_i in t:
             try:
-                data = history(symbol_i, frequency='1d', start_time=begin, end_time=end, df=True)
+                data = history(
+                    symbol_i, frequency="1d", start_time=begin, end_time=end, df=True
+                )
                 _len = len(data)
                 t.set_postfix({"状态": "已写入{}的{}条数据".format(symbol_i, _len)})  # 进度条右边显示信息
                 errors_num = 0
@@ -41,9 +43,15 @@ def gmData_history(begin, end, **kwargs):
     return outData
 
 
-def gmData_history_update(upDateBegin, endDate='20231231'):
+def gmData_history_update(upDateBegin, endDate="20231231"):
     data = gmData_history(begin=upDateBegin, end=endDate, symbol=symbolList)
     if len(data) == 0:
         print("无数据更新")
     else:
-        save_data_Q(data, 'bob', 'gmData_history', reWrite=True, _dataBase_root_path=dataBase_root_path_gmStockFactor)
+        save_data_Q(
+            data,
+            "bob",
+            "gmData_history",
+            reWrite=True,
+            _dataBase_root_path=dataBase_root_path_gmStockFactor,
+        )

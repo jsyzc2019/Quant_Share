@@ -16,14 +16,34 @@ def FdmtIndiRtnPit(begin, end, **kwargs):
     :param kwargs: ticker = stockNumList
     :return:
     """
-    if 'ticker' not in kwargs.keys():
-        raise AttributeError('ticker should in kwargs!')
-    data = DataAPI.FdmtIndiRtnPitGet(ticker=kwargs['ticker'], secID="", beginDate=begin, endDate=end, beginYear=u"", endYear=u"", reportType=u"",
-                                     publishDateEnd=u"", publishDateBegin=u"", field=u"", pandas="1",
-                                     pat_len=100)
+    if "ticker" not in kwargs.keys():
+        raise AttributeError("ticker should in kwargs!")
+    data = DataAPI.FdmtIndiRtnPitGet(
+        ticker=kwargs["ticker"],
+        secID="",
+        beginDate=begin,
+        endDate=end,
+        beginYear="",
+        endYear="",
+        reportType="",
+        publishDateEnd="",
+        publishDateBegin="",
+        field="",
+        pandas="1",
+        pat_len=100,
+    )
     return data
 
 
-def FdmtIndiRtnPit_update(upDateBegin, endDate='20231231'):
-    rolling_save(FdmtIndiRtnPit, 'FdmtIndiRtnPit', upDateBegin, endDate, freq='q', subPath="{}/FdmtIndiRtnPit".format(dataBase_root_path),
-                 reWrite=True, monthlyStack=False, ticker=stockNumList)
+def FdmtIndiRtnPit_update(upDateBegin, endDate="20231231"):
+    rolling_save(
+        FdmtIndiRtnPit,
+        "FdmtIndiRtnPit",
+        upDateBegin,
+        endDate,
+        freq="q",
+        subPath="{}/FdmtIndiRtnPit".format(dataBase_root_path),
+        reWrite=True,
+        monthlyStack=False,
+        ticker=stockNumList,
+    )

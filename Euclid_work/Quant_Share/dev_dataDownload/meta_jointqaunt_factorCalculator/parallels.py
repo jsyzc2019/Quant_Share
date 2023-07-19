@@ -2,6 +2,7 @@ from multiprocessing import Pool
 from .utils import update
 from Euclid_work.Quant_Share import time_decorator
 
+
 class MyMultiprocess(object):
     def __init__(self, process_num):
         self.pool = Pool(processes=process_num)
@@ -9,7 +10,14 @@ class MyMultiprocess(object):
     @time_decorator
     def work(self, func, _vars, constant, callback):
         for arg in _vars:
-            self.pool.apply_async(func, args=(arg, *constant, ), callback=callback)
+            self.pool.apply_async(
+                func,
+                args=(
+                    arg,
+                    *constant,
+                ),
+                callback=callback,
+            )
         self.pool.close()
         self.pool.join()
 

@@ -25,9 +25,18 @@ def write_df_to_pgDB(df, **kwargs):
 
 
 tableNameList = [
-    'share_change', 'balance_sheet', 'deriv_finance_indicator', 'fundamentals_balance', 'fundamentals_income',
-    'fundamentals_cashflow', 'trading_derivative_indicator', 'future_daily', 'continuous_contracts', 'symbol_industry',
-    'gmData_history', 'gmData_bench_price'
+    "share_change",
+    "balance_sheet",
+    "deriv_finance_indicator",
+    "fundamentals_balance",
+    "fundamentals_income",
+    "fundamentals_cashflow",
+    "trading_derivative_indicator",
+    "future_daily",
+    "continuous_contracts",
+    "symbol_industry",
+    "gmData_history",
+    "gmData_bench_price",
 ]
 
 for tableName in tableNameList:

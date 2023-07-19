@@ -9,10 +9,10 @@ from .base_package import *
 
 
 def future_daily(**kwargs):
-    if 'tradeDateArr' not in kwargs.keys():
-        raise AttributeError('tradeDateArr should in kwargs!')
+    if "tradeDateArr" not in kwargs.keys():
+        raise AttributeError("tradeDateArr should in kwargs!")
 
-    tradeDateArr = kwargs['tradeDateArr']
+    tradeDateArr = kwargs["tradeDateArr"]
     outData = pd.DataFrame()
     errors_num = 0
     update_exit = 0
@@ -20,7 +20,9 @@ def future_daily(**kwargs):
         for patSymbol in t:
             t.set_description("trade date:{}".format(patSymbol))
             try:
-                tmpData = get_symbols(1040, df=True, trade_date=patSymbol.strftime('%Y-%m-%d'))
+                tmpData = get_symbols(
+                    1040, df=True, trade_date=patSymbol.strftime("%Y-%m-%d")
+                )
                 t.set_postfix({"状态": "已成功获取{}条数据".format(len(tmpData))})  # 进度条右边显示信息
                 errors_num = 0
 
@@ -30,7 +32,7 @@ def future_daily(**kwargs):
 
                 if _len > 0:
                     update_exit = 0
-                    tmpData.trade_date = tmpData.trade_date.dt.strftime('%Y-%m-%d')
+                    tmpData.trade_date = tmpData.trade_date.dt.strftime("%Y-%m-%d")
                     outData = pd.concat([outData, tmpData], ignore_index=True, axis=0)
                 else:
                     update_exit += 1
@@ -48,10 +50,16 @@ def future_daily(**kwargs):
     return outData
 
 
-def future_daily_update(upDateBegin, endDate='20231231'):
+def future_daily_update(upDateBegin, endDate="20231231"):
     tradeDateList = get_tradeDates(upDateBegin, endDate)
     data = future_daily(tradeDateArr=tradeDateList)
     if len(data) == 0:
         print("无数据更新")
     else:
-        save_data_Y(data, 'trade_date', 'future_daily', reWrite=True, _dataBase_root_path=dataBase_root_path_gmStockFactor)
+        save_data_Y(
+            data,
+            "trade_date",
+            "future_daily",
+            reWrite=True,
+            _dataBase_root_path=dataBase_root_path_gmStockFactor,
+        )

@@ -249,7 +249,9 @@ class simpleBT:
                 diff[~tradable] = 0
                 fee_each_ticker = np.abs(diff) * fee_rate  # 计算费用=(买入+卖出)*手续费率
                 fee.loc[date] = fee_each_ticker.sum()
-                trade_rtn_each_ticker = diff * rtn_after_trade.loc[date]  # 使用交易后的收益率更新收益
+                trade_rtn_each_ticker = (
+                    diff * rtn_after_trade.loc[date]
+                )  # 使用交易后的收益率更新收益
                 temp_pos += diff  # 更新仓位
                 turnover.loc[date] = np.abs(diff).sum()  # 存储当日的交易额
 

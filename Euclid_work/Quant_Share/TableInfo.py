@@ -9,92 +9,105 @@ import json
 import os
 
 InfoTable = {
-    'SecID_E_info': {
-        'assets': 'info',
-        'description': 'DataAPI.SecIDGet, assetClass=E',
+    "SecID_E_info": {
+        "assets": "info",
+        "description": "DataAPI.SecIDGet, assetClass=E",
     },
-    'SecID_IDX_info': {
-        'assets': 'info',
-        'description': 'DataAPI.SecIDGet, assetClass=IDX, exchangeCD=[XSHE, HSHG]',
+    "SecID_IDX_info": {
+        "assets": "info",
+        "description": "DataAPI.SecIDGet, assetClass=IDX, exchangeCD=[XSHE, HSHG]",
     },
-    'SysCode_info': {
-        'assets': 'info',
-        'description': 'DataAPI.SysCodeGet',
+    "SysCode_info": {
+        "assets": "info",
+        "description": "DataAPI.SysCodeGet",
     },
-    'PartyID_info': {
-        'assets': 'info',
-        'description': 'DataAPI.PartyIDGet',
+    "PartyID_info": {
+        "assets": "info",
+        "description": "DataAPI.PartyIDGet",
     },
-    'bench_info': {
-        'assets': 'info',
-        'description': '',
+    "bench_info": {
+        "assets": "info",
+        "description": "",
     },
-    'EquDiv_info': {
-        'assets': 'info',
-        'description': 'DataAPI.EquDivGet',
+    "EquDiv_info": {
+        "assets": "info",
+        "description": "DataAPI.EquDivGet",
     },
-    'TradeCal': {
-        'assets': 'info',
-        'description': 'DataAPI.TradeCalGet',
-    }
+    "TradeCal": {
+        "assets": "info",
+        "description": "DataAPI.TradeCalGet",
+    },
 }
 
 gmStock = {
-    'bench_price': {
-        'assets': 'stock',
-        'description': '',
-        'date_column': 'trade_date',
-        'ticker_column': 'symbol'
+    "bench_price": {
+        "assets": "stock",
+        "description": "",
+        "date_column": "trade_date",
+        "ticker_column": "symbol",
     },
-    'stock_price': {
-        'assets': 'stock',
-        'description': '',
-        'date_column': 'trade_date',
-        'ticker_column': 'symbol'
+    "stock_price": {
+        "assets": "stock",
+        "description": "",
+        "date_column": "trade_date",
+        "ticker_column": "symbol",
     },
 }
 
 gmFuture = {
-    'Broker_Data': {
-        'assets': 'future',
-        'description': '',
-        'date_column': 'date',
-        'ticker_column': ''
+    "Broker_Data": {
+        "assets": "future",
+        "description": "",
+        "date_column": "date",
+        "ticker_column": "",
     },
-    'Price_Volume_Data/main': {
-        'assets': 'future',
-        'description': '',
-        'date_column': 'bob',
-        'ticker_column': ''
+    "Price_Volume_Data/main": {
+        "assets": "future",
+        "description": "",
+        "date_column": "bob",
+        "ticker_column": "",
     },
-    'Price_Volume_Data/submain': {
-        'assets': 'future',
-        'description': '',
-        'date_column': 'bob',
-        'ticker_column': ''
+    "Price_Volume_Data/submain": {
+        "assets": "future",
+        "description": "",
+        "date_column": "bob",
+        "ticker_column": "",
     },
 }
 
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(current_dir, 'dev_files/dataYesStockData_tableInfo.json'), 'r', encoding='utf-8') as f:
+with open(
+    os.path.join(current_dir, "dev_files/dataYesStockData_tableInfo.json"),
+    "r",
+    encoding="utf-8",
+) as f:
     dataYesStock = json.load(f)
 # 针对D:\Share\Stk_Data\gm 下的表
 # 从gmStockFactor_tableInfo.json中读取
-with open(os.path.join(current_dir, 'dev_files/gmStockFactor_tableInfo.json'), 'r') as f:
+with open(
+    os.path.join(current_dir, "dev_files/gmStockFactor_tableInfo.json"), "r"
+) as f:
     gmStockFactor = json.load(f)
-with open(os.path.join(current_dir, 'dev_files/gmStockData_tableInfo.json'), 'r') as f:
+with open(os.path.join(current_dir, "dev_files/gmStockData_tableInfo.json"), "r") as f:
     gmStockData = json.load(f)
-with open(os.path.join(current_dir, 'dev_files/emData_tableInfo.json'), 'r') as f:
+with open(os.path.join(current_dir, "dev_files/emData_tableInfo.json"), "r") as f:
     emData = json.load(f)
-with open(os.path.join(current_dir, 'dev_files/jointquant_tableInfo.json'), 'r') as f:
+with open(os.path.join(current_dir, "dev_files/jointquant_tableInfo.json"), "r") as f:
     jointquant = json.load(f)
 
 tableInfo = {}
-for table in ['InfoTable', 'gmStock', 'dataYesStock', 'gmFuture', 'gmStockFactor', 'gmStockData', 'emData', 'jointquant']:
+for table in [
+    "InfoTable",
+    "gmStock",
+    "dataYesStock",
+    "gmFuture",
+    "gmStockFactor",
+    "gmStockData",
+    "emData",
+    "jointquant",
+]:
     _table = eval(table)
     for key, value in _table.items():
-        _table[key]['tableSource'] = table
+        _table[key]["tableSource"] = table
     tableInfo.update(_table)
-
-

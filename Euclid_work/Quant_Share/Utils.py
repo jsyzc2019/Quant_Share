@@ -15,28 +15,59 @@ from functools import reduce, wraps
 from time import strptime
 from datetime import datetime as dt
 
-dataBase_root_path = r'E:\Share\Stk_Data\dataFile'
+dataBase_root_path = r"E:\Share\Stk_Data\dataFile"
 dataBase_root_path_future = r"E:\Share\Fut_Data"
 dataBase_root_path_gmStockFactor = r"E:\Share\Stk_Data\gm"
 dataBase_root_path_EM_data = r"E:\Share\EM_Data"
 dataBase_root_path_JointQuant_Factor = r"E:\Share\JointQuant_Factor"
-dataBase_root_path_JointQuant_prepare = r'E:\Share\JointQuant_prepare'
+dataBase_root_path_JointQuant_prepare = r"E:\Share\JointQuant_prepare"
 
 # dataBase_root_path = r'D:\Share\Euclid_work\dataFile'
 # dataBase_root_path_future = r"D:\Share\Fut_Data"
 # dataBase_root_path_gmStockFactor = r"D:\Share\Stk_Data\gm"
 
-__all__ = ['readPkl', 'savePkl', 'save_data_h5',  # files operation
-           'get_tradeDate', 'format_date', 'format_stockCode', 'reindex', 'data2score', 'info_lag',
-           'format_futures', 'printJson', 'extend_date_span', 'patList', 'is_tradeDate', 'get_tradeDates',
-           'isdate', 'binary_search', 'winsorize_med', 'standardlize', 'save_data_Y', 'save_data_Q',
-           # Consts
-           'stock_info', 'stockList', 'stockNumList', 'bench_info', 'tradeDate_info', 'tradeDateList', 'quarter_begin',
-           'quarter_end',
-           'futures_list', 'dataBase_root_path', 'dataBase_root_path_future', 'dataBase_root_path_gmStockFactor',
-           'dataBase_root_path_EM_data', 'dataBase_root_path_JointQuant_Factor', 'dataBase_root_path_JointQuant_prepare',
-           # decorator
-           'time_decorator', 'lazyproperty']
+__all__ = [
+    "readPkl",
+    "savePkl",
+    "save_data_h5",  # files operation
+    "get_tradeDate",
+    "format_date",
+    "format_stockCode",
+    "reindex",
+    "data2score",
+    "info_lag",
+    "format_futures",
+    "printJson",
+    "extend_date_span",
+    "patList",
+    "is_tradeDate",
+    "get_tradeDates",
+    "isdate",
+    "binary_search",
+    "winsorize_med",
+    "standardlize",
+    "save_data_Y",
+    "save_data_Q",
+    # Consts
+    "stock_info",
+    "stockList",
+    "stockNumList",
+    "bench_info",
+    "tradeDate_info",
+    "tradeDateList",
+    "quarter_begin",
+    "quarter_end",
+    "futures_list",
+    "dataBase_root_path",
+    "dataBase_root_path_future",
+    "dataBase_root_path_gmStockFactor",
+    "dataBase_root_path_EM_data",
+    "dataBase_root_path_JointQuant_Factor",
+    "dataBase_root_path_JointQuant_prepare",
+    # decorator
+    "time_decorator",
+    "lazyproperty",
+]
 
 
 def time_decorator(func):
@@ -45,7 +76,7 @@ def time_decorator(func):
         start = dt.now()
         result = func(*args, **kwargs)
         end = dt.now()
-        print(f'“{func.__name__}” run time: {end - start}.')
+        print(f"“{func.__name__}” run time: {end - start}.")
         return result
 
     return timer
@@ -68,7 +99,7 @@ def patList(InList: list, pat: int):
     if pat == -1:
         return [InList]
     else:
-        return [InList[i: i + pat] for i in range(0, len(InList), pat)]
+        return [InList[i : i + pat] for i in range(0, len(InList), pat)]
 
 
 def format_stockCode(numCode):
@@ -78,7 +109,7 @@ def format_stockCode(numCode):
     :return: '000001.SZ'
     """
     if isinstance(numCode, str):
-        if numCode[-2:] in ['BJ', 'SZ', 'SH']:
+        if numCode[-2:] in ["BJ", "SZ", "SH"]:
             windCode = numCode
             return windCode
         elif "." in numCode or numCode.isdigit():
@@ -93,49 +124,119 @@ def format_stockCode(numCode):
             return np.nan
     tag = numCode // 100000
     if tag in [4, 8]:
-        tail = 'BJ'
+        tail = "BJ"
     elif numCode < 500000:
-        tail = 'SZ'
+        tail = "SZ"
     else:
-        tail = 'SH'
+        tail = "SH"
     windCode = "{:06.0f}.{}".format(numCode, tail)
     return windCode
 
 
 def format_futures(file_name):
-    if 'qe' in file_name:
+    if "qe" in file_name:
         out = file_name.split("_")[0].upper()
     else:
-        out = file_name.split('.')[1]
+        out = file_name.split(".")[1]
         if "_" in out:
-            out = out.split('_')[0].upper()
+            out = out.split("_")[0].upper()
 
     if out in futures_list:
         return out
     else:
-        raise KeyError('{} is not format futures!'.format(file_name))
+        raise KeyError("{} is not format futures!".format(file_name))
 
 
 # consts
 # https://www.myquant.cn/docs2/sdk/python/API%E4%BB%8B%E7%BB%8D.html#get-symbol-infos-%E6%9F%A5%E8%AF%A2%E6%A0%87%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BF%A1%E6%81%AF
-stock_info = pd.read_hdf('{}/stock_info.h5'.format(dataBase_root_path))
-stockList = [format_stockCode(code) for code in stock_info['symbol']]  # 000001.SZ
+stock_info = pd.read_hdf("{}/stock_info.h5".format(dataBase_root_path))
+stockList = [format_stockCode(code) for code in stock_info["symbol"]]  # 000001.SZ
 stockNumList = list(set(stock_info.sec_id))  # 000001
-futures_list = ['AG', 'AL', 'AU', 'A', 'BB', 'BU', 'B', 'CF', 'CS', 'CU', 'C', 'FB', 'FG', 'HC', 'IC', 'IF', 'IH', 'I',
-                'JD', 'JM', 'JR', 'J', 'LR', 'L', 'MA', 'M', 'NI', 'OI',
-                'PB', 'PM', 'PP', 'P', 'RB', 'RI', 'RM', 'RS', 'RU', 'SF', 'SM', 'SN', 'SR', 'TA', 'TF', 'T', 'V', 'WH',
-                'Y', 'ZC', 'ZN', 'PG',
-                'EB', 'AP', 'LU', 'SA', 'TS', 'CY', 'IM', 'PF', 'PK', 'CJ', 'UR', 'NR', 'SS', 'FU', 'EG', 'LH', 'SP',
-                'RR', 'SC', 'WR', 'BC']
+futures_list = [
+    "AG",
+    "AL",
+    "AU",
+    "A",
+    "BB",
+    "BU",
+    "B",
+    "CF",
+    "CS",
+    "CU",
+    "C",
+    "FB",
+    "FG",
+    "HC",
+    "IC",
+    "IF",
+    "IH",
+    "I",
+    "JD",
+    "JM",
+    "JR",
+    "J",
+    "LR",
+    "L",
+    "MA",
+    "M",
+    "NI",
+    "OI",
+    "PB",
+    "PM",
+    "PP",
+    "P",
+    "RB",
+    "RI",
+    "RM",
+    "RS",
+    "RU",
+    "SF",
+    "SM",
+    "SN",
+    "SR",
+    "TA",
+    "TF",
+    "T",
+    "V",
+    "WH",
+    "Y",
+    "ZC",
+    "ZN",
+    "PG",
+    "EB",
+    "AP",
+    "LU",
+    "SA",
+    "TS",
+    "CY",
+    "IM",
+    "PF",
+    "PK",
+    "CJ",
+    "UR",
+    "NR",
+    "SS",
+    "FU",
+    "EG",
+    "LH",
+    "SP",
+    "RR",
+    "SC",
+    "WR",
+    "BC",
+]
 
-bench_info = pd.read_hdf('{}/bench_info.h5'.format(dataBase_root_path))  # gm's bench info
+bench_info = pd.read_hdf(
+    "{}/bench_info.h5".format(dataBase_root_path)
+)  # gm's bench info
 tradeDate_info = pd.read_hdf("{}/tradeDate_info.h5".format(dataBase_root_path))
-tradeDateList = tradeDate_info['tradeDate'].dropna().to_list()
-quarter_begin = ['0101', '0401', '0701', '1001']
-quarter_end = ['0331', '0630', '0930', '1231']
+tradeDateList = tradeDate_info["tradeDate"].dropna().to_list()
+quarter_begin = ["0101", "0401", "0701", "1001"]
+quarter_end = ["0331", "0630", "0930", "1231"]
 
 
 # TODO 股票池 行业中心化 标准回测 groupBy加速
+
 
 def readPkl(fpath):
     with open(fpath, "rb") as f:
@@ -164,7 +265,9 @@ def data2score(data, neg=False, ascending=True, axis=1):
     return pd.DataFrame(data=score, columns=data.columns, index=data.index)
 
 
-def winsorize_med(data: pd.Series, scale=1, inclusive: bool = True, inf2nan: bool = True):
+def winsorize_med(
+    data: pd.Series, scale=1, inclusive: bool = True, inf2nan: bool = True
+):
     s = data.copy()
     if inf2nan:
         s[np.isinf(s)] = np.nan
@@ -210,18 +313,20 @@ def reindex(data, tradeDate=True, **kwargs):
     data.columns = [format_stockCode(x) for x in data.columns]
     if np.NAN in data.columns:
         data.drop(columns=np.NAN, inplace=True)
-    begin = kwargs.get('begin', data.index.min())
-    end = kwargs.get('end', data.index.max())
+    begin = kwargs.get("begin", data.index.min())
+    end = kwargs.get("end", data.index.max())
     if tradeDate:
         # TODO 使用二分法优化速度
-        new_index = [x for x in pd.date_range(begin, end, freq='D') if x in tradeDateList]
+        new_index = [
+            x for x in pd.date_range(begin, end, freq="D") if x in tradeDateList
+        ]
     else:
-        new_index = pd.date_range(begin, end, freq='D')
+        new_index = pd.date_range(begin, end, freq="D")
     new_columns = stockList
     # fill na
     fill_value = np.nan
-    if 'fill_value' in kwargs.keys():
-        fill_value = kwargs['fill_value']
+    if "fill_value" in kwargs.keys():
+        fill_value = kwargs["fill_value"]
     return data.reindex(index=new_index, columns=new_columns, fill_value=fill_value)
 
 
@@ -238,7 +343,7 @@ def info_lag(data, n_lag):
     return out
 
 
-def save_data_h5(toSaveData, name, subPath='dataFile', reWrite=False, append=False):
+def save_data_h5(toSaveData, name, subPath="dataFile", reWrite=False, append=False):
     """
     Store the pd.Data Frame data as a file in .h5 format
     :param toSaveData:
@@ -250,7 +355,7 @@ def save_data_h5(toSaveData, name, subPath='dataFile', reWrite=False, append=Fal
     """
     # format confirm
     if not name.endswith(".h5"):
-        name = name + '.h5'
+        name = name + ".h5"
     # save path
     if subPath:
         if not os.path.exists(subPath):
@@ -262,23 +367,25 @@ def save_data_h5(toSaveData, name, subPath='dataFile', reWrite=False, append=Fal
         if reWrite:
             if os.path.exists(fullPath):
                 if append:
-                    toSaveData.to_hdf(fullPath, 'a', append=True)
+                    toSaveData.to_hdf(fullPath, "a", append=True)
                     print("{} has appended!".format(fullPath))
                 else:
                     existsData = pd.read_hdf(fullPath)
                     allData = pd.concat([existsData, toSaveData]).drop_duplicates()
                     if len(allData) > len(existsData):
                         print("{} has Updated!".format(fullPath))
-                        allData.to_hdf(fullPath, 'a', 'w')
+                        allData.to_hdf(fullPath, "a", "w")
                     else:
                         print("{} has none Updated!".format(fullPath))
             else:  # file not exists
-                toSaveData.to_hdf(fullPath, 'a', mode='a', format='b' if append else 'f')
+                toSaveData.to_hdf(
+                    fullPath, "a", mode="a", format="b" if append else "f"
+                )
                 print("{} has been created!".format(fullPath))
         else:  # can not rewrite
             if os.path.exists(fullPath):
                 raise FileExistsError("{} has Existed!".format(fullPath))
-            toSaveData.to_hdf(fullPath, 'a', mode='a', format='b' if append else 'f')
+            toSaveData.to_hdf(fullPath, "a", mode="a", format="b" if append else "f")
     else:
         raise TypeError("only save pd.DataFrame format!")
         # pd.DataFrame(toSaveData).to_hdf(name,'a','w')
@@ -294,12 +401,18 @@ def save_data_Y(df, date_column_name, tableName, _dataBase_root_path, reWrite=Fa
     df["year"] = df[date_column_name].apply(lambda x: format_date(x).year)
     for yeari in range(df["year"].min(), df["year"].max() + 1):
         df1 = df[df["year"] == yeari]
-        df1 = df1.drop(['year'], axis=1)
-        save_data_h5(df1, name='{}_Y{}'.format(tableName, yeari),
-                     subPath="{}/{}".format(_dataBase_root_path, tableName), reWrite=reWrite)
+        df1 = df1.drop(["year"], axis=1)
+        save_data_h5(
+            df1,
+            name="{}_Y{}".format(tableName, yeari),
+            subPath="{}/{}".format(_dataBase_root_path, tableName),
+            reWrite=reWrite,
+        )
 
 
-def save_data_Q(df, date_column_name, tableName, _dataBase_root_path, reWrite=False, append=False):
+def save_data_Q(
+    df, date_column_name, tableName, _dataBase_root_path, reWrite=False, append=False
+):
     """
     对df进行拆分, 进一步存储
     """
@@ -312,9 +425,14 @@ def save_data_Q(df, date_column_name, tableName, _dataBase_root_path, reWrite=Fa
         df1 = df[df["year"] == yeari]
         for quarteri in range(df1["quarter"].min(), df1["quarter"].max() + 1):
             df2 = df1[df1["quarter"] == quarteri]
-            df2 = df2.drop(columns=['year', 'quarter'], axis=1)
-            save_data_h5(df2, name='{}_Y{}_Q{}'.format(tableName, yeari, quarteri),
-                         subPath="{}/{}".format(_dataBase_root_path, tableName), reWrite=reWrite, append=append)
+            df2 = df2.drop(columns=["year", "quarter"], axis=1)
+            save_data_h5(
+                df2,
+                name="{}_Y{}_Q{}".format(tableName, yeari, quarteri),
+                subPath="{}/{}".format(_dataBase_root_path, tableName),
+                reWrite=reWrite,
+                append=append,
+            )
 
 
 def get_tradeDate(InputDate, lag=0):
@@ -329,9 +447,9 @@ def get_tradeDate(InputDate, lag=0):
     """
     date = format_date(InputDate)
     if lag == 0:
-        return tradeDate_info.loc[date]['tradeDate_fore']
+        return tradeDate_info.loc[date]["tradeDate_fore"]
     elif lag == -1:
-        return tradeDate_info.loc[date]['tradeDate_back']
+        return tradeDate_info.loc[date]["tradeDate_back"]
     else:
         res, index = binary_search(tradeDateList, date)
         if res:
@@ -356,10 +474,10 @@ def get_tradeDates(begin, end=None, n: int = None):
         res, index_end = binary_search(tradeDateList, end)
         if not res:
             index_end += 1
-        return tradeDateList[index_begin:index_end + 1]
+        return tradeDateList[index_begin : index_end + 1]
     else:
         if n:
-            return tradeDateList[index_begin:index_begin + n + 1]
+            return tradeDateList[index_begin : index_begin + n + 1]
         else:
             raise AttributeError("u should input end or n!")
 
@@ -394,7 +512,7 @@ def format_date(date):
     elif isinstance(date, datetime.date):
         return pd.to_datetime(date)
     elif isinstance(date, int):
-        date = pd.to_datetime(date, format='%Y%m%d')
+        date = pd.to_datetime(date, format="%Y%m%d")
         return date
     elif isinstance(date, str):
         date = pd.to_datetime(date)
@@ -452,31 +570,43 @@ def extend_date_span(begin, end, freq) -> tuple[datetime.datetime, datetime.date
 
 def isdate(datestr, **kwargs):
     datestr = str(datestr)
-    chinesenum = {'一': '1', '二': '2', '三': '3', '四': '4',
-                  '五': '5', '六': '6', '七': '7', '八': '8', '九': '9', '零': '0', '十': '10'}
-    strdate = ''
+    chinesenum = {
+        "一": "1",
+        "二": "2",
+        "三": "3",
+        "四": "4",
+        "五": "5",
+        "六": "6",
+        "七": "7",
+        "八": "8",
+        "九": "9",
+        "零": "0",
+        "十": "10",
+    }
+    strdate = ""
     for i in range(len(datestr)):
         temp = datestr[i]
         if temp in chinesenum:
-            if temp == '十':
+            if temp == "十":
                 if datestr[i + 1] not in chinesenum:
                     strdate += chinesenum[temp]
                 elif datestr[i - 1] in chinesenum:
                     continue
                 else:
-                    strdate += '1'
+                    strdate += "1"
             else:
                 strdate += chinesenum[temp]
         else:
             strdate += temp
 
-    pattern = ('%Y年%m月%d日',
-               '%Y-%m-%d',
-               '%y年%m月%d日',
-               '%y-%m-%d',
-               '%Y/%m/%d',
-               '%Y%m%d'
-               ) + kwargs.get('pattern', ())
+    pattern = (
+        "%Y年%m月%d日",
+        "%Y-%m-%d",
+        "%y年%m月%d日",
+        "%y-%m-%d",
+        "%Y/%m/%d",
+        "%Y%m%d",
+    ) + kwargs.get("pattern", ())
     for i in pattern:
         try:
             ret = strptime(strdate, i)

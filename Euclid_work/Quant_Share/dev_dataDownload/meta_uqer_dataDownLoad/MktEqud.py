@@ -37,12 +37,30 @@ def MktEqud(begin, end, **kwargs):
         isOpen	int	股票今日是否开盘标记：0-未开盘，1-交易日
         vwap	float	VWAP，成交金额/成交量
     """
-    if 'ticker' not in kwargs.keys():
-        raise AttributeError('ticker should in kwargs!')
-    data = DataAPI.MktEqudGet(secID=u"", ticker=kwargs['ticker'], tradeDate=u"", beginDate=begin, endDate=end, isOpen="", field=u"", pandas="1")
+    if "ticker" not in kwargs.keys():
+        raise AttributeError("ticker should in kwargs!")
+    data = DataAPI.MktEqudGet(
+        secID="",
+        ticker=kwargs["ticker"],
+        tradeDate="",
+        beginDate=begin,
+        endDate=end,
+        isOpen="",
+        field="",
+        pandas="1",
+    )
     return data
 
 
-def MktEqud_update(upDateBegin, endDate='20231231'):
-    rolling_save(MktEqud, 'MktEqud', upDateBegin, endDate, freq='q', subPath="{}/MktEqud".format(dataBase_root_path),
-                 reWrite=True, monthlyStack=False, ticker=stockNumList)
+def MktEqud_update(upDateBegin, endDate="20231231"):
+    rolling_save(
+        MktEqud,
+        "MktEqud",
+        upDateBegin,
+        endDate,
+        freq="q",
+        subPath="{}/MktEqud".format(dataBase_root_path),
+        reWrite=True,
+        monthlyStack=False,
+        ticker=stockNumList,
+    )

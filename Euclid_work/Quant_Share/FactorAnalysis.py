@@ -7,7 +7,14 @@
 import numpy as np
 import pandas as pd
 
-from .Utils import printJson, reindex, info_lag, get_tradeDate, format_date, dataBase_root_path
+from .Utils import (
+    printJson,
+    reindex,
+    info_lag,
+    get_tradeDate,
+    format_date,
+    dataBase_root_path,
+)
 from .EuclidGetData import get_data
 
 
@@ -106,12 +113,12 @@ def get_Performance_analysis(nav, year_day=252):
 
     # 输出
     out = {
-        'net_values': net_values,
-        'year_ret_sqrt': year_ret_sqrt,
-        'downlow': downlow,
-        'Sharpe': Sharpe,
-        'volitiy': volitiy,
-        'max_day_rate': max_day_rate
+        "net_values": net_values,
+        "year_ret_sqrt": year_ret_sqrt,
+        "downlow": downlow,
+        "Sharpe": Sharpe,
+        "volitiy": volitiy,
+        "max_day_rate": max_day_rate,
     }
     return out
 
@@ -126,7 +133,10 @@ def get_new_stock_filter(Score, newly_listed_threshold=120):
     # 速度慢, 单独提closePrice为文件
     # price_df = get_data('MktEqud')
     # closeP = reindex(price_df.pivot(index='tradeDate', columns='ticker', values='closePrice'))
-    closeP = pd.read_csv("{}/dev_closeP_formated_wide.csv".format(dataBase_root_path), index_col='tradeDate')
+    closeP = pd.read_csv(
+        "{}/dev_closeP_formated_wide.csv".format(dataBase_root_path),
+        index_col="tradeDate",
+    )
     closeP = reindex(closeP)
     listed_days = (~pd.isnull(closeP)).cumsum()
     fit = listed_days < newly_listed_threshold
@@ -136,9 +146,11 @@ def get_new_stock_filter(Score, newly_listed_threshold=120):
     else:
         Score = Score.copy()
         # TODO 改用纯交易日滞后
-        tag = get_tradeDate(20150101, n=newly_listed_threshold)['tradeDate_fore']
+        tag = get_tradeDate(20150101, n=newly_listed_threshold)["tradeDate_fore"]
         if format_date(Score.index[0]) <= tag:
-            raise ResourceWarning("Score should start behind {}".format(tag.strftime("%Y-%m-%d")))
+            raise ResourceWarning(
+                "Score should start behind {}".format(tag.strftime("%Y-%m-%d"))
+            )
         fit = fit.reindex(Score.index, Score.columns)
         Score[fit] = np.nan
         return Score
@@ -150,8 +162,8 @@ def get_st_filter(Score=None):
     :param Score: 传入空值则返回ST信息, 如果传入数据为Score, 则ST股对应的Score为会赋值为Nan
     :return:
     """
-    SecST = get_data('SecST')
-    SecST = SecST.pivot(index='tradeDate', columns='ticker', values='STflg')
+    SecST = get_data("SecST")
+    SecST = SecST.pivot(index="tradeDate", columns="ticker", values="STflg")
     SecST = reindex(SecST, tradeDate=True).notna()
     SecST = info_lag(SecST, n_lag=1)
     if Score.empty:
@@ -170,7 +182,10 @@ def get_suspended_filter(Score=None):
     :return: 停牌为True或np.nan
     """
     # 直接使用MktEqud中的isopen即可
-    isOpen = pd.read_csv("{}/dev_isOpen_formated_wide.csv".format(dataBase_root_path), index_col='tradeDate')
+    isOpen = pd.read_csv(
+        "{}/dev_isOpen_formated_wide.csv".format(dataBase_root_path),
+        index_col="tradeDate",
+    )
     isOpen = reindex(isOpen)
     fit = isOpen != 1
     if Score.empty:
@@ -188,14 +203,24 @@ def get_limit_up_down_filter(Score=None):
     :param Score:
     :return: 涨跌停为True或np.nan
     """
-    openP = pd.read_csv("{}/dev_openP_formated_wide.csv".format(dataBase_root_path), index_col='tradeDate')
+    openP = pd.read_csv(
+        "{}/dev_openP_formated_wide.csv".format(dataBase_root_path),
+        index_col="tradeDate",
+    )
     openP = reindex(openP)
-    closeP = pd.read_csv("{}/dev_closeP_formated_wide.csv".format(dataBase_root_path), index_col='tradeDate')
+    closeP = pd.read_csv(
+        "{}/dev_closeP_formated_wide.csv".format(dataBase_root_path),
+        index_col="tradeDate",
+    )
     closeP = reindex(closeP)
 
-    MktLimit = get_data('MktLimit')
-    limitUp = reindex(MktLimit.pivot(index='tradeDate', columns='ticker', values='limitUpPrice'))
-    limitDown = reindex(MktLimit.pivot(index='tradeDate', columns='ticker', values='limitDownPrice'))
+    MktLimit = get_data("MktLimit")
+    limitUp = reindex(
+        MktLimit.pivot(index="tradeDate", columns="ticker", values="limitUpPrice")
+    )
+    limitDown = reindex(
+        MktLimit.pivot(index="tradeDate", columns="ticker", values="limitDownPrice")
+    )
     udStatus = (closeP == limitUp).astype(int) - (closeP == limitDown).astype(int)
     udStatus = udStatus.fillna(0)
     # udStatus[closeP != openP] = 0  # 非closeP交易, 实际上可以买卖

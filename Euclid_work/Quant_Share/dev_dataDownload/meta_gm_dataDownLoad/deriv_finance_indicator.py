@@ -9,17 +9,17 @@ from .base_package import *
 
 
 def deriv_finance_indicator(begin, end, **kwargs):
-    if 'deriv_finance_indicator_fields' not in kwargs.keys():
-        raise AttributeError('deriv finance indicator fields should in kwargs!')
+    if "deriv_finance_indicator_fields" not in kwargs.keys():
+        raise AttributeError("deriv finance indicator fields should in kwargs!")
 
-    if 'symbol' not in kwargs.keys():
-        raise AttributeError('symbol should in kwargs!')
+    if "symbol" not in kwargs.keys():
+        raise AttributeError("symbol should in kwargs!")
 
     begin = format_date(begin).strftime("%Y-%m-%d")
     end = format_date(end).strftime("%Y-%m-%d")
 
-    symbol = kwargs['symbol']
-    deriv_finance_indicator_fields = kwargs['deriv_finance_indicator_fields']
+    symbol = kwargs["symbol"]
+    deriv_finance_indicator_fields = kwargs["deriv_finance_indicator_fields"]
     outData = pd.DataFrame()
     errors_num = 0
     update_exit = 0
@@ -27,8 +27,15 @@ def deriv_finance_indicator(begin, end, **kwargs):
         t.set_description("begin:{} -- end:{}".format(begin, end))
         for patSymbol in t:
             try:
-                tmpData = get_fundamentals(table='deriv_finance_indicator', symbols=patSymbol, limit=1000,
-                                           start_date=begin, end_date=end, fields=deriv_finance_indicator_fields, df=True)
+                tmpData = get_fundamentals(
+                    table="deriv_finance_indicator",
+                    symbols=patSymbol,
+                    limit=1000,
+                    start_date=begin,
+                    end_date=end,
+                    fields=deriv_finance_indicator_fields,
+                    df=True,
+                )
                 _len = len(tmpData)
                 t.set_postfix({"状态": "已成功获取{}条数据".format(_len)})  # 进度条右边显示信息
                 errors_num = 0
@@ -52,12 +59,24 @@ def deriv_finance_indicator(begin, end, **kwargs):
     return outData
 
 
-def deriv_finance_indicator_update(upDateBegin, endDate='20231231'):
-    deriv_finance_indicator_info = pd.read_excel(os.path.join(dev_files_dir, 'deriv_finance_indicator.xlsx'))
-    deriv_finance_indicator_fields = deriv_finance_indicator_info['列名'].to_list()
-    data = deriv_finance_indicator(begin=upDateBegin, end=endDate, symbol=symbolList,
-                                   deriv_finance_indicator_fields=deriv_finance_indicator_fields)
+def deriv_finance_indicator_update(upDateBegin, endDate="20231231"):
+    deriv_finance_indicator_info = pd.read_excel(
+        os.path.join(dev_files_dir, "deriv_finance_indicator.xlsx")
+    )
+    deriv_finance_indicator_fields = deriv_finance_indicator_info["列名"].to_list()
+    data = deriv_finance_indicator(
+        begin=upDateBegin,
+        end=endDate,
+        symbol=symbolList,
+        deriv_finance_indicator_fields=deriv_finance_indicator_fields,
+    )
     if len(data) == 0:
         print("无数据更新")
     else:
-        save_data_Y(data, 'pub_date', 'deriv_finance_indicator', reWrite=True, _dataBase_root_path=dataBase_root_path_gmStockFactor)
+        save_data_Y(
+            data,
+            "pub_date",
+            "deriv_finance_indicator",
+            reWrite=True,
+            _dataBase_root_path=dataBase_root_path_gmStockFactor,
+        )
