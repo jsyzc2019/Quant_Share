@@ -8,12 +8,14 @@ import json
 import os
 import os.path
 import pickle
-from tqdm import tqdm
+from datetime import datetime as dt
+from functools import wraps
+from time import strptime
+from typing import Union, Optional
+
 import numpy as np
 import pandas as pd
-from functools import reduce, wraps
-from time import strptime
-from datetime import datetime as dt
+from pandas import Series, Timestamp
 
 dataBase_root_path = r"E:\Share\Stk_Data\dataFile"
 dataBase_root_path_future = r"E:\Share\Fut_Data"
@@ -317,16 +319,18 @@ def reindex(data, tradeDate=True, **kwargs):
     end = kwargs.get("end", data.index.max())
     if tradeDate:
         # TODO 使用二分法优化速度
-        new_index = [
-            x for x in pd.date_range(begin, end, freq="D") if x in tradeDateList
-        ]
+        # new_index = [
+        #     x for x in pd.date_range(begin, end, freq="D") if x in tradeDateList
+        # ]
+        new_index = pd.date_range(begin, end, freq="D").intersection(tradeDateList)
     else:
         new_index = pd.date_range(begin, end, freq="D")
     new_columns = stockList
     # fill na
-    fill_value = np.nan
-    if "fill_value" in kwargs.keys():
-        fill_value = kwargs["fill_value"]
+    # fill_value = np.nan
+    # if "fill_value" in kwargs.keys():
+    #     fill_value = kwargs["fill_value"]
+    fill_value = kwargs.get("fill_value", np.nan)
     return data.reindex(index=new_index, columns=new_columns, fill_value=fill_value)
 
 
@@ -459,7 +463,11 @@ def get_tradeDate(InputDate, lag=0):
             return tradeDateList[index + lag]
 
 
-def get_tradeDates(begin, end=None, n: int = None):
+def get_tradeDates(
+    begin: Union[pd.Timestamp, str],
+    end: Union[pd.Timestamp, str] = None,
+    n: int = None,
+) -> list[pd.Timestamp]:
     """
     获取指定时间段内的交易日列表
     :param begin:
@@ -479,7 +487,7 @@ def get_tradeDates(begin, end=None, n: int = None):
         if n:
             return tradeDateList[index_begin : index_begin + n + 1]
         else:
-            raise AttributeError("u should input end or n!")
+            raise AttributeError("You should input end or n!")
 
 
 def binary_search(arr: list, target):
@@ -499,14 +507,18 @@ def binary_search(arr: list, target):
     return False, low
 
 
-def is_tradeDate(date: int or str or datetime.datetime):
+def is_tradeDate(
+        date: Union[int, str, datetime.datetime]
+) -> bool:
     if format_date(date) in tradeDateList:
         return True
     else:
         return False
 
 
-def format_date(date):
+def format_date(
+        date: Union[datetime.datetime, datetime.date, int, str]
+) -> Series | Timestamp:
     if isinstance(date, datetime.datetime):
         return pd.to_datetime(date.date())
     elif isinstance(date, datetime.date):
@@ -518,7 +530,7 @@ def format_date(date):
         date = pd.to_datetime(date)
         return pd.to_datetime(date.date())
     else:
-        raise TypeError("date should be str or int!")
+        raise TypeError("date should be str, int or timestamp!")
 
 
 def printJson(dataJson):
