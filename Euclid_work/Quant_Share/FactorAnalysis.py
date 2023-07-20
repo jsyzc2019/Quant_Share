@@ -7,15 +7,14 @@
 import numpy as np
 import pandas as pd
 
+from .EuclidGetData import get_data
 from .Utils import (
-    printJson,
     reindex,
     info_lag,
     get_tradeDate,
     format_date,
     dataBase_root_path,
 )
-from .EuclidGetData import get_data
 
 
 def format_nav(nav):
@@ -92,8 +91,8 @@ def get_Performance_analysis(nav, year_day=252):
     net_values = round(nav[-1], 4)
 
     # 计算算术年化收益率
-    year_ret_mean = nav.pct_change().dropna().mean() * year_day
-    year_ret_mean = round(year_ret_mean * 100, 2)
+    # year_ret_mean = nav.pct_change().dropna().mean() * year_day
+    # year_ret_mean = round(year_ret_mean * 100, 2)
 
     # 计算几何年化收益率
     year_ret_sqrt = net_values ** (year_day / len(nav)) - 1
@@ -146,7 +145,7 @@ def get_new_stock_filter(Score, newly_listed_threshold=120):
     else:
         Score = Score.copy()
         # TODO 改用纯交易日滞后
-        tag = get_tradeDate(20150101, n=newly_listed_threshold)["tradeDate_fore"]
+        tag = get_tradeDate(20150101, lag=newly_listed_threshold)["tradeDate_fore"]
         if format_date(Score.index[0]) <= tag:
             raise ResourceWarning(
                 "Score should start behind {}".format(tag.strftime("%Y-%m-%d"))
@@ -203,11 +202,11 @@ def get_limit_up_down_filter(Score=None):
     :param Score:
     :return: 涨跌停为True或np.nan
     """
-    openP = pd.read_csv(
-        "{}/dev_openP_formated_wide.csv".format(dataBase_root_path),
-        index_col="tradeDate",
-    )
-    openP = reindex(openP)
+    # openP = pd.read_csv(
+    #     "{}/dev_openP_formated_wide.csv".format(dataBase_root_path),
+    #     index_col="tradeDate",
+    # )
+    # openP = reindex(openP)
     closeP = pd.read_csv(
         "{}/dev_closeP_formated_wide.csv".format(dataBase_root_path),
         index_col="tradeDate",

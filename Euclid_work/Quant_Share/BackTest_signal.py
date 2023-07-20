@@ -39,7 +39,7 @@ class simpleBT_signal(simpleBT):
         # 清理Score
         # TODO(@Euclid) 形成新的Utils.Clean，适配Array(1D,2D), pd.Series, pd.DataFrame
         Score.loc[
-            (Score < 0).values | (Score.isna()).values | (Score == np.Inf).values
+            (Score < 0).values | (Score.isna()).values | (Score == np.Inf)
         ] = 0
 
         # 调整仓位和为1

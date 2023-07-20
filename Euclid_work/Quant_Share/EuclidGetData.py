@@ -2,19 +2,27 @@
 # @Time    : 2023/4/8 21:38
 # @Author  : Euclid-Jie
 # @File    : EuclidGetData.py
+import json
+import multiprocessing
 import os
 import time
-from tqdm import tqdm
-import pandas as pd
-from datetime import datetime
+import warnings
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
-import multiprocessing
+from datetime import datetime
+
+import pandas as pd
+from fuzzywuzzy import process
 from joblib import Parallel, delayed
+from pandas.errors import ParserError
+from tqdm import tqdm
+
+from .TableInfo import tableInfo
+from .Utils import dataBase_root_path_EM_data
 from .Utils import (
     format_date,
     format_stockCode,
     format_futures,
-    futures_list,
     dataBase_root_path,
     dataBase_root_path_future,
     dataBase_root_path_gmStockFactor,
@@ -22,13 +30,6 @@ from .Utils import (
     isdate,
     dataBase_root_path_JointQuant_prepare,
 )
-from .Utils import dataBase_root_path_EM_data
-from .TableInfo import tableInfo
-import json
-from collections import defaultdict
-from fuzzywuzzy import process
-from pandas.errors import ParserError
-import warnings
 
 warnings.filterwarnings("ignore")
 __all__ = ["get_data", "get_table_info", "search_keyword", "get_data_Base"]
@@ -60,7 +61,7 @@ def run_thread_pool_sub(target, args, max_work_count):
 
 
 def read_data_h5(h5FileFullPath, key="a"):
-    return pd.read_hdf(h5FileFullPath, key="a")
+    return pd.read_hdf(h5FileFullPath, key=key)
 
 
 def load_file(toLoadList):
@@ -127,7 +128,7 @@ def get_data_Base(tableName, begin, end, fields, ticker, path, **kwargs):
     tableFoldPath = os.path.join(path, tableName)
     if not os.path.exists(tableFoldPath):
         try:
-            data = pd.read_hdf(tableFoldPath + ".h5")
+            data: pd.DataFrame | object = pd.read_hdf(tableFoldPath + ".h5")
             return selectFields(data, tableName, begin, end, fields, ticker)
         except FileNotFoundError:
             print("{} no exits!".format(tableName))

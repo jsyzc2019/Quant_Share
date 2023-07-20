@@ -251,10 +251,10 @@ class H5DataTS:
 
         assert self.h5File_Iterator is not None
         count = 0
-        res = []
+        _res = []
         for ck in tqdm(self.h5File_Iterator):
             tmp = func(ck, *args)
-            res.append(tmp)
+            _res.append(tmp)
             count += 1
             if break_count and count > break_count:
                 break
@@ -262,7 +262,7 @@ class H5DataTS:
         if reload:
             self.load_h5_data(self.transform_file_path)
 
-        return res
+        return _res
 
     @staticmethod
     def extract_column(data, args: str or list[str]):
@@ -270,16 +270,16 @@ class H5DataTS:
 
     @staticmethod
     def get_attrs(data, *args):
-        res = []
+        _res = []
         for arg in args:
-            res.append(getattr(data, arg))
-        return res
+            _res.append(getattr(data, arg))
+        return _res
 
     def to_list(self):
         return list(self.h5File_Iterator)
 
     @staticmethod
-    def memory_analysis(*args):
+    def memory_analysis():
         pid = os.getpid()
         # 创建psutil的Process对象
         process = psutil.Process(pid)
@@ -304,11 +304,4 @@ if __name__ == "__main__":
     res = ts.ergodic_process(
         H5DataTS.get_attrs, break_count=None, reload=True, args=("shape",)
     )
-    print(res)
-    # res = ts.ergodic_process(
-    #     H5DataTS.extract_column,
-    #     break_count=None,
-    #     reload=True,
-    #     args=('shape',))
-    # print(res)
     ts.memory_analysis()

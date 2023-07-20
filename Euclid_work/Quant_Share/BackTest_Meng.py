@@ -169,7 +169,7 @@ class simpleBT:
             # calc the position holding rtn
             pos_rtn_each_ticker = temp_pos * self.tickerData["Rtn"].loc[date]
             # init the rtn after trade as 0
-            trade_rtn = 0
+            # trade_rtn = 0
 
             if date in Score.index.to_list():
                 # pos adjusted by rtn
@@ -179,7 +179,7 @@ class simpleBT:
 
                 # calc target position
                 tmpScore = Score.loc[date].copy()
-                ## adjust by bench con
+                # adjust by bench con
                 _, idx = binary_search(
                     self.benchData["con_code"].index, format_date(date)
                 )
@@ -200,10 +200,10 @@ class simpleBT:
                 # Zcore处理
                 if _Zcore:
                     tmpScore = standardlize(data=tmpScore, inf2nan=_inf2nan)
+                # noinspection PyBroadException
                 try:
                     this_pos = self.getGroupTargPost(Score=tmpScore, group=group)
                 except Exception as e:
-                    # print(e)
                     this_pos = temp_pos
                 if self.negValueAdjust:
                     # adjust by negValue
@@ -326,8 +326,7 @@ class simpleBT:
         :return:
         """
         rtn = np.diff(np.log(nav))
-        result = {}
-        result["totalrtn"] = nav[-1] / nav[0] - 1
+        result = {"totalrtn": nav[-1] / nav[0] - 1}
         number_of_years = (
             pd.to_datetime(nav.index[-1]).toordinal()
             - pd.to_datetime(nav.index[0]).toordinal()

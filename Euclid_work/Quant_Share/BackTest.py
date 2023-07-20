@@ -2,15 +2,16 @@
 # @Time    : 2023/4/9 16:17
 # @Author  : Euclid-Jie
 # @File    : BackTest.py
-import math
-import numpy as np
-import pandas
-import pandas as pd
 import datetime
+import math
+
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 from tqdm import tqdm
-from .Utils import *
+
 from .EuclidGetData import get_data
+from .Utils import *
 
 
 class DataPrepare:
@@ -30,8 +31,8 @@ class DataPrepare:
 
         # tradeDate init
         self.tradeDateBase = tradeDate_info.loc[
-            format_date(beginDate) : format_date(endDate)
-        ]
+                             format_date(beginDate): format_date(endDate)
+                             ]
 
     def get_bench_info(self):
         # bench nav
@@ -116,11 +117,11 @@ class simpleBT:
             )
         else:
             rtn_before_trade = (
-                self.tickerData[dealPrice] / self.tickerData["closePrice"].shift(axis=0)
-                - 1
+                    self.tickerData[dealPrice] / self.tickerData["closePrice"].shift(axis=0)
+                    - 1
             )
             rtn_after_trade = (
-                self.tickerData["closePrice"] / self.tickerData[dealPrice] - 1
+                    self.tickerData["closePrice"] / self.tickerData[dealPrice] - 1
             )
 
             rtn_before_trade[pd.isnull(rtn_before_trade)] = 0
@@ -193,7 +194,7 @@ class simpleBT:
                             break
                         else:
                             diff[tradable & temp_sell] = diff[temp_sell].sum() / (
-                                temp_sell.sum() - unfilled_sell
+                                    temp_sell.sum() - unfilled_sell
                             )
 
                     if unfilled_buy > 0:
@@ -205,7 +206,7 @@ class simpleBT:
                             break
                         else:
                             diff[tradable & temp_buy] = diff[temp_buy].sum() / (
-                                temp_buy.sum() - unfilled_buy
+                                    temp_buy.sum() - unfilled_buy
                             )
                     break
                 diff[~tradable] = 0
@@ -216,14 +217,14 @@ class simpleBT:
 
             else:  # not in Score
                 temp_pos = temp_pos * (
-                    1 + self.tickerData["Rtn"].loc[date]
+                        1 + self.tickerData["Rtn"].loc[date]
                 )  # 直接使用close/close_pre - 1收益率进行更新
                 temp_pos = temp_pos / temp_pos.sum()
                 temp_pos.fillna(0, inplace=True)
 
             pos_out.loc[date] = temp_pos  # 记录个股仓位
             daily_rtn.loc[date] = (
-                pos_rtn + trade_rtn - fee.loc[date]
+                    pos_rtn + trade_rtn - fee.loc[date]
             )  # 每日收益=持仓收益+交易后的收益-手续费
 
         print(">>> Back Test done")
@@ -281,12 +282,11 @@ class simpleBT:
         :return:
         """
         rtn = np.diff(np.log(nav))
-        result = {}
-        result["totalrtn"] = nav[-1] / nav[0] - 1
+        result = {"totalrtn": nav[-1] / nav[0] - 1}
         number_of_years = (
-            pd.to_datetime(nav.index[-1]).toordinal()
-            - pd.to_datetime(nav.index[0]).toordinal()
-        ) / 356
+                                  pd.to_datetime(nav.index[-1]).toordinal()
+                                  - pd.to_datetime(nav.index[0]).toordinal()
+                          ) / 356
         result["alzdrtn"] = (result["totalrtn"] + 1) ** (1 / number_of_years) - 1
         result["stdev"] = rtn.std()
         result["vol"] = rtn.std() * np.sqrt(250)
@@ -298,6 +298,7 @@ class simpleBT:
     @staticmethod
     def getGroupTargPost(Score, group, ascending=True):
         """
+        :param ascending:
         :param Score: 评分
         :param group: 评分分组
         :return: 目标仓位
@@ -306,7 +307,7 @@ class simpleBT:
         if not ascending:
             labels = labels[::-1]
         TargPost = (
-            pd.qcut(Score, 5, labels=labels, duplicates="drop") == str(group)
+                pd.qcut(Score, 5, labels=labels, duplicates="drop") == str(group)
         ).astype(int)
         TargPost = TargPost / TargPost.sum()
         return TargPost

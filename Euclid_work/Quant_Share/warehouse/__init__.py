@@ -90,7 +90,6 @@ def write_df_to_pgDB(df, **kwargs):
 
 
 def load_gmData_history(symbols: str | list[str] = None, begin=None, end=None):
-    conn = postgres_connect()
 
     query = 'SELECT * FROM "gmData_history"'
     params = {}

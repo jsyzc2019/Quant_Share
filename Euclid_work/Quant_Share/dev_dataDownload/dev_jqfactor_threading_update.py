@@ -19,8 +19,6 @@ def main():
     start = time.perf_counter()
     dp = DataPrepare("20200101")
 
-    result_dict = dict()
-
     joint_quant_factor = dp.joint_quant_factor
     factor_list = joint_quant_factor["factor_name"]
 
