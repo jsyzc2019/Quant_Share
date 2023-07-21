@@ -10,6 +10,8 @@ import pandas as pd
 
 class FactorScore(BARRA):
     def __init__(self, beginDate: str = None, endDate: str = None):
+        self.market_data = None
+        self.indus_data = None
         endDate = endDate if endDate else date.today().strftime("%Y%m%d")
         super().__init__(beginDate, endDate)
 
@@ -88,7 +90,8 @@ class FactorScore(BARRA):
         df = self.adjust(df)
         return df
 
-    def get_dummy_industry(self, industry_data, trade_date):
+    @staticmethod
+    def get_dummy_industry(industry_data, trade_date):
         if isinstance(trade_date, str):
             trade_date = pd.to_datetime(trade_date)
         df_in_date = industry_data[industry_data.index == trade_date]
@@ -131,16 +134,16 @@ class FactorScore(BARRA):
         try:
             model = LinearRegression().fit(X.values, y.values)
             resid = y - model.predict(X.values)
+            return resid
         except ValueError:
             print(y.values.max())
-        return resid
 
     def neutralization(
-        self,
-        factor: Union[pd.DataFrame, str],
-        industry=True,
-        market=False,
-        normalize=False,
+            self,
+            factor: Union[pd.DataFrame, str],
+            industry=True,
+            market=False,
+            normalize=False,
     ):
         if isinstance(factor, str):
             factor = getattr(self, factor)
@@ -176,7 +179,8 @@ class FactorScore(BARRA):
         fator_nual = factor.apply(self.neutral_process, axis=1)
         return fator_nual
 
-    def ScoretoGroup(self, Score, num=5, inverse=False):
+    @staticmethod
+    def ScoretoGroup(Score, num=5, inverse=False):
         """
         :param Score:
         :param num:

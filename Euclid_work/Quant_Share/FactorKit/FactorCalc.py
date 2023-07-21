@@ -315,7 +315,7 @@ class FactorData:
             df["adj_factor"].shift(1) if not all(df["adj_factor"] == 0) else 1
         )
         df["return"] = (
-            (df["close"] - df["pre_close"]) / df["pre_close"] * df["pre_adj_factor"]
+                (df["close"] - df["pre_close"]) / df["pre_close"] * df["pre_adj_factor"]
         )
         df = df[["trade_date", "return"]]
         # df['trade_date'] = df['trade_date'].dt.strftime('%Y-%m-%d')
@@ -327,8 +327,10 @@ class FactorData:
 
 class FactorBase(FactorData):
     def __init__(self, beginDate: str = None, endDate: str = None, **kwargs) -> None:
+
         self.beginDate = beginDate
         self.endDate = endDate if endDate else date.today().strftime("%Y%m%d")
+        super().__init__(beginDate, endDate, **kwargs)
         for k, v in kwargs.items():
             setattr(self, k, v)
 
@@ -381,13 +383,17 @@ class FactorBase(FactorData):
             print(e)
             print(X.shape, y.shape, X.size, y.size)
 
-    def align_data(self, data_lst: list[pd.DataFrame] = [], clean: bool = True, *args):
+    @staticmethod
+    def align_data(data_lst=None, clean: bool = True, *args):
         """
         基于index和columns进行表格的对齐
+        :param clean:
         :param data_lst: 以列表形式传入需要对齐的表格
         :param args: 可以传入单个表格
         :return:
         """
+        if data_lst is None:
+            data_lst = []
         data_lst = list(chain(data_lst, args))
         if clean:
             data_lst = [reindex(df) for df in data_lst]
@@ -418,10 +424,10 @@ class FactorBase(FactorData):
 
     @staticmethod
     def winsorize(
-        series: pd.Series or np.ndarray,
-        n: float or int = 3,
-        mode: str = "mad",
-        **kwargs,
+            series: pd.Series or np.ndarray,
+            n: float or int = 3,
+            mode: str = "mad",
+            **kwargs,
     ):
         """
         :param series:
@@ -490,7 +496,8 @@ class FactorBase(FactorData):
             )
         return res
 
-    def rolling_apply(self, datdf, func, args=None, axis=0, window=None):
+    @staticmethod
+    def rolling_apply(datdf, func, args=None, axis=0, window=None):
         if window:
             res = datdf.rolling(window=window).apply(func, args=args, raw=True)
         else:
@@ -539,7 +546,7 @@ class FactorBase(FactorData):
         return np.sqrt(np.nansum((series - np.nanmean(series)) ** 2 * weights))
 
     def rolling_regress(
-        self, y, x, window=5, half_life=None, fill_na: str or (int, float) = 0
+            self, y, x, window=5, half_life=None, fill_na: str or (int, float) = 0
     ):
         fill_args = (
             {"method": fill_na} if isinstance(fill_na, str) else {"value": fill_na}
@@ -561,7 +568,7 @@ class FactorBase(FactorData):
         sigma = pd.DataFrame(columns=stocks)
         for i, (rolling_x, rolling_y) in enumerate(zip(rolling_xs, rolling_ys)):
             rolling_y = pd.DataFrame(
-                rolling_y, columns=y.columns, index=y.index[i : i + window]
+                rolling_y, columns=y.columns, index=y.index[i: i + window]
             )
             window_sdate, window_edate = rolling_y.index[0], rolling_y.index[-1]
             rolling_y = rolling_y.fillna(**fill_args)

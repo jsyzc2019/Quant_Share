@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 from datetime import date
 
-
 DATA_READY = {
     "raw_data": ["chgPct", "marketValue", "closePrice", "turnoverRate", "bench"],
     "factor": [
@@ -42,7 +41,7 @@ class SizeFactor(FactorBase):
     def _calc_MIDCAP(self, x: pd.Series or np.ndarray) -> pd.DataFrame:
         if isinstance(x, pd.Series):
             x = x.values
-        y = x**3
+        y = x ** 3
         beta, alpha, _ = self.regress(y, x, intercept=True, weight=1, verbose=True)
         y_hat = alpha + beta * x
         resid = y - y_hat
@@ -80,7 +79,7 @@ class DividendYield(FactorBase):
         df = df.loc[
             (df.index >= pd.to_datetime(self.beginDate))
             & (df.index <= pd.to_datetime(self.endDate))
-        ]
+            ]
         return df
 
 
@@ -90,7 +89,8 @@ class Liquidity(FactorBase):
         super().__init__(beginDate, endDate)
         pass
 
-    def _calc_Liquidity(self, series, days: int):
+    @staticmethod
+    def _calc_Liquidity(series, days: int):
         freq = len(series) // days
         res = np.log(np.nansum(series) / freq)
         return -1e10 if np.isinf(res) else res
@@ -179,7 +179,7 @@ class Volatility(FactorBase):
     @staticmethod
     def _cal_cmra(series, months=12, days_per_month=21, version=6):
         z = sorted(
-            np.nansum(series[-i * days_per_month :]) for i in range(1, months + 1)
+            np.nansum(series[-i * days_per_month:]) for i in range(1, months + 1)
         )
         if version == 6:
             return z[-1] - z[0]

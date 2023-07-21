@@ -101,7 +101,7 @@ def patList(InList: list, pat: int):
     if pat == -1:
         return [InList]
     else:
-        return [InList[i : i + pat] for i in range(0, len(InList), pat)]
+        return [InList[i: i + pat] for i in range(0, len(InList), pat)]
 
 
 def format_stockCode(numCode):
@@ -268,7 +268,7 @@ def data2score(data, neg=False, ascending=True, axis=1):
 
 
 def winsorize_med(
-    data: pd.Series, scale=1, inclusive: bool = True, inf2nan: bool = True
+        data: pd.Series, scale=1, inclusive: bool = True, inf2nan: bool = True
 ):
     s = data.copy()
     if inf2nan:
@@ -415,7 +415,7 @@ def save_data_Y(df, date_column_name, tableName, _dataBase_root_path, reWrite=Fa
 
 
 def save_data_Q(
-    df, date_column_name, tableName, _dataBase_root_path, reWrite=False, append=False
+        df, date_column_name, tableName, _dataBase_root_path, reWrite=False, append=False
 ):
     """
     对df进行拆分, 进一步存储
@@ -464,9 +464,9 @@ def get_tradeDate(InputDate, lag=0):
 
 
 def get_tradeDates(
-    begin: Union[pd.Timestamp, str],
-    end: Union[pd.Timestamp, str] = None,
-    n: int = None,
+        begin: Union[pd.Timestamp, str],
+        end: Union[pd.Timestamp, str] = None,
+        n: int = None,
 ) -> list[pd.Timestamp]:
     """
     获取指定时间段内的交易日列表
@@ -482,10 +482,10 @@ def get_tradeDates(
         res, index_end = binary_search(tradeDateList, end)
         if not res:
             index_end += 1
-        return tradeDateList[index_begin : index_end + 1]
+        return tradeDateList[index_begin: index_end + 1]
     else:
         if n:
-            return tradeDateList[index_begin : index_begin + n + 1]
+            return tradeDateList[index_begin: index_begin + n + 1]
         else:
             raise AttributeError("You should input end or n!")
 
@@ -612,18 +612,19 @@ def isdate(datestr, **kwargs):
             strdate += temp
 
     pattern = (
-        "%Y年%m月%d日",
-        "%Y-%m-%d",
-        "%y年%m月%d日",
-        "%y-%m-%d",
-        "%Y/%m/%d",
-        "%Y%m%d",
-    ) + kwargs.get("pattern", ())
+                  "%Y年%m月%d日",
+                  "%Y-%m-%d",
+                  "%y年%m月%d日",
+                  "%y-%m-%d",
+                  "%Y/%m/%d",
+                  "%Y%m%d",
+              ) + kwargs.get("pattern", ())
     for i in pattern:
+
         try:
             ret = strptime(strdate, i)
             if ret:
                 return True
-        except:
+        except ValueError as _:
             continue
     return False

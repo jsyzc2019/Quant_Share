@@ -111,5 +111,5 @@ class EnhancingDividend(BARRA):
             ]
         )
         D_t = bool_negMarketValue & bool_turnoverValue & bool_perCashDiv & bool_EPS
-        EnhancingDividend = DTOP * D_t
-        return EnhancingDividend
+        _EnhancingDividend = DTOP * D_t
+        return _EnhancingDividend

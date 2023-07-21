@@ -14,14 +14,9 @@ def get_span_list(
     begin, end, freq=None
 ) -> list[tuple[datetime.datetime, datetime.datetime, str]]:
     """
-    依据freq, 对区间begin-end进行划分
-    --- demo
-        begin = 2018-01-04
-        end = 2018-04-20
-        fre = M
-        ->
-        [(2018-01-01, 2018-01-31, Y2018_M1), (2018-02-01, 2018-02-28, Y2018_M2), (2018-03-01, 2018-03-31, Y2018_M3), (2018-04-01, 2018-04-30, Y2018_M4)]
-    ---
+    依据freq, 对区间begin-end进行划分 --- demo begin = 2018-01-04 end = 2018-04-20 fre = M -> [(2018-01-01, 2018-01-31,
+    Y2018_M1), (2018-02-01, 2018-02-28, Y2018_M2), (2018-03-01, 2018-03-31, Y2018_M3), (2018-04-01, 2018-04-30,
+    Y2018_M4)] ---
     """
     begin = format_date(begin)
     end = format_date(end)

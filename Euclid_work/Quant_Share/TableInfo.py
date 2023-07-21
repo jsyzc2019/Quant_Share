@@ -98,7 +98,7 @@ with open(os.path.join(current_dir, "dev_files/emData_tableInfo.json"), "r") as 
 with open(os.path.join(current_dir, "dev_files/jointquant_tableInfo.json"), "r") as f:
     jointquant = json.load(f)
 
-tableInfo: Dict[str:Dict] = {}
+tableInfo: Dict = {}
 for table in [
     "InfoTable",
     "gmStock",

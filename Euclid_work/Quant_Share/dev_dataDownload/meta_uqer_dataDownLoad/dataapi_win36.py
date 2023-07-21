@@ -27,14 +27,15 @@ class Client:
         if self.httpClient is not None:
             self.httpClient.close()
 
-    def encodepath(self, path):
+    @staticmethod
+    def encodepath(path):
         # 转换参数的编码
         start = 0
         n = len(path)
         re = ""
         i = path.find("=", start)
         while i != -1:
-            re += path[start : i + 1]
+            re += path[start: i + 1]
             start = i + 1
             i = path.find("&", start)
             if i >= 0:

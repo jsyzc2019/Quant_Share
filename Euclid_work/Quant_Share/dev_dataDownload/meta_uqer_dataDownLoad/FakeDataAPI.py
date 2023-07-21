@@ -84,7 +84,6 @@ class FakeDataAPI:
         doc: https://mall.datayes.com/datapreview/1905
         demoUrl: /api/idx/getmIdxCloseWeight.json?field=&ticker=000300&secID=&beginDate=20151101&endDate=20151130
         :param ticker: default=[000300,000905,000852]
-        :param tradeDate:
         :param beginDate:
         :param endDate:
         :param kwargs:
@@ -132,7 +131,8 @@ class FakeDataAPI:
         beginDate, endDate, tradeDate = cls.assert_format_data(
             beginDate, endDate, tradeDate
         )
-        base_url = "/api/market/getMktLimit.json?field=&secID=&ticker={}&exchangeCD={}&tradeDate={}&beginDate={}&endDate={}"
+        base_url = "/api/market/getMktLimit.json?field=&secID=&ticker={}&exchangeCD={}&tradeDate={}&beginDate={" \
+                   "}&endDate={}"
         pat_len = kwargs.get("pat_len", 5)
         if isinstance(ticker, list):
             outData_df = pd.DataFrame()
@@ -294,7 +294,8 @@ class FakeDataAPI:
         :return:
         """
         beginDate, endDate, tradeDate = cls.assert_format_data(beginDate, endDate, "")
-        base_url = "/api/fundamental/getFdmtIndiPSPit.json?field=&ticker={}&beginYear={}&endYear={}&reportType={}&publishDateBegin={}&publishDateEnd={}"
+        base_url = "/api/fundamental/getFdmtIndiPSPit.json?field=&ticker={}&beginYear={}&endYear={}&reportType={" \
+                   "}&publishDateBegin={}&publishDateEnd={}"
         pat_len = kwargs.get("pat_len", 5)
         if isinstance(ticker, list):
             outData_df = pd.DataFrame()
