@@ -3,23 +3,174 @@
 # @Time    : 2023/7/16 12:15
 # @Author  : Euclid-Jie
 # @File    : __init__.py.py
-# @Desc    : 用于从postgresDB中读取数据
+# @Desc    : 用于从postgresDB中读取, 写入数据
 """
-from sqlalchemy import create_engine
-from typing import Dict
-from Euclid_work.Quant_Share import format_date
+from sqlalchemy import create_engine, text
+from typing import Dict, Optional, List
 import pandas as pd
 import psycopg2
 from configparser import ConfigParser
 import os
+from Euclid_work.Quant_Share import format_date
+
+
+def format_table(
+    table_name: str,
+    columns: bool = True,
+    record_time: bool = False,
+    dataBase: str = None,
+):
+    """
+    :param table_name: 数据表名
+    :param columns: if True(default), 将对数据表的所有列名称转为小写
+    :param record_time: if Ture, 会未表添加record_time列, default False
+    :param dataBase: 数据库名称, 默认为ini文件中的dataBase
+    """
+    if dataBase is not None:
+        conn = postgres_connect(database=dataBase)
+    else:
+        conn = postgres_connect()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM {} LIMIT 0".format(table_name))
+    table_column_names = [col_i.name for col_i in cur.description]
+    if columns:
+        for col_name_i in table_column_names:
+            if col_name_i != col_name_i.lower():
+                cur.execute(
+                    'ALTER TABLE "{}" RENAME COLUMN "{}" TO {}'.format(
+                        table_name, col_name_i, col_name_i.lower()
+                    )
+                )
+
+    record_time_exits = "record_time" in table_column_names
+    if not record_time_exits and record_time:
+        cur.execute(
+            "alter table {} add record_time timestamp default current_timestamp not null;".format(
+                dataBase
+            )
+        )
+        record_time_exits = True
+        print("record_time has been created in {}".format(dataBase))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+def postgres_write_data_frame(
+    data: pd.DataFrame,
+    table_name: str,
+    update: bool = False,
+    unique_index: [str, List[str]] = None,
+    record_time: bool = False,
+    debug: bool = False,
+):
+    """
+    更通用的postgres写入方式, pd.io.sql.to_sql适用于初次建表时写入, 后续写入时, 难免遇到重复数据, 可能导致index冲突
+        重复数据: 数据内容完全一样的行, 使用append参数会导致数据库重复, 不利于维护
+        index冲突: 部分表设置了unique_index, 不能接受重复的数据写入
+            unique_index: 为加速取数速度, 增加的索引, 可以设置其为unique
+    如何解决该冲突:
+        1 忽略这部分新的重复数据, 保留原始数据
+        2 用这部分重复数据覆写, 同时设置record_time标识
+    注意:
+        1 相比于pd.io.sql.to_sql, 此函数更通用, 建议对存在index的表示使用, 无index直接使用pd.io.sql.to_sql
+        2 使用覆写时, 需要传入unique_index。同时你需要确保此表有record_time列, 当然可以帮你自动生成此列
+        3 常见报错有以下几类
+            1 无法识别表名或者列名: 是因为大小写问题, 建议全部转为小写
+            2 无法写入日期: 确实为此函数的缺陷, 建议将data中的日期列转为str, 例如timespan(2020-01-01 20:00:00) -> "2020-01-01 20:00:00"
+    :param data: 需要写入的数据
+    :param table_name: 数据库名
+    :param update: if True 则覆写; default False
+    :param unique_index: table的unique索引列
+    :param record_time: if True, 如果table没有record_time, 则未其增添
+    :param debug: if Ture, 将打印insert ... 命令, 据此在sql console进行debug
+    :return:
+    """
+    conn = postgres_connect()
+    cur = conn.cursor()
+    # 判断是否有record_time列
+    cur.execute("SELECT * FROM {} LIMIT 0".format(table_name))
+    record_time_exits = "record_time" in [col_i.name for col_i in cur.description]
+    if not record_time_exits and record_time:
+        cur.execute(
+            "alter table {} add record_time timestamp default current_timestamp not null;".format(
+                table_name
+            )
+        )
+        record_time_exits = True
+        print("record_time has been created in {}".format(table_name))
+        cur.close()
+
+    if update:
+        assert unique_index is not None, "if update data, index is needed"
+        sql_texts = SQL_UPDATE_STATEMENT_FROM_DATAFRAME(
+            data, table_name, unique_index, record_time_exits=record_time_exits
+        )
+    else:
+        sql_texts = SQL_INSERT_STATEMENT_FROM_DATAFRAME(data, table_name)
+    cur = conn.cursor()
+    for sql_text in sql_texts:
+        if debug:
+            print(sql_text)
+        cur.execute(sql_text)
+    conn.commit()
+    conn.close()
+
+
+def SQL_INSERT_STATEMENT_FROM_DATAFRAME(data: pd.DataFrame, table_name: str):
+    sql_texts = []
+    for index, row in data.iterrows():
+        sql_texts.append(
+            "INSERT INTO "
+            + table_name
+            + " ("
+            + str(", ".join(data.columns))
+            + ") VALUES "
+            + str(tuple(row.values)).replace("nan", "NULL")
+            + " ON CONFLICT DO NOTHING"
+        )
+    return sql_texts
+
+
+def SQL_UPDATE_STATEMENT_FROM_DATAFRAME(
+    data: pd.DataFrame,
+    table_name: str,
+    unique_index: [str, List[str]],
+    record_time_exits: bool = False,
+):
+    sql_texts = []
+    for index, row in data.iterrows():
+        sql_text = "INSERT INTO "
+        sql_text += table_name
+        sql_text += " ("
+        sql_text += str(", ".join(data.columns))
+        sql_text += ") VALUES "
+        sql_text += str(tuple(row.values))
+        sql_text += " ON CONFLICT ({}) DO UPDATE SET ".format(",".join(unique_index))
+
+        for key, value in zip(data.columns, row):
+            if key in unique_index:
+                continue
+            else:
+                # TODO 肯定有什么方法可以避免此操作
+                if isinstance(value, str):
+                    sql_text += "{}='{}',".format(key, value)
+                else:
+                    sql_text += "{}={},".format(key, value)
+        if record_time_exits:
+            sql_text += "record_time=CURRENT_TIMESTAMP"
+        else:
+            sql_text = sql_text[:-1]
+        sql_texts.append(sql_text.replace("nan", "NULL"))
+    return sql_texts
 
 
 def postgres_config(ini_filepath: str = None, section="postgresql") -> Dict:
     """
     由配置文件postgresDB.ini获取并返回config
     """
-    if ini_filepath is None and os.path.exists("../test/postgresDB.ini"):
-        ini_filepath = "../test/postgresDB.ini"
+    if ini_filepath is None and os.path.exists("postgresDB.ini"):
+        ini_filepath = "postgresDB.ini"
     assert ini_filepath is not None, "ini_filepath is needed!"
     # create a parser
     parser = ConfigParser()
@@ -38,12 +189,14 @@ def postgres_config(ini_filepath: str = None, section="postgresql") -> Dict:
     return db
 
 
-def postgres_connect(config: Dict = None):
+def postgres_connect(config: Dict = None, database: str = None):
     """
     Connect to the PostgresSQL database server
     """
     if config is None:
         config = postgres_config()
+    if database is not None:
+        config["database"] = database
     conn = None
     try:
         # connect to the PostgresSQL server
@@ -61,12 +214,14 @@ def postgres_connect(config: Dict = None):
             print("Database connection closed.")
 
 
-def postgres_engine(config: Dict = None):
+def postgres_engine(config: Dict = None, database: str = None):
     """
     根据config返回engine, 一般供write_df_to_pgDB调用
     """
     if config is None:
         config = postgres_config()
+    if database is not None:
+        config["database"] = database
     return create_engine(
         "postgresql+psycopg2://{}:{}@{}:{}/{}".format(
             config["user"],
@@ -90,7 +245,6 @@ def write_df_to_pgDB(df, **kwargs):
 
 
 def load_gmData_history(symbols: str | list[str] = None, begin=None, end=None):
-
     query = 'SELECT * FROM "gmData_history"'
     params = {}
 
@@ -131,7 +285,7 @@ def load_data_from_sql(
 ):
     conn = postgres_connect()
     # 将 bob 列作为 timestamp 类型进行筛
-
+    # TODO@AlkaidYuan, 表名带大写才需要额外引号, 可以进一步考虑一下
     sql_query = [f'SELECT * FROM "{tableName}"']
     params = {}
     date_condition = "WHERE"
