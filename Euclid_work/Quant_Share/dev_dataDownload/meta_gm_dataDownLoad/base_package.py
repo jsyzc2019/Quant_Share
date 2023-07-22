@@ -16,7 +16,6 @@ from Euclid_work.Quant_Share import (
 )
 from tqdm import tqdm
 import time
-from Euclid_work.Quant_Share.warehouse import pgConnect, write_df_to_pgDB
 
 # 路径识别
 current_dir = os.path.abspath(os.path.dirname(__file__))

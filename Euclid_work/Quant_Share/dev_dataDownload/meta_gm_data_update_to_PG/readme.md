@@ -1,0 +1,3 @@
+meta_gm_data_update_to_PG 用于GM数据至postgres数据库
+
+各文件单独运行更新, 也可以运行update_to_PG.py实现批量更新
