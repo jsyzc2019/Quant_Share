@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
-# @Time    : 2023/4/8 18:47
+# @Time    : 2023/7/22
 # @Author  : Alkaid-Yuan
 # @File    : chronos.py
 
 
 from datetime import datetime, date
 from time import strptime
-from typing import Union, Optional, Literal
+from typing import Union, Optional, Literal, Tuple
 import numpy as np
 import pandas as pd
+
+TimeType = Union[str, int, datetime, date, pd.Timestamp]
 
 
 def watcher(func):
@@ -21,9 +23,6 @@ def watcher(func):
         return result
 
     return timer
-
-
-TimeType = Union[str, int, datetime, date, pd.Timestamp]
 
 
 class TradeDate:
@@ -150,9 +149,56 @@ class TradeDate:
             raise AttributeError("frq should be M, Q or Y!")
 
     @classmethod
-    def is_trade_date(
-            cls,
-            date_repr: TimeType
-    ) -> bool:
+    def is_trade_date(cls, date_repr: TimeType) -> bool:
         # TODO：二分法优化
         return cls.format_date(date_repr) in cls.trade_date_list
+
+    @staticmethod
+    def binary_search(
+        arr: Union[pd.Series, list, tuple, np.ndarray], target
+    ) -> Tuple[bool, int]:
+        low: int = 0
+        high: int = len(arr) - 1
+        while low <= high:
+            mid = (low + high) // 2
+            if arr[mid] == target:
+                return True, mid
+            elif arr[mid] < target:
+                low = mid + 1
+            else:
+                high = mid - 1
+        return False, low
+
+    @classmethod
+    def shift_trade_date(
+        cls,
+        date_repr: TimeType,
+        lag: int,
+    ) -> pd.Timestamp:
+
+        date_repr = cls.format_date(date_repr)
+        res, index = cls.binary_search(cls.trade_date_list, date_repr)
+        return cls.trade_date_list[index + lag]
+
+    @classmethod
+    def range_trade_date(cls, begin: TimeType, end: TimeType = None, lag: int = None):
+        begin = cls.format_date(begin)
+        _, index_begin = cls.binary_search(cls.trade_date_list, begin)
+        if end is not None:
+            end = cls.format_date(end)
+            res, index_end = cls.binary_search(cls.trade_date_list, end)
+            if not res:
+                index_end += 1
+            return cls.trade_date_list[index_begin:index_end+1]
+        elif lag is not None:
+            if lag < 0:
+                index_end = index_begin
+                index_begin -= lag
+            else:
+                index_end = index_begin + lag
+            return cls.trade_date_list[index_begin:index_end + 1]
+        else:
+            raise AttributeError("Pass attribute end or lag to the function!")
+
+
+
