@@ -14,3 +14,4 @@ from .FactorAnalysis import (
 )
 from .FactorKit import *
 from .H5DataSet import H5DataSet
+from .chronos import *

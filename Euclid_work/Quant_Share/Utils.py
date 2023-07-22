@@ -80,7 +80,6 @@ def time_decorator(func):
         end = dt.now()
         print(f"“{func.__name__}” run time: {end - start}.")
         return result
-
     return timer
 
 

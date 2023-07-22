@@ -95,14 +95,19 @@ class FactorScore(BARRA):
         if isinstance(trade_date, str):
             trade_date = pd.to_datetime(trade_date)
         df_in_date = industry_data[industry_data.index == trade_date]
+        index_name = df_in_date.index.name
+        if index_name is None:
+            index_name = 'date'
+            df_in_date.index.name = index_name
         df_in_date = df_in_date.reset_index()
+
         df_in_date = df_in_date.melt(
-            id_vars=["date"], var_name="ticker", value_name="industryName"
+            id_vars=[index_name], var_name="ticker", value_name="industryName"
         )
         X_industry = pd.get_dummies(
             df_in_date, columns=["industryName"], drop_first=True
         )
-        X_industry = X_industry.drop("date", axis=1)
+        X_industry = X_industry.drop(index_name, axis=1)
         return X_industry
 
     def concat_industry_market(self, industry, trade_date, market=None):
