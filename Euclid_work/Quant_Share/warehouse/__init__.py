@@ -63,6 +63,7 @@ def postgres_write_data_frame(
     unique_index: [str, List[str]] = None,
     record_time: bool = False,
     debug: bool = False,
+    **kwargs,
 ):
     """
     更通用的postgres写入方式, pd.io.sql.to_sql适用于初次建表时写入, 后续写入时, 难免遇到重复数据, 可能导致index冲突
@@ -86,7 +87,7 @@ def postgres_write_data_frame(
     :param debug: if Ture, 将打印insert ... 命令, 据此在sql console进行debug
     :return:
     """
-    conn = postgres_connect()
+    conn = postgres_connect(database=kwargs.get("database", None))
     cur = conn.cursor()
     # 判断是否有record_time列
     cur.execute("SELECT * FROM {} LIMIT 0".format(table_name))
@@ -126,7 +127,7 @@ def SQL_INSERT_STATEMENT_FROM_DATAFRAME(data: pd.DataFrame, table_name: str):
             + " ("
             + str(", ".join(data.columns))
             + ") VALUES "
-            + str(tuple(row.values)).replace("nan", "NULL")
+            + str(tuple(row.values)).replace("nan", "NULL").replace("None", "NULL")
             + " ON CONFLICT DO NOTHING"
         )
     return sql_texts
@@ -161,7 +162,7 @@ def SQL_UPDATE_STATEMENT_FROM_DATAFRAME(
             sql_text += "record_time=CURRENT_TIMESTAMP"
         else:
             sql_text = sql_text[:-1]
-        sql_texts.append(sql_text.replace("nan", "NULL"))
+        sql_texts.append(sql_text.replace("nan", "NULL").replace("None", "NULL"))
     return sql_texts
 
 
@@ -189,7 +190,7 @@ def postgres_config(ini_filepath: str = None, section="postgresql") -> Dict:
     return db
 
 
-def postgres_connect(config: Dict = None, database: str = None):
+def postgres_connect(database: str = None, config: Dict = None):
     """
     Connect to the PostgresSQL database server
     """
@@ -214,7 +215,7 @@ def postgres_connect(config: Dict = None, database: str = None):
             print("Database connection closed.")
 
 
-def postgres_engine(config: Dict = None, database: str = None):
+def postgres_engine(database: str = None, config: Dict = None):
     """
     根据config返回engine, 一般供write_df_to_pgDB调用
     """
