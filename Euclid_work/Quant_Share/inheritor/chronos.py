@@ -9,6 +9,7 @@ from time import strptime
 from typing import Union, Optional, Literal, Tuple
 import numpy as np
 import pandas as pd
+from .consts import Config
 
 TimeType = Union[str, int, datetime, date, pd.Timestamp]
 
@@ -26,9 +27,9 @@ def watcher(func):
 
 
 class TradeDate:
-    dataBase_root_path = r"E:\Share\Stk_Data\dataFile"
-    trade_date_table = pd.read_hdf("{}/tradeDate_info.h5".format(dataBase_root_path))
-    trade_date_list = trade_date_table["tradeDate"].dropna().to_list()
+
+    trade_date_table = Config.trade_date_table
+    trade_date_list = Config.trade_date_list
 
     @classmethod
     def is_date(
@@ -150,13 +151,18 @@ class TradeDate:
 
     @classmethod
     def is_trade_date(cls, date_repr: TimeType) -> bool:
-        # TODO：二分法优化
-        return cls.format_date(date_repr) in cls.trade_date_list
+        res, _ = cls.binary_search(cls.trade_date_list, date_repr)
+        return res
 
-    @staticmethod
+    @classmethod
     def binary_search(
-        arr: Union[pd.Series, list, tuple, np.ndarray], target
+        cls,
+        arr: Union[pd.Series, list, tuple, np.ndarray],
+        target: TimeType
     ) -> Tuple[bool, int]:
+        if isinstance(arr[0], (pd.Timestamp, datetime, date)):
+            target = cls.format_date(target)
+
         low: int = 0
         high: int = len(arr) - 1
         while low <= high:

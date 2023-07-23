@@ -1,7 +1,7 @@
 import unittest
 import pandas as pd
 from datetime import datetime
-from Euclid_work.Quant_Share import TradeDate
+from Euclid_work.Quant_Share.inheritor import TradeDate, format_stock
 
 
 class MyTestCase(unittest.TestCase):
@@ -31,6 +31,9 @@ class MyTestCase(unittest.TestCase):
 
     def test_in_trade_date(self):
         self.assertEqual(True, TradeDate.is_trade_date('20230721'))
+
+    def test_in_format_stock(self):
+        self.assertEqual('000001.SZ', format_stock(1))
 
 
 if __name__ == '__main__':
