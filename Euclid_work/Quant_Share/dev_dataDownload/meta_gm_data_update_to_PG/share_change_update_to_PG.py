@@ -1,28 +1,15 @@
 """
 # -*- coding: utf-8 -*-
-# @Time    : 2023/7/20 9:41
+# @Time    : 2023/7/22 8:58
 # @Author  : Euclid-Jie
-# @File    : gmData_history_update_to_PG.py
-# @Desc    : 更新gmData_history(1d), 基于record_time
+# @File    : share_change_update_to_PG.py
 """
-from Euclid_work.Quant_Share.warehouse import *
-from Euclid_work.Quant_Share import get_tradeDate
-from meta_gm_dataDownLoad import *
-from datetime import date, datetime
-import logging
+from base_package import *
+logger = logger_update_to_PG("share_change")
 
-logging.basicConfig(
-    filename="log_gmData_history_update_{}.txt".format(
-        datetime.now().strftime("%Y%m%d_%H%M%S")
-    ),
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-)
-logger = logging.getLogger()
-
-
+# 获取数据库中已有数据
 exit_info = pd.read_sql(
-    'select symbol, max(Date(record_time)) as date from "gmData_history" group by symbol',
+    "select symbol, max(Date(record_time)) as date from share_change group by symbol;",
     con=postgres_engine(),
 )
 exit_info = exit_info.set_index("symbol")
@@ -34,6 +21,7 @@ with tqdm(symbolList) as t:
         except KeyError:
             # 一般认为这种数据表中没有的symbol为2015-01-01前就退市, 可以直接continue, 不用获取数据
             # begin = "2015-01-01"
+            logger.info("{}:{}-{} skip".format(symbol, begin, end))
             continue
 
         if format_date(begin) > get_tradeDate(end, -5):
@@ -41,19 +29,11 @@ with tqdm(symbolList) as t:
             continue
         t.set_postfix({"状态": "{}:{}-{}开始获取数据...".format(symbol, begin, end)})
         try:
-            data = history(
-                symbol, frequency="1d", start_time=begin, end_time=end, df=True
-            )
+            data = stk_get_share_change(symbol=symbol, start_date=begin, end_date=end)
             if len(data) > 0:
-                for i in ["bob", "eob"]:
-                    data[i] = data[i].dt.strftime("%Y-%m-%d %H:%M:%S")
-                postgres_write_data_frame(
-                    data,
-                    '"gmData_history"',
-                    update=True,
-                    unique_index=["symbol", "bob"],
-                    record_time=True,
-                )
+                symbol = data["symbol"].values[0]
+                data.columns = [col_i.lower() for col_i in data.columns]
+                postgres_write_data_frame(data, "share_change", update=True, unique_index=["symbol", "pub_date", "chg_date"], record_time=True)
         except GmError:
             t.set_postfix({"状态": "GmError:{}".format(GmError)})
             logger.error("{}:{}-{} GmError:{}".format(symbol, begin, end, GmError))
