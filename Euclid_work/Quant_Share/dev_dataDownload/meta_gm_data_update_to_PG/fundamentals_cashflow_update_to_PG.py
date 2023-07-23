@@ -3,8 +3,10 @@
 # @Time    : 2023/7/22 11:03
 # @Author  : Euclid-Jie
 # @File    : fundamentals_cashflow_update_to_PG.py
+# @Desc    : [stk_get_fundamentals_cashflow - 查询现金流量表数据](https://www.myquant.cn/docs2/sdk/python/API%E4%BB%8B%E7%BB%8D.html#stk-get-fundamentals-cashflow-%E6%9F%A5%E8%AF%A2%E7%8E%B0%E9%87%91%E6%B5%81%E9%87%8F%E8%A1%A8%E6%95%B0%E6%8D%AE)
 """
 from base_package import *
+
 logger = logger_update_to_PG("fundamentals_cashflow")
 
 fundamentals_cashflow_info = pd.read_excel(
@@ -27,7 +29,7 @@ with tqdm(symbolList) as t:
             begin = exit_info.loc[symbol]["date"].strftime("%Y-%m-%d")
         except KeyError:
             # 一般认为这种数据表中没有的symbol为2015-01-01前就退市, 可以直接continue, 不用获取数据
-            # begin = "2015-01-01"
+            begin = "2015-01-01"
             logger.info("{}:{}-{} skip".format(symbol, begin, end))
             continue
 

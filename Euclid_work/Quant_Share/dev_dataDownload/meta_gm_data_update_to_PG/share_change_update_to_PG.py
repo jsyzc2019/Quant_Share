@@ -3,6 +3,7 @@
 # @Time    : 2023/7/22 8:58
 # @Author  : Euclid-Jie
 # @File    : share_change_update_to_PG.py
+# @Desc    : [stk_get_share_change - 查询股本变动](https://www.myquant.cn/docs2/sdk/python/API%E4%BB%8B%E7%BB%8D.html#stk-get-share-change-%E6%9F%A5%E8%AF%A2%E8%82%A1%E6%9C%AC%E5%8F%98%E5%8A%A8)
 """
 from base_package import *
 logger = logger_update_to_PG("share_change")

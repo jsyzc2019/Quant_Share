@@ -7,6 +7,9 @@
 """
 import subprocess
 import os
+from Euclid_work.Quant_Share.dev_dataDownload.meta_gm_dataDownLoad.AutoEmail import (
+    AutoEmail,
+)
 
 meta_path = r"E:\Euclid\Quant_Share\Euclid_work\Quant_Share\dev_dataDownload\meta_gm_data_update_to_PG"
 for file in os.listdir(meta_path):
@@ -18,3 +21,10 @@ for file in os.listdir(meta_path):
                 os.path.join(meta_path, file),
             ],
         )
+
+AutoEmail(
+    title="gm data update finished",
+    content=None,
+    sender="2379928684@qq.com",
+    config_path=r"E:\Euclid\Quant_Share\Euclid_work\Quant_Share\dev_dataDownload\meta_gm_dataDownLoad\AutoEmail_config.txt",
+)

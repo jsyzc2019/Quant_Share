@@ -5,13 +5,16 @@
 # @File    : __init__.py.py
 # @Desc    : 用于从postgresDB中读取, 写入数据
 """
+from datetime import datetime, date
 from sqlalchemy import create_engine, text
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Union
 import pandas as pd
 import psycopg2
 from configparser import ConfigParser
 import os
 from Euclid_work.Quant_Share import format_date
+
+TimeType = Union[str, int, datetime, date, pd.Timestamp]
 
 
 def format_table(
@@ -49,7 +52,6 @@ def format_table(
                 dataBase
             )
         )
-        record_time_exits = True
         print("record_time has been created in {}".format(dataBase))
     conn.commit()
     cur.close()
@@ -146,7 +148,9 @@ def SQL_UPDATE_STATEMENT_FROM_DATAFRAME(
         sql_text += " ("
         sql_text += str(", ".join(data.columns))
         sql_text += ") VALUES "
-        sql_text += str(tuple(row.values))
+        sql_text += (
+            str(tuple(row.values)).replace("nan", "NULL").replace("None", "NULL")
+        )
         sql_text += " ON CONFLICT ({}) DO UPDATE SET ".format(",".join(unique_index))
 
         for key, value in zip(data.columns, row):
@@ -155,14 +159,16 @@ def SQL_UPDATE_STATEMENT_FROM_DATAFRAME(
             else:
                 # TODO 肯定有什么方法可以避免此操作
                 if isinstance(value, str):
+                    value = value.replace("nan", "NULL").replace("None", "NULL")
                     sql_text += "{}='{}',".format(key, value)
                 else:
+                    value = str(value).replace("nan", "NULL").replace("None", "NULL")
                     sql_text += "{}={},".format(key, value)
         if record_time_exits:
             sql_text += "record_time=CURRENT_TIMESTAMP"
         else:
             sql_text = sql_text[:-1]
-        sql_texts.append(sql_text.replace("nan", "NULL").replace("None", "NULL"))
+        sql_texts.append(sql_text)
     return sql_texts
 
 
@@ -234,11 +240,13 @@ def postgres_engine(database: str = None, config: Dict = None):
     )
 
 
-def write_df_to_pgDB(df, **kwargs):
+def write_df_to_pgDB(df, table_name, engine=None, **kwargs):
+    if engine is None:
+        engine = postgres_engine(kwargs.get("database"), None)
     pd.io.sql.to_sql(
         df,
-        kwargs.get("table_name", "demo"),
-        kwargs.get("engine"),
+        table_name,
+        engine,
         index=False,
         schema="public",
         if_exists="append",
@@ -313,3 +321,29 @@ def load_data_from_sql(
     sql_query = " ".join(sql_query) + ";"
 
     return pd.read_sql_query(sql_query, conn, params=params)
+
+
+def load_latest_sw21_data(query_date: TimeType = None):
+    """
+    查询距离query_date最近的申万(2021)行业分类
+    该表每月底更新
+    """
+    if query_date is None:
+        query_date = date.today()
+    query_date = format_date(query_date)
+    assert query_date >= pd.to_datetime(
+        "20200131"
+    ), "query_date should after 2020-01-31"
+    if not pd.offsets.DateOffset().is_month_end(query_date):
+        query_date = query_date - pd.offsets.MonthEnd(n=1)
+    query = (
+        "select symbol, industryid1 as industryID1 ,industryid2  as industryID2, industryid3  as industryID3, date_in, date_out , query_date from symbol_industry_sw21 as "
+        "indus join industry_category_info indus_info on indus.industry_code = indus_info.industryid3 where DATE(query_date) = '{}'".format(
+            query_date
+        )
+    )
+    sw21_data = pd.read_sql(query, postgres_engine())
+    if len(sw21_data) > 0:
+        return sw21_data
+    else:
+        raise KeyError("无返回数据")

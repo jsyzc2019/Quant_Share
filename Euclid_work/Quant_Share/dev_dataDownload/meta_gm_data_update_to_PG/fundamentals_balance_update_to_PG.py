@@ -3,6 +3,7 @@
 # @Time    : 2023/7/22 9:15
 # @Author  : Euclid-Jie
 # @File    : fundamentals_balance_update_to_PG.py
+# @Desc    : [stk_get_fundamentals_balance - 查询资产负债表数据](https://www.myquant.cn/docs2/sdk/python/API%E4%BB%8B%E7%BB%8D.html#stk-get-fundamentals-balance-%E6%9F%A5%E8%AF%A2%E8%B5%84%E4%BA%A7%E8%B4%9F%E5%80%BA%E8%A1%A8%E6%95%B0%E6%8D%AE)
 """
 from base_package import *
 
@@ -27,7 +28,7 @@ with tqdm(symbolList) as t:
             begin = exit_info.loc[symbol]["date"].strftime("%Y-%m-%d")
         except KeyError:
             # 一般认为这种数据表中没有的symbol为2015-01-01前就退市, 可以直接continue, 不用获取数据
-            # begin = "2015-01-01"
+            begin = "2015-01-01"
             logger.info("{}:{}-{} skip".format(symbol, begin, end))
             continue
 

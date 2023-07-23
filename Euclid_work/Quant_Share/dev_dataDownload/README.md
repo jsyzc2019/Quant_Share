@@ -44,5 +44,6 @@
 gm数据仅在服务器能进行更新 ，因为需要打开并登录掘金客户端
 
 `Uqer`本地`SDK`仅在本地能更新，因为token保留在本地，但`WebAPI`都可
+> 20230722 通联[WebAPI](https://mall.datayes.com/mydata/purchasedData)试用期已过, 无法使用
 
 `EM`的数据仅能在服务器上更新，因为仅在服务器上配置好了登陆文件。

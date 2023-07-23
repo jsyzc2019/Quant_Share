@@ -3,9 +3,11 @@
 # @Time    : 2023/7/4 9:47
 # @Author  : Euclid-Jie
 # @File    : gmData_history_1m_update_to_PG.py
-# @Desc    : 用于下载/更新60s bar数据数据至数据库
+# @Desc    : [history - 查询历史行情](https://www.myquant.cn/docs2/sdk/python/API%E4%BB%8B%E7%BB%8D.html#history-%E6%9F%A5%E8%AF%A2%E5%8E%86%E5%8F%B2%E8%A1%8C%E6%83%85)
+            - 用于下载/更新60s bar数据数据至数据库
             - 更新适用于短日期间隔
             - 长间隔使用gmData_history_1m_download.py
+
 """
 from base_package import *
 
@@ -27,7 +29,7 @@ with tqdm(symbolList) as t:
             )
         except KeyError:
             # 一般认为这种数据表中没有的symbol为2015-01-01前就退市, 可以直接continue, 不用获取数据
-            # begin = "2015-01-01"
+            begin = "2015-01-01"
             logger.info("{}:{}-{} skip".format(symbol, begin, end))
             continue
 

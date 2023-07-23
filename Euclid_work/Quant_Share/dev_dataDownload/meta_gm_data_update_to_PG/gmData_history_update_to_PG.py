@@ -3,7 +3,8 @@
 # @Time    : 2023/7/20 9:41
 # @Author  : Euclid-Jie
 # @File    : gmData_history_update_to_PG.py
-# @Desc    : 更新gmData_history(1d), 基于record_time
+# @Desc    : [history - 查询历史行情](https://www.myquant.cn/docs2/sdk/python/API%E4%BB%8B%E7%BB%8D.html#history-%E6%9F%A5%E8%AF%A2%E5%8E%86%E5%8F%B2%E8%A1%8C%E6%83%85)
+            - 更新gmData_history(1d), 基于record_time
 """
 from base_package import *
 
@@ -22,7 +23,7 @@ with tqdm(symbolList) as t:
             begin = exit_info.loc[symbol]["date"].strftime("%Y-%m-%d")
         except KeyError:
             # 一般认为这种数据表中没有的symbol为2015-01-01前就退市, 可以直接continue, 不用获取数据
-            # begin = "2015-01-01"
+            begin = "2015-01-01"
             logger.info("{}:{}-{} skip".format(symbol, begin, end))
             continue
 
