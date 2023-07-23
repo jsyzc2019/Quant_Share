@@ -11,7 +11,7 @@ def packaging(
     assert pat > 0
     if iterator:
         for i in range(0, len(series), pat):
-            yield series[i: i + n]
+            yield series[i: i + pat]
     else:
         return [series[i: i + pat] for i in range(0, len(series), pat)]
 
