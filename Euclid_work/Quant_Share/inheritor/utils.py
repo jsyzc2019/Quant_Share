@@ -1,15 +1,271 @@
-from typing import Union
+from typing import Union, Optional, Literal, Tuple, List, Any
 from collections import OrderedDict
 from configparser import ConfigParser
 import os
 from typing import Sequence, Iterator
-from .consts import Config, TimeType
 import pandas as pd
+import numpy as np
 from datetime import datetime, date
 from time import strptime
 
+TimeType = Union[str, int, datetime, date, pd.Timestamp]
 
-__all__ = ["Formatter", "packaging", 'get_config']
+__all__ = [
+    "Formatter",
+    "TradeDate",
+    "Config",
+    "packaging",
+    "get_config",
+    "info_lag",
+    "watcher",
+]
+
+
+def watcher(func):
+    @wraps(func)
+    def timer(*args, **kwargs):
+        start = datetime.now()
+        result = func(*args, **kwargs)
+        end = datetime.now()
+        print(f"“{func.__name__}” run time: {end - start}.")
+        return result
+
+    return timer
+
+
+class Config:
+
+    database_dir = {
+        "root": r"E:\Share\Stk_Data\dataFile",
+        "future": r"E:\Share\Fut_Data",
+        "gm_stock_factor": r"E:\Share\Stk_Data\gm",
+        "em_stock_factor": r"E:\Share\EM_Data",
+        "jq_stock_factor": r"E:\Share\JointQuant_Factor",
+        "jq_data_prepare": r"E:\Share\JointQuant_prepare",
+    }
+
+    datasets_name = list(database_dir.keys())
+
+    stock_table = pd.read_hdf("{}/stock_info.h5".format(database_dir["root"]))
+    stock_list = stock_table["symbol"].tolist()
+    stock_num_list = stock_table["sec_id"].unique().tolist()
+
+    futures_list: list[str | Any] = (
+        "AG",
+        "AL",
+        "AU",
+        "A",
+        "BB",
+        "BU",
+        "B",
+        "CF",
+        "CS",
+        "CU",
+        "C",
+        "FB",
+        "FG",
+        "HC",
+        "IC",
+        "IF",
+        "IH",
+        "I",
+        "JD",
+        "JM",
+        "JR",
+        "J",
+        "LR",
+        "L",
+        "MA",
+        "M",
+        "NI",
+        "OI",
+        "PB",
+        "PM",
+        "PP",
+        "P",
+        "RB",
+        "RI",
+        "RM",
+        "RS",
+        "RU",
+        "SF",
+        "SM",
+        "SN",
+        "SR",
+        "TA",
+        "TF",
+        "T",
+        "V",
+        "WH",
+        "Y",
+        "ZC",
+        "ZN",
+        "PG",
+        "EB",
+        "AP",
+        "LU",
+        "SA",
+        "TS",
+        "CY",
+        "IM",
+        "PF",
+        "PK",
+        "CJ",
+        "UR",
+        "NR",
+        "SS",
+        "FU",
+        "EG",
+        "LH",
+        "SP",
+        "RR",
+        "SC",
+        "WR",
+        "BC",
+    )
+
+    trade_date_table = pd.read_hdf("{}/tradeDate_info.h5".format(database_dir["root"]))
+    trade_date_list = trade_date_table["tradeDate"].dropna().to_list()
+
+    quarter_begin = ["0101", "0401", "0701", "1001"]
+    quarter_end = ["0331", "0630", "0930", "1231"]
+
+
+class TradeDate:
+
+    trade_date_table = Config.trade_date_table
+    trade_date_list = Config.trade_date_list
+
+    @classmethod
+    def is_date(
+        cls, date_repr: TimeType, pattern_return: bool = False, **kwargs
+    ) -> bool | str:
+
+        return Formatter.is_date(date_repr, **kwargs)
+
+    @classmethod
+    def format_date(
+        cls,
+        date_repr: Union[TimeType, pd.Series, list, tuple],
+        **kwargs,
+    ) -> pd.Series | pd.Timestamp:
+
+        return Formatter.date(date_repr, **kwargs)
+
+    @classmethod
+    def extend_date_span(
+        cls, begin: TimeType, end: TimeType, freq: Literal["Q", "q", "Y", "y", "M", "m"]
+    ) -> tuple[datetime, datetime]:
+        """
+        将区间[begin, end] 进行拓宽, 依据freq将拓展至指定位置, 详见下
+        freq = M :
+            [2018-01-04, 2018-04-20] -> [2018-01-01, 2018-04-30]
+            [2018-01-01, 2018-04-20] -> [2018-01-01, 2018-04-30]
+            [2018-01-04, 2018-04-30] -> [2018-01-01, 2018-04-30]
+        freq = Q :
+            [2018-01-04, 2018-04-20] -> [2018-01-01, 2018-06-30]
+            [2018-01-01, 2018-04-20] -> [2018-01-01, 2018-06-30]
+            [2018-01-04, 2018-06-30] -> [2018-01-01, 2018-06-30]
+        freq = Y :
+            [2018-01-04, 2018-04-20] -> [2018-01-01, 2018-12-31]
+            [2018-01-01, 2018-04-20] -> [2018-01-01, 2018-12-31]
+            [2018-01-04, 2018-12-31] -> [2018-01-01, 2018-12-31]
+        """
+        begin = cls.format_date(begin)
+        end = cls.format_date(end)
+        if freq in ["Q", "q"]:
+            if not pd.DateOffset().is_quarter_start(begin):
+                begin = begin - pd.offsets.QuarterBegin(n=1, startingMonth=1)
+            if not pd.offsets.DateOffset().is_quarter_end(end):
+                end = end + pd.offsets.QuarterEnd(n=1)
+            return begin, end
+
+        elif freq in ["Y", "y"]:
+            if not pd.offsets.DateOffset().is_year_start(begin):
+                begin = begin - pd.offsets.YearBegin(n=1)
+            if not pd.offsets.DateOffset().is_year_end(end):
+                end = end + pd.offsets.YearEnd(n=1)
+            return begin, end
+        elif freq in ["M", "m"]:
+            if not pd.DateOffset().is_month_start(begin):
+                begin = begin - pd.offsets.MonthBegin(n=1)
+            if not pd.offsets.DateOffset().is_month_end(end):
+                end = end + pd.offsets.MonthEnd(n=1)
+            return begin, end
+        else:
+            raise AttributeError("frq should be M, Q or Y!")
+
+    @classmethod
+    def is_trade_date(cls, date_repr: TimeType) -> bool:
+        res, _ = cls.binary_search(cls.trade_date_list, date_repr)
+        return res
+
+    @classmethod
+    def binary_search(
+        cls, arr: Union[pd.Series, list, tuple, np.ndarray], target: TimeType
+    ) -> Tuple[bool, int]:
+        if isinstance(arr[0], (pd.Timestamp, datetime, date)):
+            target = cls.format_date(target)
+
+        low: int = 0
+        high: int = len(arr) - 1
+        while low <= high:
+            mid = (low + high) // 2
+            if arr[mid] == target:
+                return True, mid
+            elif arr[mid] < target:
+                low = mid + 1
+            else:
+                high = mid - 1
+        return False, low
+
+    @classmethod
+    def shift_trade_date(
+        cls,
+        date_repr: TimeType,
+        lag: int,
+    ) -> pd.Timestamp:
+
+        date_repr = cls.format_date(date_repr)
+        res, index = cls.binary_search(cls.trade_date_list, date_repr)
+        return cls.trade_date_list[index + lag]
+
+    @classmethod
+    def range_trade_date(cls, begin: TimeType, end: TimeType = None, lag: int = None):
+        begin = cls.format_date(begin)
+        _, index_begin = cls.binary_search(cls.trade_date_list, begin)
+        if end is not None:
+            end = cls.format_date(end)
+            res, index_end = cls.binary_search(cls.trade_date_list, end)
+            if not res:
+                index_end += 1
+            return cls.trade_date_list[index_begin : index_end + 1]
+        elif lag is not None:
+            if lag < 0:
+                index_end = index_begin
+                index_begin -= lag
+            else:
+                index_end = index_begin + lag
+            return cls.trade_date_list[index_begin : index_end + 1]
+        else:
+            raise AttributeError("Pass attribute end or lag to the function!")
+
+
+def info_lag(data: pd.DataFrame, n_lag: int, clean: bool = False):
+    """
+    Delay the time corresponding to the data by n trading days
+    :param clean:
+    :param data:
+    :param n_lag:
+    :return:
+    """
+    res = data.copy()
+    res = res.sort_index()
+    if clean:
+        res = Formatter.dataframe(res)
+    res = res.shift(n_lag)
+    res = res.dropna(axis=0, how="all")
+    return res
 
 
 class Formatter:
@@ -101,7 +357,7 @@ class Formatter:
             except TypeError as te:
                 raise te
 
-        res.columns = res.columns.rename(format_stock)
+        res = res.rename(columns=cls.stock)
         if np.nan in res.columns:
             res = res.drop(columns=np.nan)
 
@@ -146,6 +402,7 @@ class Formatter:
         format_code = "{:06.0f}.{}".format(code, tail)
         return format_code
 
+
 def packaging(
     series: Sequence, pat: int, iterator: bool = False
 ) -> Sequence[Sequence] | Iterator:
@@ -155,8 +412,6 @@ def packaging(
             yield series[i : i + pat]
     else:
         return [series[i : i + pat] for i in range(0, len(series), pat)]
-
-
 
 
 def get_config(
