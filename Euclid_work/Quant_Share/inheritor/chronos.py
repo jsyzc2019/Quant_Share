@@ -9,9 +9,10 @@ from time import strptime
 from typing import Union, Optional, Literal, Tuple
 import numpy as np
 import pandas as pd
-from .consts import Config
+from .consts import Config, TimeType
+from .utils import Formatter
 
-TimeType = Union[str, int, datetime, date, pd.Timestamp]
+__all__ = ["watcher", "TradeDate"]
 
 
 def watcher(func):
@@ -35,54 +36,8 @@ class TradeDate:
     def is_date(
         cls, date_repr: TimeType, pattern_return: bool = False, **kwargs
     ) -> bool | str:
-        if not isinstance(date_repr, str):
-            date_repr = str(date_repr)
 
-        chinesenum = {
-            "一": "1",
-            "二": "2",
-            "三": "3",
-            "四": "4",
-            "五": "5",
-            "六": "6",
-            "七": "7",
-            "八": "8",
-            "九": "9",
-            "零": "0",
-            "十": "10",
-        }
-        strdate = ""
-        for i in range(len(date_repr)):
-            temp = date_repr[i]
-            if temp in chinesenum:
-                if temp == "十":
-                    if datestr[i + 1] not in chinesenum:
-                        strdate += chinesenum[temp]
-                    elif datestr[i - 1] in chinesenum:
-                        continue
-                    else:
-                        strdate += "1"
-                else:
-                    strdate += chinesenum[temp]
-            else:
-                strdate += temp
-
-        pattern = (
-            "%Y年%m月%d日",
-            "%Y-%m-%d",
-            "%y年%m月%d日",
-            "%y-%m-%d",
-            "%Y/%m/%d",
-            "%Y%m%d",
-        ) + kwargs.get("pattern", ())
-        for i in pattern:
-            try:
-                ret = strptime(strdate, i)
-                if ret:
-                    return True if not pattern_return else i
-            except ValueError as _:
-                continue
-        return False if not pattern_return else None
+        return Formatter.is_date(date_repr, **kwargs)
 
     @classmethod
     def format_date(
@@ -91,20 +46,7 @@ class TradeDate:
         **kwargs,
     ) -> pd.Series | pd.Timestamp:
 
-        if isinstance(date_repr, (list, tuple, pd.Series)):
-            if isinstance(date_repr[0], (datetime, date)):
-                return pd.to_datetime(date_repr)
-            elif isinstance(date_repr[0], (int, str)):
-                pattern = cls.is_date(date_repr[0], pattern_return=True, **kwargs)
-                return pd.to_datetime(date_repr, format=pattern)
-        elif isinstance(date_repr, TimeType):
-            if isinstance(date_repr, (datetime, date, pd.Timestamp)):
-                return pd.to_datetime(date_repr)
-            elif isinstance(date_repr, (int, str)):
-                pattern = cls.is_date(date_repr, pattern_return=True, **kwargs)
-                return pd.to_datetime(date_repr, format=pattern)
-        else:
-            raise TypeError(f"date_repr {type(date_repr)} is not supported")
+        return Formatter.date(date_repr, **kwargs)
 
     @classmethod
     def extend_date_span(
@@ -156,9 +98,7 @@ class TradeDate:
 
     @classmethod
     def binary_search(
-        cls,
-        arr: Union[pd.Series, list, tuple, np.ndarray],
-        target: TimeType
+        cls, arr: Union[pd.Series, list, tuple, np.ndarray], target: TimeType
     ) -> Tuple[bool, int]:
         if isinstance(arr[0], (pd.Timestamp, datetime, date)):
             target = cls.format_date(target)
@@ -195,16 +135,13 @@ class TradeDate:
             res, index_end = cls.binary_search(cls.trade_date_list, end)
             if not res:
                 index_end += 1
-            return cls.trade_date_list[index_begin:index_end+1]
+            return cls.trade_date_list[index_begin : index_end + 1]
         elif lag is not None:
             if lag < 0:
                 index_end = index_begin
                 index_begin -= lag
             else:
                 index_end = index_begin + lag
-            return cls.trade_date_list[index_begin:index_end + 1]
+            return cls.trade_date_list[index_begin : index_end + 1]
         else:
             raise AttributeError("Pass attribute end or lag to the function!")
-
-
-

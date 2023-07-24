@@ -1,7 +1,10 @@
-from typing import List, Any
-
+from typing import List, Any, Union
 import pandas as pd
-from .utils import format_stock
+from datetime import datetime, date
+
+__all__ = ['TimeType', 'Config']
+
+TimeType = Union[str, int, datetime, date, pd.Timestamp]
 
 
 class Config:
@@ -17,7 +20,7 @@ class Config:
     datasets_name = list(database_dir.keys())
 
     stock_table = pd.read_hdf("{}/stock_info.h5".format(database_dir["root"]))
-    stock_list = list(map(format_stock, stock_table["symbol"]))
+    stock_list = stock_table["symbol"].tolist()
     stock_num_list = stock_table["sec_id"].unique().tolist()
 
     futures_list: list[str | Any] = (

@@ -1,7 +1,7 @@
 import unittest
 import pandas as pd
 from datetime import datetime
-from Euclid_work.Quant_Share.inheritor import TradeDate, format_stock, packaging
+from Euclid_work.Quant_Share.inheritor import TradeDate, packaging, Formatter
 
 
 class MyTestCase(unittest.TestCase):
@@ -30,7 +30,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(True, TradeDate.is_trade_date("20230721"))
 
     def test_in_format_stock(self):
-        self.assertEqual("000001.SZ", format_stock(1))
+        self.assertEqual("000001.SZ", Formatter.stock(1))
 
     def test_packaging(self):
         my_sequence = [1, 2, 3, 4, 5]
