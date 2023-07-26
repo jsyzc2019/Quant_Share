@@ -1,7 +1,7 @@
 import unittest
 import pandas as pd
 from datetime import datetime
-from Euclid_work.Quant_Share.inheritor import TradeDate, packaging, Formatter
+from Euclid_work.Quant_Share.inheritor import TradeDate, Common, Config, Formatter
 
 
 class MyTestCase(unittest.TestCase):
@@ -25,6 +25,10 @@ class MyTestCase(unittest.TestCase):
             pd.to_datetime(date_test, format="%Y年%m月%d日"),
             TradeDate.format_date(date_test),
         )
+        self.assertEqual(
+            pd.to_datetime(date_test, format="%Y年%m月%d日"),
+            Formatter.date(date_test),
+        )
 
     def test_in_trade_date(self):
         self.assertEqual(True, TradeDate.is_trade_date("20230721"))
@@ -34,9 +38,12 @@ class MyTestCase(unittest.TestCase):
 
     def test_packaging(self):
         my_sequence = [1, 2, 3, 4, 5]
-        res = [i for i in packaging(my_sequence, pat=2, iterator=True)]
+        res = [i for i in Common.packaging(my_sequence, pat=2, iterator=True)]
         expect_res = [[1, 2], [3, 4], [5]]
         self.assertEqual(res, expect_res)
+
+    def test_datatables(self):
+        self.assertEqual(True, "HKshszHold" in Config.datatables)
 
 
 if __name__ == "__main__":

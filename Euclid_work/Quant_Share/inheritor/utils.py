@@ -1,12 +1,14 @@
-from typing import Union, Optional, Literal, Tuple, List, Any
+import os
 from collections import OrderedDict
 from configparser import ConfigParser
-import os
-from typing import Sequence, Iterator
-import pandas as pd
-import numpy as np
 from datetime import datetime, date
+from functools import wraps
 from time import strptime
+from typing import Sequence, Iterator
+from typing import Union, Literal, Tuple, Any
+from .consts import datatables
+import numpy as np
+import pandas as pd
 
 TimeType = Union[str, int, datetime, date, pd.Timestamp]
 
@@ -14,27 +16,11 @@ __all__ = [
     "Formatter",
     "TradeDate",
     "Config",
-    "packaging",
-    "get_config",
-    "info_lag",
-    "watcher",
+    "Common",
 ]
 
 
-def watcher(func):
-    @wraps(func)
-    def timer(*args, **kwargs):
-        start = datetime.now()
-        result = func(*args, **kwargs)
-        end = datetime.now()
-        print(f"“{func.__name__}” run time: {end - start}.")
-        return result
-
-    return timer
-
-
 class Config:
-
     database_dir = {
         "root": r"E:\Share\Stk_Data\dataFile",
         "future": r"E:\Share\Fut_Data",
@@ -45,8 +31,11 @@ class Config:
     }
 
     datasets_name = list(database_dir.keys())
+    datatables = datatables
 
-    stock_table = pd.read_hdf("{}/stock_info.h5".format(database_dir["root"]))
+    stock_table: pd.DataFrame = pd.read_hdf(
+        "{}/stock_info.h5".format(database_dir["root"])
+    )
     stock_list = stock_table["symbol"].tolist()
     stock_num_list = stock_table["sec_id"].unique().tolist()
 
@@ -124,7 +113,9 @@ class Config:
         "BC",
     )
 
-    trade_date_table = pd.read_hdf("{}/tradeDate_info.h5".format(database_dir["root"]))
+    trade_date_table: pd.DataFrame = pd.read_hdf(
+        "{}/tradeDate_info.h5".format(database_dir["root"])
+    )
     trade_date_list = trade_date_table["tradeDate"].dropna().to_list()
 
     quarter_begin = ["0101", "0401", "0701", "1001"]
@@ -132,7 +123,6 @@ class Config:
 
 
 class TradeDate:
-
     trade_date_table = Config.trade_date_table
     trade_date_list = Config.trade_date_list
 
@@ -141,7 +131,7 @@ class TradeDate:
         cls, date_repr: TimeType, pattern_return: bool = False, **kwargs
     ) -> bool | str:
 
-        return Formatter.is_date(date_repr, **kwargs)
+        return Formatter.is_date(date_repr, pattern_return, **kwargs)
 
     @classmethod
     def format_date(
@@ -204,6 +194,11 @@ class TradeDate:
     def binary_search(
         cls, arr: Union[pd.Series, list, tuple, np.ndarray], target: TimeType
     ) -> Tuple[bool, int]:
+        """
+        :param arr:
+        :param target:
+        :return:
+        """
         if isinstance(arr[0], (pd.Timestamp, datetime, date)):
             target = cls.format_date(target)
 
@@ -225,13 +220,23 @@ class TradeDate:
         date_repr: TimeType,
         lag: int,
     ) -> pd.Timestamp:
-
+        """
+        :param date_repr:
+        :param lag:
+        :return:
+        """
         date_repr = cls.format_date(date_repr)
         res, index = cls.binary_search(cls.trade_date_list, date_repr)
         return cls.trade_date_list[index + lag]
 
     @classmethod
     def range_trade_date(cls, begin: TimeType, end: TimeType = None, lag: int = None):
+        """
+        :param begin:
+        :param end:
+        :param lag:
+        :return:
+        """
         begin = cls.format_date(begin)
         _, index_begin = cls.binary_search(cls.trade_date_list, begin)
         if end is not None:
@@ -249,23 +254,6 @@ class TradeDate:
             return cls.trade_date_list[index_begin : index_end + 1]
         else:
             raise AttributeError("Pass attribute end or lag to the function!")
-
-
-def info_lag(data: pd.DataFrame, n_lag: int, clean: bool = False):
-    """
-    Delay the time corresponding to the data by n trading days
-    :param clean:
-    :param data:
-    :param n_lag:
-    :return:
-    """
-    res = data.copy()
-    res = res.sort_index()
-    if clean:
-        res = Formatter.dataframe(res)
-    res = res.shift(n_lag)
-    res = res.dropna(axis=0, how="all")
-    return res
 
 
 class Formatter:
@@ -289,21 +277,21 @@ class Formatter:
             "零": "0",
             "十": "10",
         }
-        strdate = ""
+        date_str_res = ""
         for i in range(len(date_repr)):
             temp = date_repr[i]
             if temp in chinesenum:
                 if temp == "十":
-                    if datestr[i + 1] not in chinesenum:
-                        strdate += chinesenum[temp]
-                    elif datestr[i - 1] in chinesenum:
+                    if date_repr[i + 1] not in chinesenum:
+                        date_str_res += chinesenum[temp]
+                    elif date_repr[i - 1] in chinesenum:
                         continue
                     else:
-                        strdate += "1"
+                        date_str_res += "1"
                 else:
-                    strdate += chinesenum[temp]
+                    date_str_res += chinesenum[temp]
             else:
-                strdate += temp
+                date_str_res += temp
 
         pattern = (
             "%Y年%m月%d日",
@@ -315,7 +303,7 @@ class Formatter:
         ) + kwargs.get("pattern", ())
         for i in pattern:
             try:
-                ret = strptime(strdate, i)
+                ret = strptime(date_str_res, i)
                 if ret:
                     return True if not pattern_return else i
             except ValueError as _:
@@ -403,31 +391,86 @@ class Formatter:
         return format_code
 
 
-def packaging(
-    series: Sequence, pat: int, iterator: bool = False
-) -> Sequence[Sequence] | Iterator:
-    assert pat > 0
-    if iterator:
-        for i in range(0, len(series), pat):
-            yield series[i : i + pat]
-    else:
-        return [series[i : i + pat] for i in range(0, len(series), pat)]
+class Common:
+    @classmethod
+    def info_lag(cls, data: pd.DataFrame, n_lag: int, clean: bool = False):
+        """
+        Delay the time corresponding to the data by n trading days
+        :param clean:
+        :param data:
+        :param n_lag:
+        :return:
+        """
+        res = data.copy()
+        res = res.sort_index()
+        if clean:
+            res = Formatter.dataframe(res)
+        res = res.shift(n_lag)
+        res = res.dropna(axis=0, how="all")
+        return res
 
+    @classmethod
+    def watcher(cls, func: callable):
+        """
+        :param func:
+        :return:
+        """
 
-def get_config(
-    filename: Union[str, os.PathLike] = "./quant.const.ini", section: str = None
-) -> OrderedDict:
-    # create a parser
-    parser = ConfigParser()
-    # read config file
-    parser.read(filename)
-    res = OrderedDict()
-    if section is None:
-        for sec in parser.sections():
-            params = parser.items(sec)
-            tmp = OrderedDict()
-            for key, val in params:
-                tmp[key] = val
-            res[sec] = tmp
+        @wraps(func)
+        def timer(*args, **kwargs):
+            """
+            :param args:
+            :param kwargs:
+            :return:
+            """
+            start = datetime.now()
+            result = func(*args, **kwargs)
+            end = datetime.now()
+            print(f"“{func.__name__}” run time: {end - start}.")
+            return result
 
-    return res
+        return timer
+
+    @classmethod
+    def packaging(
+            cls, series: Sequence, pat: int, iterator: bool = False
+    ) -> Sequence[Sequence] | Iterator:
+        """
+        :param series:
+        :param pat:
+        :param iterator:
+        :return:
+        """
+        assert pat > 0
+        if iterator:
+            for i in range(0, len(series), pat):
+                yield series[i : i + pat]
+        else:
+            return [series[i : i + pat] for i in range(0, len(series), pat)]
+
+    @classmethod
+    def get_config(
+            cls,
+            filename: Union[str, os.PathLike] = "./quant.const.ini",
+            section: str = None,
+    ) -> OrderedDict:
+        """
+
+        :param filename:
+        :param section:
+        :return:
+        """
+        # create a parser
+        parser = ConfigParser()
+        # read config file
+        parser.read(filename)
+        res = OrderedDict()
+        if section is None:
+            for sec in parser.sections():
+                params = parser.items(sec)
+                tmp = OrderedDict()
+                for key, val in params:
+                    tmp[key] = val
+                res[sec] = tmp
+
+        return res
