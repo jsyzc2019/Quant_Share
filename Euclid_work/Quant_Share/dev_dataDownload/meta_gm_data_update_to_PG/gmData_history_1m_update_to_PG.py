@@ -12,7 +12,10 @@
 from base_package import *
 
 logger = logger_update_to_PG("gmData_history_1m")
-
+symbolList = pd.read_sql(
+    "select symbol  from stock_info where delisted_date >= '2015-01-01'",
+    con=postgres_engine(),
+)["symbol"].values
 # gmData_history_1m原始数据表过大, 更新需要使用QS_log.gmData_history_1m_latest_info
 exit_info = pd.read_sql(
     'select symbol, latest as date from "gmData_history_1m_latest_info";',
@@ -28,12 +31,10 @@ with tqdm(symbolList) as t:
                 "%Y-%m-%d"
             )
         except KeyError:
-            # 一般认为这种数据表中没有的symbol为2015-01-01前就退市, 可以直接continue, 不用获取数据
+            # 一般认为这种数据表中没有的symbol为新上市, begin设置为2015-01-01
             begin = "2015-01-01"
-            logger.info("{}:{}-{} skip".format(symbol, begin, end))
-            continue
 
-        if format_date(begin) > get_tradeDate(end, -1):
+        if format_date(begin) >= get_tradeDate(end, -1):
             logger.info("{}:{}-{} pass".format(symbol, begin, end))
             continue
         t.set_postfix({"状态": "{}:{}-{}开始获取数据...".format(symbol, begin, end)})
@@ -68,6 +69,7 @@ with tqdm(symbolList) as t:
         except GmError:
             t.set_postfix({"状态": "GmError:{}".format(GmError)})
             logger.error("{}:{}-{} GmError:{}".format(symbol, begin, end, GmError))
+            _len = -1
             continue
         finally:
             t.set_postfix({"状态": "{}:{}-{}写入{}条数据".format(symbol, begin, end, _len)})

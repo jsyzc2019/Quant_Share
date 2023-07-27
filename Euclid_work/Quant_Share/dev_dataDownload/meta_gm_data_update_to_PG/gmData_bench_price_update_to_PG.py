@@ -26,7 +26,7 @@ with tqdm(bench_symbol_list) as t:
             logger.info("{}:{}-{} skip".format(symbol, begin, end))
             continue
 
-        if format_date(begin) > get_tradeDate(end, -5):
+        if format_date(begin) > get_tradeDate(end, -1):
             logger.info("{}:{}-{} pass".format(symbol, begin, end))
             continue
         t.set_postfix({"状态": "{}:{}-{}开始获取数据...".format(symbol, begin, end)})
