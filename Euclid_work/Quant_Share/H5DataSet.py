@@ -12,6 +12,7 @@ from tqdm import tqdm
 import h5py
 import numpy as np
 import pandas as pd
+from pathlib import Path
 import psutil
 from psutil._common import bytes2human
 
@@ -53,6 +54,9 @@ class H5DataSet:
         else:
             return "{:.2f} B".format(size_b)
 
+    def __getitem__(self, name: str):
+        return self.load_h5data(name)
+
     def __h5dir(self, h5FilePath, tab_path):
         if isinstance(h5FilePath, h5py.Group):
             f_object = h5FilePath
@@ -87,6 +91,12 @@ class H5DataSet:
         for root_path, name in Group_list:
             self.__h5dir(root_path, name)
 
+    @classmethod
+    def load_single_pivotDF_from_h5data(cls, h5FilePath):
+        if isinstance(h5FilePath, Path):
+            h5FilePath = h5FilePath.resolve().as_posix()
+        return cls(h5FilePath).load_pivotDF_from_h5data(Path(h5FilePath).name.split(".")[0])
+
     @staticmethod
     def h5dir(attrs=False, dir_only=False):
         with open("dirTreeCache", "r") as f:
@@ -100,6 +110,8 @@ class H5DataSet:
 
     @staticmethod
     def __get_h5handle(h5FilePath, mode="r"):
+        if isinstance(h5FilePath, Path):
+            h5FilePath = h5FilePath.resolve().as_posix()
         if not h5FilePath.endswith(".h5"):
             h5FilePath += ".h5"
         assert os.path.exists(h5FilePath)
@@ -120,7 +132,11 @@ class H5DataSet:
         if "view_dtype" in dataSet.attrs.keys():
             return dataSet[:].view(dataSet.attrs["view_dtype"])
         else:
-            return dataSet[:]
+            if dataSet[:].dtype == "O":
+                decode_func = np.vectorize(lambda x: x.decode())
+                return decode_func(dataSet[:])
+            else:
+                return dataSet[:]
 
     @staticmethod
     def format_h5data_type(data_array: np.ndarray):
@@ -131,7 +147,7 @@ class H5DataSet:
             return None, data_array
 
     def __write_array_to_h5dataset(
-        self, h5Object, tableName: str, arrayData: np.ndarray
+            self, h5Object, tableName: str, arrayData: np.ndarray
     ):
         assert h5Object, h5py.Group | h5py.File
         view_dtype, arrayData = self.format_h5data_type(arrayData)
@@ -141,8 +157,10 @@ class H5DataSet:
 
     @classmethod
     def write_pivotDF_to_h5data(
-        cls, h5FilePath, pivotDF: pd.DataFrame, pivotKey: str, rewrite=False
+            cls, h5FilePath, pivotDF: pd.DataFrame, pivotKey: str, rewrite=False
     ):
+        if isinstance(h5FilePath, Path):
+            h5FilePath = h5FilePath.resolve().as_posix()
         if not h5FilePath.endswith(".h5"):
             h5FilePath += ".h5"
         index_array = pivotDF.index.values
@@ -172,8 +190,10 @@ class H5DataSet:
 
     @classmethod
     def add_pivotDF_to_h5data(
-        cls, h5FilePath, pivotDF: pd.DataFrame, pivotKey: str, reindex=False
+            cls, h5FilePath, pivotDF: pd.DataFrame, pivotKey: str, reindex=False
     ):
+        if isinstance(h5FilePath, Path):
+            h5FilePath = h5FilePath.resolve().as_posix()
         if not h5FilePath.endswith(".h5"):
             h5FilePath += ".h5"
         assert os.path.exists(h5FilePath), "{} not exists".format(h5FilePath)
@@ -198,9 +218,12 @@ class H5DataSet:
             # 关闭HDF5文件
             file.close()
 
-    def load_pivotDF_from_h5data(self, pivotKey: str):
+    def load_pivotDF_from_h5data(self, pivotKey: str = None):
         index_array = self.load_h5data("index")
         columns_array = self.load_h5data("columns")
+        if pivotKey is None:
+            assert len(self.known_data) == 3, "pivotKey is needed!"
+            pivotKey = self.known_data[-1]
         data_array = self.load_h5data(pivotKey)
         return pd.DataFrame(data=data_array, index=index_array, columns=columns_array)
 
@@ -241,11 +264,11 @@ class H5DataTS:
                 self.load_h5_data(h5FilePath=self.transform_file_path)
 
     def ergodic_process(
-        self,
-        func,
-        break_count: Optional[int] = None,
-        reload: bool = True,
-        args: Optional = (),
+            self,
+            func,
+            break_count: Optional[int] = None,
+            reload: bool = True,
+            args: Optional = (),
     ):
         assert callable(func)
 

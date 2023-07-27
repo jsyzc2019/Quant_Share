@@ -12,7 +12,7 @@ import pandas as pd
 import psycopg2
 from configparser import ConfigParser
 import os
-from Euclid_work.Quant_Share import format_date
+from ..Utils import format_date
 
 TimeType = Union[str, int, datetime, date, pd.Timestamp]
 
@@ -253,8 +253,13 @@ def write_df_to_pgDB(df, table_name, engine=None, **kwargs):
     )
 
 
-def load_gmData_history(symbols: str | list[str] = None, begin=None, end=None):
-    query = 'SELECT * FROM "gmData_history"'
+def load_gmData_history(
+    symbols: str | list[str] = None, begin=None, end=None, adj: bool = True
+):
+    if adj:
+        query = 'SELECT * FROM "gmData_history_adj"'
+    else:
+        query = 'SELECT * FROM "gmData_history"'
     params = {}
 
     if symbols is not None:
