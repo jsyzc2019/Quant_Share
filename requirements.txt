@@ -20,3 +20,5 @@ typing~=3.7.4.3
 h5py~=3.8.0
 sqlalchemy<2.0
 psycopg2==2.9.6
+psutil~=5.9.5
+bokeh~=2.4.3
