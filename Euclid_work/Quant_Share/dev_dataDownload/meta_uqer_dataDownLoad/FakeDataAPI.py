@@ -131,8 +131,10 @@ class FakeDataAPI:
         beginDate, endDate, tradeDate = cls.assert_format_data(
             beginDate, endDate, tradeDate
         )
-        base_url = "/api/market/getMktLimit.json?field=&secID=&ticker={}&exchangeCD={}&tradeDate={}&beginDate={" \
-                   "}&endDate={}"
+        base_url = (
+            "/api/market/getMktLimit.json?field=&secID=&ticker={}&exchangeCD={}&tradeDate={}&beginDate={"
+            "}&endDate={}"
+        )
         pat_len = kwargs.get("pat_len", 5)
         if isinstance(ticker, list):
             outData_df = pd.DataFrame()
@@ -211,6 +213,355 @@ class FakeDataAPI:
                     endDate,
                 )
             )
+            return pd.DataFrame(eval(result)["data"])
+
+    @classmethod
+    def ResConIndex(
+        cls,
+        ticker: Union[list, str],
+        beginDate: Union[pd.datetime, str, int] = None,
+        endDate: Union[pd.datetime, str, int] = None,
+        **kwargs
+    ):
+        """
+        doc: https://mall.datayes.com/datapreview/3686
+        demoUrl: /api/researchReport/getResConIndex.json?field=&indexID=&indexCode=000002&beginDate=20211001&endDate=20211031
+        :param ticker:
+        :param beginDate:
+        :param endDate:
+        :param kwargs:
+        :return:
+        """
+        beginDate, endDate, _ = cls.assert_format_data(beginDate, endDate)
+        base_url = "/api/researchReport/getResConIndex.json?field=&indexID=&indexCode={}&beginDate={}&endDate={}"
+        if isinstance(ticker, list):
+            outData_df = pd.DataFrame()
+            for ti in tqdm(ticker):
+                _, result = cls.client.getData(base_url.format(ti, beginDate, endDate))
+                try:
+                    outData_df = pd.concat(
+                        [outData_df, pd.DataFrame(eval(result)["data"])]
+                    )
+                except KeyError:
+                    print(eval(result)["retMsg"])
+                    break
+            return outData_df
+        else:
+            _, result = cls.client.getData(base_url.format(ticker, beginDate, endDate))
+            return pd.DataFrame(eval(result)["data"])
+
+    @classmethod
+    def ResConIndexFy12(
+        cls,
+        ticker: Union[list, str],
+        beginDate: Union[pd.datetime, str, int] = None,
+        endDate: Union[pd.datetime, str, int] = None,
+        **kwargs
+    ):
+        """
+        doc: https://mall.datayes.com/datapreview/3687
+        demoUrl: /api/researchReport/getResConIndexFy12.json?field=&indexID=&indexCode=000016&beginDate=20211001&endDate=20211031
+        :param ticker:
+        :param beginDate:
+        :param endDate:
+        :param kwargs:
+        :return:
+        """
+        beginDate, endDate, _ = cls.assert_format_data(beginDate, endDate)
+        base_url = "/api/researchReport/getResConIndexFy12.json?field=&indexID=&indexCode={}&beginDate={}&endDate={}"
+        if isinstance(ticker, list):
+            outData_df = pd.DataFrame()
+            for ti in tqdm(ticker):
+                _, result = cls.client.getData(base_url.format(ti, beginDate, endDate))
+                try:
+                    outData_df = pd.concat(
+                        [outData_df, pd.DataFrame(eval(result)["data"])]
+                    )
+                except KeyError:
+                    print(eval(result)["retMsg"])
+                    break
+            return outData_df
+        else:
+            _, result = cls.client.getData(base_url.format(ticker, beginDate, endDate))
+            return pd.DataFrame(eval(result)["data"])
+
+    @classmethod
+    def ResConIndustryCitic(
+        cls,
+        ticker: Union[list, str],
+        beginDate: Union[pd.datetime, str, int] = None,
+        endDate: Union[pd.datetime, str, int] = None,
+        **kwargs
+    ):
+        """
+        中信行业一致预期数据表
+        doc: https://mall.datayes.com/datapreview/3688
+        demoUrl: /api/researchReport/getResConIndustryCitic.json?field=&induID=&induLevel=&indexID=3&indexCode=&beginDate=20211015&endDate=20211015
+        :param ticker:
+        :param beginDate:
+        :param endDate:
+        :param kwargs:
+        :return:
+        """
+        beginDate, endDate, _ = cls.assert_format_data(beginDate, endDate)
+        base_url = "/api/researchReport/getResConIndustryCitic.json?field=&induID=&induLevel=&indexID=3&indexCode=&beginDate={}&endDate={}"
+        outData_df = pd.DataFrame()
+        _, result = cls.client.getData(base_url.format(beginDate, endDate))
+        try:
+            outData_df = pd.concat([outData_df, pd.DataFrame(eval(result)["data"])])
+        except KeyError:
+            print(eval(result)["retMsg"])
+        return outData_df
+
+    @classmethod
+    def ResConIndustryCiticFy12(
+        cls,
+        indexID: Union[list, int],
+        beginDate: Union[pd.datetime, str, int] = None,
+        endDate: Union[pd.datetime, str, int] = None,
+        **kwargs
+    ):
+        """
+        中信行业一致预期动态预测数据表
+        doc: https://mall.datayes.com/datapreview/3689
+        demoUrl: /api/researchReport/getResConIndustryCiticFy12.json?field=&induID=&induLevel=&indexID=3&indexCode=&beginDate=20211015&endDate=20211015
+        :param indexID:
+        :param beginDate:
+        :param endDate:
+        :param kwargs:
+        :return:
+        """
+        beginDate, endDate, _ = cls.assert_format_data(beginDate, endDate)
+        base_url = "/api/researchReport/getResConIndustryCiticFy12.json?field=&induID=&induLevel=&indexID={}&indexCode=&beginDate={}&endDate={}"
+        if isinstance(indexID, list):
+            outData_df = pd.DataFrame()
+            for ti in tqdm(indexID):
+                _, result = cls.client.getData(base_url.format(ti, beginDate, endDate))
+                try:
+                    outData_df = pd.concat(
+                        [outData_df, pd.DataFrame(eval(result)["data"])]
+                    )
+                except KeyError:
+                    print(eval(result)["retMsg"])
+                    continue
+            return outData_df
+        else:
+            _, result = cls.client.getData(base_url.format(indexID, beginDate, endDate))
+            return pd.DataFrame(eval(result)["data"])
+
+    @classmethod
+    def ResConIndustrySw(
+        cls,
+        indexID: Union[int, list[int]] = 3,
+        beginDate: Union[pd.datetime, str, int] = None,
+        endDate: Union[pd.datetime, str, int] = None,
+        **kwargs
+    ):
+        """
+        申万行业一致预期数据表
+        doc: https://mall.datayes.com/datapreview/3690
+        demoUrl: /api/researchReport/getResConIndustrySw.json?field=&induID=&induID=&induLevel=&indexID=3&indexCode=&beginDate=20211015&endDate=20211015&repForeDate=
+        :param indexID:
+        :param beginDate:
+        :param endDate:
+        :param kwargs:
+        :return:
+        """
+        beginDate, endDate, _ = cls.assert_format_data(beginDate, endDate)
+        base_url = "/api/researchReport/getResConIndustrySw.json?field=&induID=&induID=&induLevel=&indexID={}&indexCode=&beginDate={}&endDate={}&repForeDate="
+        if isinstance(indexID, list):
+            outData_df = pd.DataFrame()
+            for ti in tqdm(indexID):
+                _, result = cls.client.getData(base_url.format(ti, beginDate, endDate))
+                try:
+                    outData_df = pd.concat(
+                        [outData_df, pd.DataFrame(eval(result)["data"])]
+                    )
+                except KeyError:
+                    print(eval(result)["retMsg"])
+                    continue
+            return outData_df
+        else:
+            _, result = cls.client.getData(base_url.format(indexID, beginDate, endDate))
+            return pd.DataFrame(eval(result)["data"])
+
+    @classmethod
+    def ResConIndustrySwFy12(
+        cls,
+        indexID: Union[int, list[int]] = 3,
+        beginDate: Union[pd.datetime, str, int] = None,
+        endDate: Union[pd.datetime, str, int] = None,
+        **kwargs
+    ):
+        """
+        申万行业一致预期动态预测数据表
+        doc: https://mall.datayes.com/datapreview/3691
+        demoUrl: /api/researchReport/getResConIndustrySwFy12.json?field=&induID=&induID=&induLevel=&indexID={}&indexCode=&beginDate={}&endDate={}&repForeDate=
+        :param indexID:
+        :param beginDate:
+        :param endDate:
+        :param kwargs:
+        :return:
+        """
+        beginDate, endDate, _ = cls.assert_format_data(beginDate, endDate)
+        base_url = "/api/researchReport/getResConIndustrySwFy12.json?field=&induID=&induID=&induLevel=&indexID={}&indexCode=&beginDate={}&endDate={}&repForeDate="
+        if isinstance(indexID, list):
+            outData_df = pd.DataFrame()
+            for ti in tqdm(indexID):
+                _, result = cls.client.getData(base_url.format(ti, beginDate, endDate))
+                try:
+                    outData_df = pd.concat(
+                        [outData_df, pd.DataFrame(eval(result)["data"])]
+                    )
+                except KeyError:
+                    print(eval(result)["retMsg"])
+                    continue
+            return outData_df
+        else:
+            _, result = cls.client.getData(base_url.format(indexID, beginDate, endDate))
+            return pd.DataFrame(eval(result)["data"])
+
+    @classmethod
+    def ResConSecReportHeat(
+        cls,
+        secCode,
+        beginDate: Union[pd.datetime, str, int] = None,
+        endDate: Union[pd.datetime, str, int] = None,
+        **kwargs
+    ):
+        """
+        个股研报热度统计数据表
+        doc: https://mall.datayes.com/datapreview/3692
+        demoUrl: /api/researchReport/getResConSecReportHeat.json?field=&secCode={}&secName=&beginDate={}&endDate={}&repForeDate=
+        :param secCode:
+        :param beginDate:
+        :param endDate:
+        :param kwargs:
+        :return:
+        """
+        beginDate, endDate, _ = cls.assert_format_data(beginDate, endDate)
+        base_url = "/api/researchReport/getResConSecReportHeat.json?field=&secCode={}&secName=&beginDate={}&endDate={}&repForeDate="
+        if isinstance(secCode, list):
+            outData_df = pd.DataFrame()
+            for ti in tqdm(secCode):
+                _, result = cls.client.getData(base_url.format(ti, beginDate, endDate))
+                try:
+                    outData_df = pd.concat(
+                        [outData_df, pd.DataFrame(eval(result)["data"])]
+                    )
+                except KeyError:
+                    print(eval(result)["retMsg"])
+                    continue
+            return outData_df
+        else:
+            _, result = cls.client.getData(base_url.format(secCode, beginDate, endDate))
+            return pd.DataFrame(eval(result)["data"])
+
+    @classmethod
+    def ResConSecCoredata(
+        cls,
+        secCode,
+        beginDate: Union[pd.datetime, str, int] = None,
+        endDate: Union[pd.datetime, str, int] = None,
+        **kwargs
+    ):
+        """
+        个股一致预期核心表
+        doc: https://mall.datayes.com/datapreview/3692
+        demoUrl: /api/researchReport/getResConSecCoredata.json?field=&secCode={}&secName=&beginDate={}&endDate={}&repForeDate=
+        :param secCode:
+        :param beginDate:
+        :param endDate:
+        :param kwargs:
+        :return:
+        """
+        beginDate, endDate, _ = cls.assert_format_data(beginDate, endDate)
+        base_url = "/api/researchReport/getResConSecCoredata.json?field=&secCode={}&secName=&beginDate={}&endDate={}&repForeDate="
+        if isinstance(secCode, list):
+            outData_df = pd.DataFrame()
+            for ti in tqdm(secCode):
+                _, result = cls.client.getData(base_url.format(ti, beginDate, endDate))
+                try:
+                    outData_df = pd.concat(
+                        [outData_df, pd.DataFrame(eval(result)["data"])]
+                    )
+                except KeyError:
+                    # print(eval(result)["retMsg"])
+                    continue
+            return outData_df
+        else:
+            _, result = cls.client.getData(base_url.format(secCode, beginDate, endDate))
+            return pd.DataFrame(eval(result)["data"])
+
+    @classmethod
+    def ResConSecTarpriScore(
+        cls,
+        secCode,
+        beginDate: Union[pd.datetime, str, int] = None,
+        endDate: Union[pd.datetime, str, int] = None,
+        **kwargs
+    ):
+        """
+        个股一致预期目标价与评级表
+        doc: https://mall.datayes.com/datapreview/3651
+        demoUrl: /api/researchReport/getResConSecTarpriScore.json?field=&secCode=300896&secName=&beginDate=20210701&endDate=20210731&repForeDate=
+        :param secCode:
+        :param beginDate:
+        :param endDate:
+        :param kwargs:
+        :return:
+        """
+        beginDate, endDate, _ = cls.assert_format_data(beginDate, endDate)
+        base_url = "/api/researchReport/getResConSecTarpriScore.json?field=&secCode={}&secName=&beginDate={}&endDate={}&repForeDate="
+        if isinstance(secCode, list):
+            outData_df = pd.DataFrame()
+            for ti in tqdm(secCode):
+                _, result = cls.client.getData(base_url.format(ti, beginDate, endDate))
+                try:
+                    outData_df = pd.concat(
+                        [outData_df, pd.DataFrame(eval(result)["data"])]
+                    )
+                except KeyError:
+                    # print(eval(result)["retMsg"])
+                    continue
+            return outData_df
+        else:
+            _, result = cls.client.getData(base_url.format(secCode, beginDate, endDate))
+            return pd.DataFrame(eval(result)["data"])
+    @classmethod
+    def ResConSecCorederi(
+        cls,
+        secCode,
+        beginDate: Union[pd.datetime, str, int] = None,
+        endDate: Union[pd.datetime, str, int] = None,
+        **kwargs
+    ):
+        """
+        个股一致预期核心加工表
+        doc: https://mall.datayes.com/datapreview/3653
+        demoUrl: /api/researchReport/getResConSecCorederi.json?field=&secCode={}&secName=&beginDate={}&endDate={}&repForeDate=
+        :param secCode:
+        :param beginDate:
+        :param endDate:
+        :param kwargs:
+        :return:
+        """
+        beginDate, endDate, _ = cls.assert_format_data(beginDate, endDate)
+        base_url = "/api/researchReport/getResConSecCorederi.json?field=&secCode={}&secName=&beginDate={}&endDate={}&repForeDate="
+        if isinstance(secCode, list):
+            outData_df = pd.DataFrame()
+            for ti in tqdm(secCode):
+                _, result = cls.client.getData(base_url.format(ti, beginDate, endDate))
+                try:
+                    outData_df = pd.concat(
+                        [outData_df, pd.DataFrame(eval(result)["data"])]
+                    )
+                except KeyError:
+                    # print(eval(result)["retMsg"])
+                    continue
+            return outData_df
+        else:
+            _, result = cls.client.getData(base_url.format(secCode, beginDate, endDate))
             return pd.DataFrame(eval(result)["data"])
 
     @classmethod
@@ -294,8 +645,10 @@ class FakeDataAPI:
         :return:
         """
         beginDate, endDate, tradeDate = cls.assert_format_data(beginDate, endDate, "")
-        base_url = "/api/fundamental/getFdmtIndiPSPit.json?field=&ticker={}&beginYear={}&endYear={}&reportType={" \
-                   "}&publishDateBegin={}&publishDateEnd={}"
+        base_url = (
+            "/api/fundamental/getFdmtIndiPSPit.json?field=&ticker={}&beginYear={}&endYear={}&reportType={"
+            "}&publishDateBegin={}&publishDateEnd={}"
+        )
         pat_len = kwargs.get("pat_len", 5)
         if isinstance(ticker, list):
             outData_df = pd.DataFrame()
