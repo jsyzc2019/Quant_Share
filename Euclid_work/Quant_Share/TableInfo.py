@@ -96,7 +96,9 @@ with open(os.path.join(current_dir, "dev_files/gmStockData_tableInfo.json"), "r"
 with open(os.path.join(current_dir, "dev_files/emData_tableInfo.json"), "r") as f:
     emData = json.load(f)
 with open(os.path.join(current_dir, "dev_files/jointquant_tableInfo.json"), "r") as f:
-    jointquant = json.load(f)
+    jointquant_prepare = json.load(f)
+with open(os.path.join(current_dir, "dev_files/jointquant_factor.json"), "r") as f:
+    jointquant_factor = json.load(f)
 
 tableInfo: Dict = {}
 for table in [
@@ -107,9 +109,18 @@ for table in [
     "gmStockFactor",
     "gmStockData",
     "emData",
-    "jointquant",
+    "jointquant_prepare",
+    "jointquant_factor"
 ]:
     _table = eval(table)
-    for key, value in _table.items():
-        _table[key]["tableSource"] = table
+    if table == "gmStockFactor":
+        new_table = {}
+        for key, value in _table.items():
+            new_table[key + "_original"] = _table[key]
+            new_table[key + "_original"]["tableSource"] = table
+        _table = new_table
+    else:
+        for key, value in _table.items():
+            _table[key]["tableSource"] = table
+
     tableInfo.update(_table)

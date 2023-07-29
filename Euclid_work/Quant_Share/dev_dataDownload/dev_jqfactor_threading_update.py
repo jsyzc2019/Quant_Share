@@ -17,7 +17,7 @@ def log_result(result):
 
 def main():
     start = time.perf_counter()
-    dp = DataPrepare("20200101")
+    dp = DataPrepare(beginDate="20160101")
 
     joint_quant_factor = dp.joint_quant_factor
     factor_list = joint_quant_factor["factor_name"]
@@ -27,6 +27,8 @@ def main():
     ) as executor:
         futures = []
         for fn in tqdm(factor_list):
+            # if fn != "account_receivable_turnover_rate":
+            #     continue
             future = executor.submit(
                 update,
                 func=globals()[fn],

@@ -1402,7 +1402,7 @@ def adjusted_profit_to_total_profit(stock_file):
 # 应收账款周转率 account_receivable_turnover_rate
 # TTM(营业收入,0)inc_oper/（AvgQ(应收账款 acct_rcv,4,0) + AvgQ(应收票据 note_rcv,4,0) + AvgQ(预收账款 acct_rcv_adv,4,0) ）
 def account_receivable_turnover_rate(stock_file):
-    stock_file = stock_file.copy()
+    stock_file = stock_file.fillna(0)
     stock_file = stock_file.sort_values(["symbol", "rpt_date"]).reset_index(drop=True)
     stock_file["inc_oper_ttm"] = (
         stock_file.groupby(["symbol"])["inc_oper"].rolling(window=4).sum().values

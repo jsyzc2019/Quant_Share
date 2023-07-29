@@ -29,6 +29,7 @@ from .Utils import (
     extend_date_span,
     isdate,
     dataBase_root_path_JointQuant_prepare,
+    dataBase_root_path_JointQuant_Factor
 )
 
 warnings.filterwarnings("ignore")
@@ -41,7 +42,8 @@ table_MAP = {
     "gmStockFactor": dataBase_root_path_gmStockFactor,
     "gmStockData": dataBase_root_path_gmStockFactor,
     "emData": dataBase_root_path_EM_data,
-    "jointquant": dataBase_root_path_JointQuant_prepare,
+    "jointquant_prepare": dataBase_root_path_JointQuant_prepare,
+    "jointquant_factor": dataBase_root_path_JointQuant_Factor
 }
 
 
@@ -114,7 +116,7 @@ def get_data(
             ticker = [ticker]
 
     tableAssets = tableInfo[tableName]["assets"]
-    if tableAssets in ["stock", "info", "emData", "gmStockData", "jointquant"]:
+    if tableAssets in ["stock", "info", "emData", "gmStockData", "jointquant_prepare", "jointquant_factor"]:
         return get_data_Base(
             tableName, begin, end, fields, ticker, table_MAP[tableAssets], **kwargs
         )

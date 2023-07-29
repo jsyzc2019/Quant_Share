@@ -156,17 +156,21 @@ def choose_data(factor_name, joint_quant_factor):
 
 # 获取储存因子数据中的最大值
 def factor_max_rpt(factor_name):
-    folder_path = os.path.join(dataBase_root_path_JointQuant_Factor, factor_name)
-    file_name_list = os.listdir(folder_path)
-    file_name_list = sorted(file_name_list)
-    file_path = os.path.join(folder_path, file_name_list[-1])
-    df = pd.read_hdf(file_path)
-    max_rpt = df["rpt_date"].max()
-    if pd.isnull(max_rpt):
-        year = "".join(list(filter(str.isdigit, file_name_list[-1])))
-        year = year[:4]
-        max_rpt = year + "-01-01"
-        max_rpt = datetime.strptime(max_rpt, "%Y-%m-%d")
+    try:
+        folder_path = os.path.join(dataBase_root_path_JointQuant_Factor, factor_name)
+        file_name_list = os.listdir(folder_path)
+        file_name_list = sorted(file_name_list)
+        file_path = os.path.join(folder_path, file_name_list[-1])
+        df = pd.read_hdf(file_path)
+        max_rpt = df["rpt_date"].max()
+        if pd.isnull(max_rpt):
+            year = "".join(list(filter(str.isdigit, file_name_list[-1])))
+            year = year[:4]
+            max_rpt = year + "-01-01"
+            max_rpt = datetime.strptime(max_rpt, "%Y-%m-%d")
+        return max_rpt
+    except IndexError:
+        max_rpt = datetime.strptime("2016-01-01", "%Y-%m-%d")
     return max_rpt
 
 
@@ -178,8 +182,10 @@ def update(func, factor_name, joint_quant_factor, data_prepare, callback=None):
         df = get_data(data_name, begin=data_prepare.beginDate, end=data_prepare.endDate)
         if os.path.exists(file_path):
             max_rpt = factor_max_rpt(file_path)
-
-            max_rpt1 = df["rpt_date"].max()
+            if df is not None:
+                max_rpt1 = df["rpt_date"].max()
+            else:
+                max_rpt1 = datetime(year=2050, month=1, day=1)
             if max_rpt >= max_rpt1:
                 print("根据quant_share中的数据，" + factor_name + "因子不需要更新")
                 return Wrong
