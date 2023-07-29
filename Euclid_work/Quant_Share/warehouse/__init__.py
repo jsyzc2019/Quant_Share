@@ -58,6 +58,22 @@ def format_table(
     conn.close()
 
 
+def clean_data_frame_to_postgres(
+    data: pd.DataFrame, time_columns: List[str] | str = None, lower=False
+):
+    if time_columns is not None:
+        if isinstance(time_columns, str):
+            if data[time_columns].dtype != "O":
+                data[time_columns] = data[time_columns].dt.strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            for i in time_columns:
+                if data[i].dtype != "O":
+                    data[i] = data[i].dt.strftime("%Y-%m-%d %H:%M:%S")
+    if lower:
+        data.columns = [col_i.lower() for col_i in data.columns]
+    return data
+
+
 def postgres_write_data_frame(
     data: pd.DataFrame,
     table_name: str,
@@ -135,6 +151,15 @@ def SQL_INSERT_STATEMENT_FROM_DATAFRAME(data: pd.DataFrame, table_name: str):
     return sql_texts
 
 
+def postgres_cur_execute(database: str, sql_text: str):
+    conn = postgres_connect(database=database)
+    cur = conn.cursor()
+    cur.execute(sql_text)
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
 def SQL_UPDATE_STATEMENT_FROM_DATAFRAME(
     data: pd.DataFrame,
     table_name: str,
@@ -165,7 +190,7 @@ def SQL_UPDATE_STATEMENT_FROM_DATAFRAME(
                     value = str(value).replace("nan", "NULL").replace("None", "NULL")
                     sql_text += "{}={},".format(key, value)
         if record_time_exits:
-            sql_text += "record_time=CURRENT_TIMESTAMP"
+            sql_text += "record_time=CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Shanghai'"
         else:
             sql_text = sql_text[:-1]
         sql_texts.append(sql_text)

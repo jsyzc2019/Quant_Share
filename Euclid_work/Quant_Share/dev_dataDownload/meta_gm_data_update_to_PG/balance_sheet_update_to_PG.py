@@ -9,14 +9,24 @@
 from base_package import *
 
 logger = logger_update_to_PG("balance_sheet")
+# 获取2015年后的所有symbol
+symbolList = pd.read_sql(
+    """
+    select symbol from stock_info where delisted_date >= '2015-01-01'
+    """,
+    con=postgres_engine(),
+)["symbol"].values
+
 balance_sheet_info = pd.read_excel(os.path.join(dev_files_dir, "balance_sheet.xlsx"))
 balance_sheet_fields = balance_sheet_info["列名"].to_list()
 
-# 获取数据库中已有数据
+# 由balance_sheet_latest_info获取上一次更新时间
+# 更新时间begin的选取, 应为update_time
 exit_info = pd.read_sql(
-    "select symbol, max(Date(record_time)) as date from balance_sheet group by symbol",
+    "select symbol, max(Date(update_time)) as date from balance_sheet group by symbol;",
     con=postgres_engine(),
 )
+
 exit_info = exit_info.set_index("symbol")
 with tqdm(symbolList) as t:
     end = date.today().strftime("%Y-%m-%d")
@@ -24,12 +34,19 @@ with tqdm(symbolList) as t:
         try:
             begin = exit_info.loc[symbol]["date"].strftime("%Y-%m-%d")
         except KeyError:
-            # 一般认为这种数据表中没有的symbol为2015-01-01前就退市, 可以直接continue, 不用获取数据
+            # 说明目前有的表中, 没有该symbol, 设置其begin为2015-01-01
             begin = "2015-01-01"
-            logger.info("{}:{}-{} skip".format(symbol, begin, end))
-            continue
+            postgres_cur_execute(
+                database="QS",
+                sql_text="""
+                INSERT INTO balance_sheet (symbol, pub_date)
+                VALUES ('{}', '2015-01-01')""".format(
+                    symbol
+                ),
+            )
 
         if format_date(begin) > get_tradeDate(end, -5):
+            # 设置更新周期, 相较于record time
             logger.info("{}:{}-{} pass".format(symbol, begin, end))
             continue
         t.set_postfix({"状态": "{}:{}-{}开始获取数据...".format(symbol, begin, end)})
@@ -43,25 +60,31 @@ with tqdm(symbolList) as t:
                 fields=balance_sheet_fields,
                 df=True,
             )
-            if len(data) > 0:
+            _len = len(data)
+            if _len > 0:
                 # TODO 贼离谱, 查出来的symbol并不是query中的symbol
                 symbol = data["symbol"].values[0]
-                for i in ["pub_date", "end_date"]:
-                    data[i] = data[i].dt.strftime("%Y-%m-%d %H:%M:%S")
-                data.columns = [col_i.lower() for col_i in data.columns]
+                # 记录数据
                 postgres_write_data_frame(
-                    data,
+                    clean_data_frame_to_postgres(
+                        data, ["pub_date", "end_date"], lower=True
+                    ),
                     "balance_sheet",
                     update=True,
                     unique_index=["symbol", "pub_date", "end_date"],
                     record_time=True,
                 )
+
         except GmError:
             t.set_postfix({"状态": "GmError:{}".format(GmError)})
             logger.error("{}:{}-{} GmError:{}".format(symbol, begin, end, GmError))
-            continue
+            _len = -1
         finally:
-            t.set_postfix(
-                {"状态": "{}:{}-{}写入{}条数据".format(symbol, begin, end, len(data))}
+            t.set_postfix({"状态": "{}:{}-{}写入{}条数据".format(symbol, begin, end, _len)})
+            logger.info("{}:{}-{} get {} itme(s)".format(symbol, begin, end, _len))
+            update_time(
+                table_name="balance_sheet",
+                symbol=symbol,
+                database="QS",
+                time_column_name="update_time",
             )
-            logger.info("{}:{}-{} get {} itme(s)".format(symbol, begin, end, len(data)))

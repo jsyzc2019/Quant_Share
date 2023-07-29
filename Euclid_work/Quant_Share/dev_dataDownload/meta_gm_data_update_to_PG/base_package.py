@@ -57,3 +57,23 @@ def logger_update_to_PG(log_file_name: str, **kwargs):
     )
     logger = logging.getLogger()
     return logger
+
+
+def update_time(table_name: str, symbol: str, time_column_name: str, database: str):
+    """
+    用于向QS_log中的表更新record_time, 无论是否有数据更新, 都应该更新QS_log中的对应表的record_time
+    :param table_name: 如果表名中带有大写, 需要两层引号, 如 '"gmData_history_1m"', 如果无大写, 则为‘balance_sheet_latest_info’即可
+    :param symbol: 需要更新的symbol
+    :param time_column_name:
+    :param database
+    """
+    postgres_cur_execute(
+        database=database,
+        sql_text="""
+        UPDATE {}
+        SET {} = CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Shanghai'
+        WHERE symbol='{}'
+    """.format(
+            table_name, time_column_name, symbol
+        ),
+    )
