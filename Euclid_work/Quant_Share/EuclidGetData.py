@@ -290,7 +290,8 @@ def selectFields(
         else:
             notExitField = "\\".join(list(set(fields) - set(outData.columns)))
             raise AttributeError("{} is not exit in {}".format(notExitField, tableName))
-    return outData.reset_index(drop=True)
+    outData = outData.reset_index(drop=True)
+    return outData.drop_duplicates(subset=[date_column, ticker_column])
 
 
 def selectFields_ticker(Data, ticker, ticker_column):
