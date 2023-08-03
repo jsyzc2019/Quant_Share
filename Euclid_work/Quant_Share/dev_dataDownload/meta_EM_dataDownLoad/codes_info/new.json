@@ -1,3 +1,20 @@
 {
-
+    "000300.SH": {
+    "codes": "000300.SH",
+    "func": [
+      "CTR_index_download"
+    ],
+    "tableName": [
+      "000300SH"
+    ]
+  },
+    "000802.SH": {
+    "codes": "000802.SH",
+    "func": [
+      "CTR_index_download"
+    ],
+    "tableName": [
+      "000802SH"
+    ]
+  }
 }

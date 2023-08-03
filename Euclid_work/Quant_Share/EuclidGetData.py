@@ -83,13 +83,13 @@ def load_file(toLoadList):
 
 
 def get_data(
-    tableName,
-    begin="20150101",
-    end=None,
-    sources="gm",
-    fields: list = None,
-    ticker: list = None,
-    **kwargs
+        tableName,
+        begin="20150101",
+        end=None,
+        sources="gm",
+        fields: list = None,
+        ticker: list = None,
+        **kwargs
 ):
     """
     :param tableName: bench_info / bench_price / stock_info / stock_price / tradeDate_info / HKshszHold
@@ -185,12 +185,12 @@ def get_data_Base(tableName, begin, end, fields, ticker, path, **kwargs):
 
 
 def get_data_future(
-    tableName,
-    begin="20160101",
-    end=None,
-    sources="gm",
-    fields: list = None,
-    ticker: list = None,
+        tableName,
+        begin="20160101",
+        end=None,
+        sources="gm",
+        fields: list = None,
+        ticker: list = None,
 ):
     tableFoldPath = os.path.join(dataBase_root_path_future, tableName)
     load_begin, load_end = extend_date_span(begin, end, "Y")
@@ -219,7 +219,7 @@ def get_data_future(
 
 
 def get_data_gmStockFactor(
-    tableName, begin="20160101", end=None, fields: list = None, ticker: list = None
+        tableName, begin="20160101", end=None, fields: list = None, ticker: list = None
 ):
     tableFoldPath = os.path.join(dataBase_root_path_gmStockFactor, tableName)
     load_begin, load_end = extend_date_span(begin, end, "Y")
@@ -243,13 +243,13 @@ def get_data_gmStockFactor(
 
 
 def selectFields(
-    data,
-    tableName,
-    begin,
-    end,
-    fields: list = None,
-    ticker: list = None,
-    verbose: bool = False,
+        data,
+        tableName,
+        begin,
+        end,
+        fields: list = None,
+        ticker: list = None,
+        verbose: bool = False,
 ):
     outData = data.copy()
     # get date_column, ticker_column

@@ -136,7 +136,7 @@ def Save_and_Log(
         df,
         date_column,
         tableName,
-        dataBase_root_path=dataBase_root_path_EM_data,
+        _dataBase_root_path=dataBase_root_path_EM_data,
         reWrite=rewrite,
     )
     with open(emTableJson, "r") as f:
