@@ -5,10 +5,12 @@
 # @File    : signal_back_test.py
 # @Desc    : 回测相关内容
 """
-
+import os
 from datetime import date, datetime
-from typing import Union
+from typing import Union, Dict, List
+import shutil
 
+import pandas as pd
 from bokeh.io import save  # 引入保存函数
 from bokeh.models import WheelZoomTool, RangeTool, DatetimeTickFormatter
 from bokeh.plotting import figure, output_file
@@ -89,13 +91,16 @@ class DataPrepare:
         else:
             self.bench_code = str(bench_code).zfill(6)
             self.get_bench_info()
+            # 由con code获取stock_ids
             self.stock_ids = np.unique(
                 H5DataSet(
                     self.back_test_data_path.joinpath(
                         "bench_price", self.bench_code, "bench_con_code.h5"
                     )
                 )
-                .load_pivotDF_from_h5data(pivotKey="bench_con_code")
+                .load_pivotDF_from_h5data(
+                    pivotKey="bench_con_code"
+                )  # 读取为data_frame, 随即取columns
                 .columns
             )
 
@@ -127,37 +132,33 @@ class DataPrepare:
         sub_path = self.back_test_data_path.joinpath("bench_price", self.bench_code)
         if sub_path.exists():
             print("bench_price has cache, pass")
-            # load cache
+            # load cache in back test
         else:
             sub_path.mkdir(parents=True)
-            bench_price_df = get_data(
-                "MktIdx",
-                begin=self.begin_date,
-                end=self.end_date,
-                ticker=[self.bench_code],
+            bench_price_df = pd.read_sql(
+                """select tradedate,chgpct from  "uqer_MktIdx" where ticker = '{}'
+                """.format(
+                    self.bench_code
+                ),
+                con=postgres_engine(),
             )
-            # bench_price_df = pd.read_sql(
-            #     """select * from "gmData_bench_price" where sec_id = '{}'""".format(
-            #         self.bench_code
-            #     ),
-            #     con=postgres_engine(),
-            # )
-            bench_price_df.to_csv(
-                sub_path.joinpath("bench_price_df_raw.csv"),
-                index=False,
-            )
-            bench_price_df["tradeDate"] = pd.to_datetime(bench_price_df["tradeDate"])
-            bench_price_df = bench_price_df.set_index("tradeDate")
-            bench_pct_chg = bench_price_df["CHGPct"].reindex(
+            bench_price_df["tradedate"] = pd.to_datetime(bench_price_df["tradedate"])
+            bench_price_df = bench_price_df.set_index("tradedate")
+            bench_pct_chg = bench_price_df["chgpct"].reindex(
                 self.trade_dates, fill_value=np.NaN
             )
             bench_pct_chg.to_hdf(sub_path.joinpath("bench_price_pct_chg.h5"), key="a")
-
-            # TODO bench con code, 在此基础上完成股票池筛选, 沪深300, ZZ500, ZZ1000
+            # bench con
             bench_con_code = (
-                get_data("mIdxCloseWeight", ticker=self.bench_code)
-                .drop_duplicates(subset=["consTickerSymbol", "effDate"])
-                .pivot(index="effDate", columns="consTickerSymbol", values="weight")
+                pd.read_sql(
+                    """select constickersymbol, effDate, weight from uqer_midx_close_weight where ticker = '{}' order by effdate
+                """.format(
+                        self.bench_code
+                    ),
+                    con=postgres_engine(),
+                )
+                .drop_duplicates(subset=["constickersymbol", "effDate"])
+                .pivot(index="effdate", columns="constickersymbol", values="weight")
             )
             bench_con_code.columns = [
                 format_stockCode(i) for i in bench_con_code.columns
@@ -181,8 +182,6 @@ class DataPrepare:
             # load cache
         else:
             sub_path.mkdir(parents=True)
-            # price_df = get_data("MktEqud", begin=self.begin_date, end=self.end_date)
-            # TODO 进行self.stock_ids的转换, 传入筛选
             price_df = load_gmData_history(
                 begin=self.begin_date, end=self.end_date, adj=True
             )
@@ -227,15 +226,22 @@ class back_test:
         method: str = "long_only",
         **kwargs
     ):
+        self.group_nums = None
+        self.bench_plot = False
+        self.group_categorize = None
         self.result = None
         self.rtn = None
         self.weight = None
         self.back_test_data_path = data_prepare.back_test_data_path
         self.bench_code = data_prepare.bench_code
+        # bench data path
         self.bench_data_path = self.back_test_data_path.joinpath(
             "bench_price", self.bench_code
         )
-        self.price_data_path = self.back_test_data_path.joinpath("price_data")
+        # stock data path
+        self.price_data_path = self.back_test_data_path.joinpath(
+            "price_data", self.bench_code
+        )
         self.method = method
         self.signal = reindex(
             signal, index=data_prepare.trade_dates, columns=data_prepare.stock_ids
@@ -281,27 +287,48 @@ class back_test:
 
     def main_back_test(self, **kwargs):
         sub_path = self.back_test_data_path.joinpath("back_test")
-        sub_path.mkdir(parents=True, exist_ok=True)
+        if kwargs.get("clean_cache", False) and sub_path.exists():
+            os.remove(sub_path.joinpath("weight.h5"))
+        sub_path.joinpath(kwargs.get("sub_name", "")).mkdir(parents=True, exist_ok=True)
 
         if self.method == "long_only":
             self.weight = signal_to_weight(self.signal)
+            self.bench_plot = True
+            self.write_to_cache(
+                self.weight, sub_path, "weight", "long_only_weight", rewrite=True
+            )
         elif self.method == "top_bottom":
             self.weight = get_top_bottom_weight(
                 self.signal, kwargs.get("quantile", 0.1)
             )
+            self.write_to_cache(
+                self.weight, sub_path, "weight", "top_bottom_weight", rewrite=True
+            )
+        elif self.method == "group_back_test":
+            self.group_nums = kwargs.get("group_nums", 5)
+            print(">> group num : {}".format(self.group_nums))
+            # 分组标识
+            self.group_categorize = categorize_signal_by_quantiles(
+                self.signal, group_nums=self.group_nums
+            )
+            for group in range(0, self.group_nums):
+                self.weight = signal_to_weight(
+                    (self.group_categorize == group).astype(int)
+                )
+                self.write_to_cache(
+                    self.weight,
+                    sub_path,
+                    "weight",
+                    "group_back_test_weight_{}".format(group),
+                    add=True,
+                    rewrite=True,
+                )
         else:
-            raise AttributeError("method should be longOnly or top_bottom")
-
-        # weight
-        H5DataSet.write_pivotDF_to_h5data(
-            h5FilePath=sub_path.joinpath("weight.h5"),
-            pivotDF=self.weight,
-            pivotKey="adjusted_signal",
-            rewrite=True,
-        )
-
+            raise AttributeError(
+                "method should be longOnly, top_bottom, group_back_test"
+            )
         stock_price_h5_dataSet = H5DataSet(
-            self.price_data_path.joinpath(self.bench_code, "stock_price.h5")
+            self.price_data_path.joinpath("stock_price.h5")
         )
         ticker_rtn = np.divide(
             stock_price_h5_dataSet["close"] - stock_price_h5_dataSet["pre_close"],
@@ -333,5 +360,70 @@ class back_test:
             rewrite=True,
         )
 
-    def group_back_test(self, **kwargs):
-        cate = categorize_signal_by_quantiles(self.signal, kwargs)
+    @classmethod
+    def write_to_cache(
+        cls,
+        pivoted_data: pd.DataFrame,
+        target_folder_path: Path | str,
+        file_name: str,
+        pivotKey_name: str,
+        add=False,
+        rewrite=False,
+    ):
+        target_folder_path = cls._format_path(target_folder_path)
+        file_name = cls._format_h5_file_name(file_name)
+        target_path = target_folder_path.joinpath(file_name)
+        if not target_path.exists():
+            # write_pivotDF_to_h5data
+            H5DataSet.write_pivotDF_to_h5data(
+                h5FilePath=target_path,
+                pivotDF=pivoted_data,
+                pivotKey=pivotKey_name,
+            )
+        else:
+            if add:
+                # add_pivotDF_to_h5data
+                if pivotKey_name in H5DataSet(target_path).known_data:
+                    if rewrite:
+                        H5DataSet.write_pivotDF_to_h5data(
+                            h5FilePath=target_path,
+                            pivotDF=pivoted_data,
+                            pivotKey=pivotKey_name,
+                            rewrite=True,
+                        )
+                    else:
+                        raise FileExistsError(
+                            "{} is exits in {}".format(pivotKey_name, target_path)
+                        )
+                else:
+                    H5DataSet.add_pivotDF_to_h5data(
+                        h5FilePath=target_path,
+                        pivotDF=pivoted_data,
+                        pivotKey=pivotKey_name,
+                    )
+            else:
+                if rewrite:
+                    H5DataSet.write_pivotDF_to_h5data(
+                        h5FilePath=target_path,
+                        pivotDF=pivoted_data,
+                        pivotKey=pivotKey_name,
+                        rewrite=True,
+                    )
+                else:
+                    raise FileExistsError("{} is exits".format(target_path))
+
+    @staticmethod
+    def _format_h5_file_name(raw_name: str):
+        if raw_name.endswith(".h5"):
+            return raw_name
+        else:
+            return raw_name + ".h5"
+
+    @staticmethod
+    def _format_path(raw_path: str | Path):
+        if isinstance(raw_path, str):
+            Path(raw_path).mkdir(parents=True, exist_ok=True)
+            return Path(raw_path)
+        else:
+            raw_path.mkdir(parents=True, exist_ok=True)
+            return raw_path
