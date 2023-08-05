@@ -28,6 +28,25 @@ from ..warehouse import load_gmData_history, postgres_engine
 TimeType = Union[str, int, datetime, date, pd.Timestamp]
 
 
+class QScache:
+    def __init__(self, cache_path):
+        self.cache_path = cache_path
+        self.cache_dict = self.load_cache(cache_path)
+
+    @classmethod
+    def load_cache(cls, path):
+        if isinstance(path, str):
+            path = Path(path)
+        cache = {}
+        for item in path.iterdir():
+            if item.is_dir():
+                cache[item.name] = cls.load_cache(item)
+            elif item.is_file() and item.name.endswith(".h5"):
+                data: H5DataSet = H5DataSet(item)
+                cache[item.name.split(".")[0]] = data
+        return cache
+
+
 class DataPrepare:
     def __init__(
         self,
@@ -253,7 +272,7 @@ class back_test:
         output_file(path)
 
         # create a new plot
-        s1 = figure(plot_width=1200, plot_height=600, title=None)
+        s1 = figure(width=1200, height=600, title=None)
         s1.line(daily_rtn.index, daily_rtn.cumsum().values)
         s1.add_tools(WheelZoomTool())
         s1.xaxis.formatter = DatetimeTickFormatter(days=["%Y-%d-%d"])
@@ -313,3 +332,6 @@ class back_test:
             pivotKey="rtn",
             rewrite=True,
         )
+
+    def group_back_test(self, **kwargs):
+        cate = categorize_signal_by_quantiles(self.signal, kwargs)
