@@ -13,6 +13,7 @@ import psycopg2
 from configparser import ConfigParser
 import os
 from ..Utils import format_date
+from tqdm import tqdm
 
 TimeType = Union[str, int, datetime, date, pd.Timestamp]
 
@@ -24,11 +25,14 @@ def format_table(
     dataBase: str = None,
 ):
     """
+    处理postgres中数据表中的列名为小写
     :param table_name: 数据表名
     :param columns: if True(default), 将对数据表的所有列名称转为小写
     :param record_time: if Ture, 会未表添加record_time列, default False
     :param dataBase: 数据库名称, 默认为ini文件中的dataBase
     """
+    if table_name.lower() != table_name:
+        table_name = '"{}"'.format(table_name)
     if dataBase is not None:
         conn = postgres_connect(database=dataBase)
     else:
@@ -40,7 +44,7 @@ def format_table(
         for col_name_i in table_column_names:
             if col_name_i != col_name_i.lower():
                 cur.execute(
-                    'ALTER TABLE "{}" RENAME COLUMN "{}" TO {}'.format(
+                    'ALTER TABLE {} RENAME COLUMN "{}" TO {}'.format(
                         table_name, col_name_i, col_name_i.lower()
                     )
                 )
@@ -49,10 +53,10 @@ def format_table(
     if not record_time_exits and record_time:
         cur.execute(
             "alter table {} add record_time timestamp default current_timestamp not null;".format(
-                dataBase
+                table_name
             )
         )
-        print("record_time has been created in {}".format(dataBase))
+        print("record_time has been created in {}".format(table_name))
     conn.commit()
     cur.close()
     conn.close()
@@ -61,6 +65,14 @@ def format_table(
 def clean_data_frame_to_postgres(
     data: pd.DataFrame, time_columns: List[str] | str = None, lower=False
 ):
+    """
+    将data frame转为可以直接写入的格式:
+        - 列名一律小写
+        - datetime, timestamp, date, 格式一律转为str(format = "%Y-%m-%d %H:%M:%S")
+    :param data:
+    :param time_columns:
+    :param lower:
+    """
     if time_columns is not None:
         if isinstance(time_columns, str):
             if data[time_columns].dtype != "O":
@@ -78,7 +90,7 @@ def postgres_write_data_frame(
     data: pd.DataFrame,
     table_name: str,
     update: bool = False,
-    unique_index: [str, List[str]] = None,
+    unique_index: List[str] = None,
     record_time: bool = False,
     debug: bool = False,
     **kwargs,
@@ -163,7 +175,7 @@ def postgres_cur_execute(database: str, sql_text: str):
 def SQL_UPDATE_STATEMENT_FROM_DATAFRAME(
     data: pd.DataFrame,
     table_name: str,
-    unique_index: [str, List[str]],
+    unique_index: List[str],
     record_time_exits: bool = False,
 ):
     sql_texts = []
@@ -281,6 +293,7 @@ def write_df_to_pgDB(df, table_name, engine=None, **kwargs):
 def load_gmData_history(
     symbols: str | list[str] = None, begin=None, end=None, adj: bool = True
 ):
+    # TODO 进行self.stock_ids的转换, 传入筛选
     if adj:
         query = 'SELECT * FROM "gmData_history_adj"'
     else:

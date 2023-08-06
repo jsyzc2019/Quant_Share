@@ -6,11 +6,11 @@
 """
 # 由 dev_data_load 将函数转到 meta中
 from .MktEqud import MktEqud_update
-from .MktLimit import MktLimit_update
-from .FdmtIndiRtnPit import FdmtIndiRtnPit_update
+from .MktLimit import MktLimit_update, MktLimit
+from .FdmtIndiRtnPit import FdmtIndiRtnPit_update, FdmtIndiRtnPit
 from .FdmtIndiPSPit import FdmtIndiPSPit_update
-from .MktIdx import MktIdx_update
-from .mIdxCloseWeight import mIdxCloseWeight_update
+from .MktIdx import MktIdx_update, MktIdx
+from .mIdxCloseWeight import mIdxCloseWeight_update, mIdxCloseWeight
 from .ResConIndex import ResConIndex_update
 from .ResConIndexFy12 import ResConIndexFy12_update
 from .ResConIndustryCitic import ResConIndustryCitic_update
@@ -21,3 +21,5 @@ from .ResConSecReportHeat import ResConSecReportHeat_update
 from .ResConSecCoredata import ResConSecCoredata_update
 from .ResConSecTarpriScore import ResConSecTarpriScore_update
 from .ResConSecCorederi import ResConSecCorederi_update
+
+from .MktEqudAdj import MktEqudAdj

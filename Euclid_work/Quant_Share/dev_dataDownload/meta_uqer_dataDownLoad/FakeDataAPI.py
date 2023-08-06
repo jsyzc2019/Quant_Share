@@ -10,7 +10,7 @@ import os
 import pandas as pd
 from tqdm import tqdm
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from Euclid_work.Quant_Share.Utils import format_date, patList
+from ...Utils import format_date, patList
 from .dataapi_win36 import Client
 
 
@@ -46,6 +46,57 @@ class FakeDataAPI:
             beginDate, endDate, tradeDate
         )
         base_url = "/api/market/getMktEqud.json?field=&beginDate={}&endDate={}&secID=&ticker={}&tradeDate={}"
+        pat_len = kwargs.get("pat_len", 5)
+        if isinstance(ticker, list):
+            outData_df = pd.DataFrame()
+            for pat_ticker_list in tqdm(patList(ticker, pat_len)):
+                _, result = cls.client.getData(
+                    base_url.format(
+                        beginDate,
+                        endDate,
+                        ",".join(pat_ticker_list),
+                        ",".join(tradeDate),
+                    )
+                )
+                try:
+                    outData_df = pd.concat(
+                        [outData_df, pd.DataFrame(eval(result)["data"])]
+                    )
+                except KeyError:
+                    print(eval(result)["retMsg"])
+                    break
+            return outData_df
+        else:
+            _, result = cls.client.getData(
+                base_url.format(beginDate, endDate, ticker, ",".join(tradeDate))
+            )
+            return pd.DataFrame(eval(result)["data"])
+
+    @classmethod
+    def MktEqudAdjGet(
+            cls,
+            ticker: Union[list, str],
+            tradeDate: Union[list[Union[pd.datetime, str]], pd.datetime, str] = "",
+            beginDate: Union[pd.datetime, str, int] = None,
+            endDate: Union[pd.datetime, str, int] = None,
+            **kwargs
+    ):
+        """
+        沪深股票前复权行情
+        doc: https://mall.datayes.com/datapreview/1290
+        demoUrl: /api/market/getMktEqudAdj.json?field=&secID=&ticker=688001&beginDate=&endDate=&tradeDate=20190816
+        :param ticker:
+        :param tradeDate:
+        :param beginDate:
+        :param endDate:
+        :param kwargs:
+            pat_len: int
+        :return:
+        """
+        beginDate, endDate, tradeDate = cls.assert_format_data(
+            beginDate, endDate, tradeDate
+        )
+        base_url = "/api/market/getMktEqudAdj.json?field=&beginDate={}&endDate={}&secID=&ticker={}&tradeDate={}"
         pat_len = kwargs.get("pat_len", 5)
         if isinstance(ticker, list):
             outData_df = pd.DataFrame()
@@ -528,6 +579,7 @@ class FakeDataAPI:
         else:
             _, result = cls.client.getData(base_url.format(secCode, beginDate, endDate))
             return pd.DataFrame(eval(result)["data"])
+
     @classmethod
     def ResConSecCorederi(
         cls,
@@ -562,6 +614,59 @@ class FakeDataAPI:
             return outData_df
         else:
             _, result = cls.client.getData(base_url.format(secCode, beginDate, endDate))
+            return pd.DataFrame(eval(result)["data"])
+
+    @classmethod
+    def MktAdjfGet(
+        cls,
+        ticker: Union[list, str],
+        beginDate: Union[pd.datetime, str, int] = None,
+        endDate: Union[pd.datetime, str, int] = None,
+        **kwargs
+    ):
+        """
+        前复权因子
+        doc: https://mall.datayes.com/datapreview/1291
+        demoUrl: /api/market/getMktAdjf.json?field=&secID=&ticker=000001&exDivDate=&beginDate=&endDate=20151123
+        :param ticker:
+        :param beginDate:
+        :param endDate:
+        :param kwargs:
+            pat_len: int, 5
+            exDivDate: str, "20200101"
+        :return:
+        """
+        beginDate, endDate, tradeDate = cls.assert_format_data(beginDate, endDate, "")
+        base_url = "/api/market/getMktAdjf.json?field=&secID=&ticker={}&exDivDate={}&beginDate={}&endDate={}"
+        pat_len = kwargs.get("pat_len", 5)
+        if isinstance(ticker, list):
+            outData_df = pd.DataFrame()
+            for pat_ticker_list in tqdm(patList(ticker, pat_len)):
+                _, result = cls.client.getData(
+                    base_url.format(
+                        ",".join(pat_ticker_list),
+                        kwargs.get("exDivDate", ""),
+                        beginDate,
+                        endDate,
+                    )
+                )
+                try:
+                    outData_df = pd.concat(
+                        [outData_df, pd.DataFrame(eval(result)["data"])]
+                    )
+                except KeyError:
+                    print(eval(result)["retMsg"])
+                    break
+            return outData_df
+        else:
+            _, result = cls.client.getData(
+                base_url.format(
+                    ticker,
+                    kwargs.get("exDivDate", ""),
+                    beginDate,
+                    endDate,
+                )
+            )
             return pd.DataFrame(eval(result)["data"])
 
     @classmethod

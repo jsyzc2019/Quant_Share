@@ -4,7 +4,6 @@ from .rolling_save import rolling_save
 
 def mIdxCloseWeight(begin, end, **kwargs):
     """
-    财务指标—盈利能力 (Point in time)
     :param begin:
     :param end:
     :param kwargs: ticker = stockNumList
