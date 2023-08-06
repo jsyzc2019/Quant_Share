@@ -43,7 +43,8 @@ with tqdm(symbolList) as t:
                 adjust=1,
                 df=True,
             )
-            if len(data) > 0:
+            _len = len(data)
+            if _len > 0:
                 for i in ["bob", "eob"]:
                     data[i] = data[i].dt.strftime("%Y-%m-%d %H:%M:%S")
                 postgres_write_data_frame(
@@ -56,9 +57,10 @@ with tqdm(symbolList) as t:
         except GmError:
             t.set_postfix({"状态": "GmError:{}".format(GmError)})
             logger.error("{}:{}-{} GmError:{}".format(symbol, begin, end, GmError))
+            _len = -1
             continue
         finally:
             t.set_postfix(
-                {"状态": "{}:{}-{}写入{}条数据".format(symbol, begin, end, len(data))}
+                {"状态": "{}:{}-{}写入{}条数据".format(symbol, begin, end, _len)}
             )
-            logger.info("{}:{}-{} get {} itme(s)".format(symbol, begin, end, len(data)))
+            logger.info("{}:{}-{} get {} itme(s)".format(symbol, begin, end, _len))

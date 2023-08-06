@@ -12,10 +12,7 @@
 from base_package import *
 
 logger = logger_update_to_PG("gmData_history_1m")
-symbolList = pd.read_sql(
-    "select symbol  from stock_info where delisted_date >= '2015-01-01'",
-    con=postgres_engine(),
-)["symbol"].values
+
 # gmData_history_1m原始数据表过大, 更新需要使用QS_log.gmData_history_1m_latest_info
 exit_info = pd.read_sql(
     'select symbol, latest as date from "gmData_history_1m_latest_info";',

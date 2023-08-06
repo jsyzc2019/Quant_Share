@@ -9,7 +9,6 @@ from base_package import *
 
 logger = logger_update_to_PG("gmData_bench_price")
 
-
 exit_info = pd.read_sql(
     'select symbol, max(Date(record_time)) as date from "gmData_bench_price" group by symbol',
     con=postgres_engine(),
@@ -20,6 +19,9 @@ with tqdm(bench_symbol_list) as t:
     for symbol in t:
         try:
             begin = exit_info.loc[symbol]["date"].strftime("%Y-%m-%d")
+        except AttributeError:
+            # 说明目前有的表中, 有该symbol, 但是无数据, 设置其begin为2015-01-01
+            begin = "2015-01-01"
         except KeyError:
             # 一般认为这种数据表中没有的symbol为2015-01-01前就退市, 可以直接continue, 不用获取数据
             begin = "2015-01-01"

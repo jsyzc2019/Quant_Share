@@ -9,13 +9,6 @@
 from base_package import *
 
 logger = logger_update_to_PG("balance_sheet")
-# 获取2015年后的所有symbol
-symbolList = pd.read_sql(
-    """
-    select symbol from stock_info where delisted_date >= '2015-01-01'
-    """,
-    con=postgres_engine(),
-)["symbol"].values
 
 balance_sheet_info = pd.read_excel(os.path.join(dev_files_dir, "balance_sheet.xlsx"))
 balance_sheet_fields = balance_sheet_info["列名"].to_list()
@@ -33,6 +26,9 @@ with tqdm(symbolList) as t:
     for symbol in t:
         try:
             begin = exit_info.loc[symbol]["date"].strftime("%Y-%m-%d")
+        except AttributeError:
+            # 说明目前有的表中, 有该symbol, 但是无数据, 设置其begin为2015-01-01
+            begin = "2015-01-01"
         except KeyError:
             # 说明目前有的表中, 没有该symbol, 设置其begin为2015-01-01
             begin = "2015-01-01"

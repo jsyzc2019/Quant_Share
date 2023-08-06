@@ -14,10 +14,10 @@ end = date.today().strftime("%Y-%m-%d")
 try:
     data = get_symbol_infos(sec_type1=1060, exchanges=["SHSE", "SZSE"], df=True)
     if len(data) > 0:
-        for i in ["listed_date", "delisted_date"]:
-            data[i] = data[i].dt.strftime("%Y-%m-%d %H:%M:%S")
         postgres_write_data_frame(
-            data,
+            clean_data_frame_to_postgres(
+                data=data, time_columns=["listed_date", "delisted_date"]
+            ),
             "bench_info",
             update=True,
             unique_index=["symbol"],

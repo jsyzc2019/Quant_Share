@@ -9,10 +9,6 @@
 from base_package import *
 
 logger = logger_update_to_PG("gmData_history")
-symbolList = pd.read_sql(
-    "select symbol  from stock_info where delisted_date >= '2015-01-01'",
-    con=postgres_engine(),
-)["symbol"].values
 
 exit_info = pd.read_sql(
     'select symbol, max(Date(bob)) as date from "gmData_history" group by symbol',

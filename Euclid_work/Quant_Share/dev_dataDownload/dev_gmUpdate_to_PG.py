@@ -17,7 +17,7 @@ for file in os.listdir(meta_path):
         print("{} update begin...".format(file.split("_update_to_PG.py")[0]))
         subprocess.run(
             [
-                "python",
+                r"E:\Euclid\Quant_Share\venv\Scripts\python.exe",
                 os.path.join(meta_path, file),
             ],
         )

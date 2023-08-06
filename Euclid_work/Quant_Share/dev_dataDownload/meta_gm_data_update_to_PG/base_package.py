@@ -38,7 +38,11 @@ with open(os.path.join(current_dir, "token.txt"), "rt", encoding="utf-8") as f:
 set_token(token)
 
 # 全量股票symbol, 格式为"SHSE.600001"
-symbolList = list(stock_info.symbol.unique())
+# symbolList = list(stock_info.symbol.unique())
+symbolList = pd.read_sql(
+    "select symbol  from stock_info where delisted_date >= '2015-01-01'",
+    con=postgres_engine(),
+)["symbol"].values
 bench_symbol_list = list(set(bench_info["symbol"]))
 
 
