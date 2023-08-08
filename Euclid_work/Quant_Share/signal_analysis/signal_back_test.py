@@ -63,13 +63,17 @@ class DataPrepare:
         end_date = date.today() if end_date is None else end_date
         self.end_date = format_date(end_date)
 
+
+
+        self.data_path = data_path
         # cache path
         self.back_test_cache_path = Path(
-            data_path,
+            self.data_path,
             self.begin_date.strftime("%Y%m%d") + "_" + self.end_date.strftime("%Y%m%d"),
             sub_name,
         )
-        Path.mkdir(self.back_test_cache_path, exist_ok=True)
+        # Path(self.back_test_cache_path, exist_ok=True)
+        self.back_test_cache_path.mkdir(parents=True, exist_ok=True)
         print("cache path : {}".format(self.back_test_cache_path.resolve()))
 
         # meta data: index(trade dates) and columns(stock ids)
@@ -85,11 +89,12 @@ class DataPrepare:
             self.bench_code = "A_all"
             symbolList = pd.read_sql(
                 """select symbol  from stock_info where delisted_date >= '2015-01-01'""",
-                con=postgres_engine(),
+                con=postgres_engine(ini_filepath=self.data_path),
             )["symbol"].values
             self.stock_ids = [format_stockCode(x) for x in symbolList]
         else:
             self.bench_code = str(bench_code).zfill(6)
+            print(self.bench_code)
             self.get_bench_info()
             # 由con code获取stock_ids
             self.stock_ids = np.unique(
@@ -141,7 +146,7 @@ class DataPrepare:
                 """.format(
                     self.bench_code
                 ),
-                con=postgres_engine(),
+                con=postgres_engine(ini_filepath=self.data_path),
             )
             bench_price_df["tradedate"] = pd.to_datetime(bench_price_df["tradedate"])
             bench_price_df = bench_price_df.set_index("tradedate")
@@ -156,7 +161,7 @@ class DataPrepare:
                 """.format(
                         self.bench_code
                     ),
-                    con=postgres_engine(),
+                    con=postgres_engine(ini_filepath=self.data_path),
                 )
                 .drop_duplicates(subset=["constickersymbol", "effdate"])
                 .pivot(index="effdate", columns="constickersymbol", values="weight")
@@ -185,7 +190,7 @@ class DataPrepare:
             print("load price_data ...")
             sub_path.mkdir(parents=True)
             price_df = load_gmData_history(
-                begin=self.begin_date, end=self.end_date, adj=True
+                begin=self.begin_date, end=self.end_date, adj=True, ini_filepath=self.data_path
             )
             close = reindex(
                 price_df.pivot(index="bob", columns="symbol", values="close"),

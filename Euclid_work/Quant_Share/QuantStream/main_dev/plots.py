@@ -7,6 +7,7 @@ from funcs import get_nav_data_2_plot
 import streamlit as st
 
 
+
 def nav_plot(_group_res, _plot_begin, _plot_end, _bench_code):
     _plot_begin = get_tradeDate(_plot_begin, 0)
     _plot_end = get_tradeDate(_plot_end, -1)

@@ -1,12 +1,15 @@
 import streamlit as st
 import pandas as pd
-from Euclid_work.Quant_Share.BackTest_Meng import DataPrepare, simpleBT, isdate
+
+# from Euclid_work.Quant_Share.BackTest_Meng import DataPrepare, simpleBT, isdate
+from Euclid_work.Quant_Share.signal_analysis import DataPrepare, back_test
 from Euclid_work.Quant_Share import (
     get_tradeDate,
     get_data,
     reindex,
     info_lag,
     data2score,
+    isdate,
 )
 import numpy as np
 from scipy.stats import spearmanr
@@ -18,14 +21,22 @@ def get_nav_data_2_plot(data: pd.Series):
     return data / data.iloc[0] - 1
 
 
-@st.cache_resource
-def data_prepare(_start_date, _end_date, _bench_code):
+# @st.cache_resource
+def data_prepare(_begin_date, _end_date, _bench_code, _data_path, _method):
     # group beck data prepare
-    _DataClass = DataPrepare(
-        beginDate=_start_date, endDate=_end_date, bench=_bench_code[3:6]
+    # _DataClass = DataPrepare(
+    #     beginDate=_start_date, endDate=_end_date, bench=_bench_code[3:6]
+    # )
+    # _DataClass.get_Tushare_data()
+    st.write("正在准备数据，请等至提示亮起。")
+    _basic_data = DataPrepare(
+        begin_date=_begin_date,
+        end_date=_end_date,
+        bench_code=_bench_code[3:6],
+        data_path=_data_path,
+        sub_name=_method
     )
-    _DataClass.get_Tushare_data()
-    return _DataClass
+    return _basic_data
 
 
 def read_file(uploaded_file, tradeDateCol="", auto=False):
@@ -69,18 +80,35 @@ def factor2score(factor, verbose=True):
         st.write(factor.head())
     return factor, score
 
-
 @st.cache_resource
-def bkTest(_score, _start_date, _end_date, _bench_code, key=""):
+def html_read(_html_path:str):
+    with open(_html_path, 'r') as fp:  # 如果遇到decode错误，就加上合适的encoding
+        _text = fp.read()
+    return _text
+
+
+
+# @st.cache_resource
+def bkTest(_score, _start_date, _end_date, _bench_code, _data_path, _method, **kwargs):
     # group beck test
-    _DataClass = data_prepare(_start_date, _end_date, _bench_code)
-    BTClass = simpleBT(_DataClass.TICKER, _DataClass.BENCH)
-    if _score is not None:
-        tmpScore = _score
+    _basic_data = data_prepare(_start_date, _end_date, _bench_code, _data_path, _method)
+    _res = back_test(
+        data_prepare=_basic_data, signal=_score, method=_method, sub_name=_method
+    )
+    if _method == "group_back_test":
+        _outMetrics = pd.DataFrame(_res.result).T
     else:
-        tmpScore = _DataClass.Score
-    _, _outMetrics, _group_res = BTClass.groupBT(tmpScore)
-    return _outMetrics, _group_res
+        _outMetrics = pd.DataFrame(_res.result)
+    return _outMetrics, _res.back_test_path
+
+    # _DataClass = data_prepare(_start_date, _end_date, _bench_code)
+    # BTClass = simpleBT(_DataClass.TICKER, _DataClass.BENCH)
+    # if _score is not None:
+    #     tmpScore = _score
+    # else:
+    #     tmpScore = _DataClass.Score
+    # _, _outMetrics, _group_res = BTClass.groupBT(tmpScore)
+    # return _outMetrics, _group_res
 
 
 @st.cache_resource

@@ -11,7 +11,7 @@ import pickle
 from datetime import datetime as dt
 from functools import wraps
 from time import strptime
-from typing import Union, Optional
+from typing import Union
 
 import numpy as np
 import pandas as pd

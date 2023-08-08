@@ -1,13 +1,15 @@
 """
 # -*- coding: utf-8 -*-
 """
+from pathlib import Path
 
 from Euclid_work.Quant_Share import BARRA, DATA_READY
 import streamlit_echarts
 import streamlit as st
 import pandas as pd
-from funcs import data_prepare, read_file, bkTest, IC_Calc, factor2score
+from funcs import data_prepare, read_file, bkTest, IC_Calc, factor2score, html_read
 from plots import nav_plot, ICIR_plot
+from streamlit.components.v1 import html
 
 # 基本网页设置
 st.set_page_config(page_title="Quant Share Factor Kit", layout="wide")
@@ -41,11 +43,25 @@ with st.sidebar:
     # 研究标的
     bench_code = st.selectbox("研究标的", ("000852.XSHG", "000905.XSHG", "000300.XSHG"))
 
+    path_to_work = st.text_input(
+        label="工作文件夹", value=r"E:\Share\tools\Quant_Share_demo"
+    )
+    path_to_work = Path(path_to_work)
+
+    backtest_method = st.selectbox("回测方法", ("分组回测", "线性计算仓位", "多空对冲"))
+
     st.divider()
+
+    if backtest_method == "分组回测":
+        backtest_method_code = "group_back_test"
+    elif backtest_method == "线性计算仓位":
+        backtest_method_code = "long_only"
+    elif backtest_method == "多空对冲":
+        backtest_method_code = "top_bottom"
 
     if st.button("准备基础数据", key="sidebar"):
         with st.spinner("Wait for it..."):
-            DataClass = data_prepare(start_date, end_date, bench_code)
+            basic_data = data_prepare(start_date, end_date, bench_code, path_to_work, backtest_method_code)
         st.success("基础数据准备完成!", icon="✅")
 
 
@@ -83,22 +99,41 @@ with factor_backtest:
 
     if col1.button("分组回测指标计算"):
         with st.spinner("Wait for it..."):
-            outMetrics, group_res = bkTest(
-                score, start_date, end_date, bench_code, key="factor"
+            st.write(f"工作文件夹：{str(path_to_work)}")
+            _outMetrics, _back_test_path = bkTest(
+                score,
+                start_date,
+                end_date,
+                bench_code,
+                _data_path=path_to_work,
+                _method=backtest_method_code,
+                key=backtest_method_code,
             )
             st.write("### 回测结束, 各组指标如下")
-            st.dataframe(outMetrics.set_index("group"))
+            st.dataframe(_outMetrics)
         st.success("分组回测指标计算完成!", icon="✅")
-    if col2.button("分组净值绘图"):
+    if col2.button("净值绘图"):
         with st.spinner("Wait for it..."):
-            outMetrics, group_res = bkTest(
-                score, start_date, end_date, bench_code, key="factor"
+            st.write(f"工作文件夹：{str(path_to_work)}")
+            _outMetrics, _back_test_path = bkTest(
+                score,
+                start_date,
+                end_date,
+                bench_code,
+                _data_path=path_to_work,
+                _method=backtest_method_code,
+                key=backtest_method_code,
             )
-            streamlit_echarts.st_pyecharts(
-                nav_plot(group_res, plot_begin, plot_end, bench_code),
-                height="500px",
-                width="100%",
+            # streamlit_echarts.st_pyecharts(
+            #     nav_plot(group_res, plot_begin, plot_end, bench_code),
+            #     height="500px",
+            #     width="100%",
+            # )
+            st.write(f"读取结果：{_back_test_path}")
+            _tmp_html_cont = html_read(
+                _html_path=_back_test_path / "signal_result.html"
             )
+            html(_tmp_html_cont, height=500, width=1000, scrolling=True)
         st.success("分组净值绘图完成!", icon="✅")
 
 with factor_analysis:
@@ -159,7 +194,7 @@ with factor_analysis:
         else:
             st.warning("未检测到因子数据!")
 
-
+# @st.cache_resource
 def get_factor(barra: BARRA, factor_name):
     return getattr(barra, factor_name)
 
@@ -170,23 +205,36 @@ with factor_barra:
     barra = BARRA(beginDate=start_date, endDate=end_date)
     factor_name = st.selectbox("BARRA因子", DATA_READY["factor"])
     if st.button("获取选定因子"):
-        factor = get_factor(barra, factor_name)
-        factor, score = factor2score(factor, verbose=False)
+        with st.spinner("Wait for it..."):
+            factor = get_factor(barra, factor_name)
+            factor, score = factor2score(factor, verbose=False)
         st.write(f"{factor_name}因子的前五行为：")
         st.write(factor.head())
     if st.button("BARRA因子回测"):
         with st.spinner("Wait for it..."):
             factor = get_factor(barra, factor_name)
             factor, score = factor2score(factor, verbose=False)
-            outMetrics, group_res = bkTest(
-                score, start_date, end_date, bench_code, key=factor_name
+            st.write(f"工作文件夹：{str(path_to_work)}")
+            _outMetrics, _back_test_path = bkTest(
+                score,
+                start_date,
+                end_date,
+                bench_code,
+                _data_path=path_to_work,
+                _method=backtest_method_code,
+                key=factor_name,
             )
             st.write("### 回测结束, 各组指标如下")
-            st.dataframe(outMetrics.set_index("group"))
+            st.dataframe(_outMetrics)
             st.success("分组回测指标计算完成!", icon="✅")
-            streamlit_echarts.st_pyecharts(
-                nav_plot(group_res, plot_begin, plot_end, bench_code),
-                height="500px",
-                width="100%",
+            # streamlit_echarts.st_pyecharts(
+            #     nav_plot(group_res, plot_begin, plot_end, bench_code),
+            #     height="500px",
+            #     width="100%",
+            # )
+            st.write(f"读取结果：{_back_test_path}")
+            _tmp_html_cont = html_read(
+                _html_path=_back_test_path / "signal_result.html"
             )
+            html(_tmp_html_cont, height=500, width=1000, scrolling=True)
             st.success("分组净值绘图完成!", icon="✅")
