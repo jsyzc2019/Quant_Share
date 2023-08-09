@@ -80,7 +80,7 @@ def factor2score(factor, verbose=True):
         st.write(factor.head())
     return factor, score
 
-@st.cache_resource
+# @st.cache_resource
 def html_read(_html_path:str):
     with open(_html_path, 'r') as fp:  # 如果遇到decode错误，就加上合适的encoding
         _text = fp.read()
@@ -95,10 +95,7 @@ def bkTest(_score, _start_date, _end_date, _bench_code, _data_path, _method, **k
     _res = back_test(
         data_prepare=_basic_data, signal=_score, method=_method, sub_name=_method
     )
-    if _method == "group_back_test":
-        _outMetrics = pd.DataFrame(_res.result).T
-    else:
-        _outMetrics = pd.DataFrame(_res.result)
+    _outMetrics = pd.DataFrame(_res.result).T
     return _outMetrics, _res.back_test_path
 
     # _DataClass = data_prepare(_start_date, _end_date, _bench_code)

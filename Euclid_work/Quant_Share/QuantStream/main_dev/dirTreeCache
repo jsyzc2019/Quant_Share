@@ -1,31 +1,12 @@
 <dir>  ~
-CLASS = b'GROUP'
-PYTABLES_FORMAT_VERSION = b'2.1'
-TITLE = Empty(dtype=dtype('S1'))
-VERSION = b'1.0'
-<dir>  ~/a
-CLASS = b'GROUP'
-TITLE = Empty(dtype=dtype('S1'))
-VERSION = b'1.0'
-encoding = b'UTF-8'
-errors = b'strict'
-index_variety = b'regular'
-name = b'chgpct'
-pandas_type = b'series'
-pandas_version = b'0.15.2'
-  <file> <631.00 B>  ~/a/index.int64
-  CLASS = b'ARRAY'
-  FLAVOR = b'numpy'
-  TITLE = Empty(dtype=dtype('S1'))
-  VERSION = b'2.4'
-  freq = b'N.'
-  index_class = b'datetime'
-  kind = b'datetime64'
-  name = b'tradedate'
-  transposed = 1
-  <file> <631.00 B>  ~/a/values.float64
-  CLASS = b'ARRAY'
-  FLAVOR = b'numpy'
-  TITLE = Empty(dtype=dtype('S1'))
-  VERSION = b'2.4'
-  transposed = 1
+<dir>  ~/meatData
+  <file> <1.17 K>  ~/meatData/columns.object
+  <file> <975.00 B>  ~/meatData/index.uint64
+  view_dtype = <M8[ns]
+<dir>  ~/pivotData
+  <file> <1.14 M>  ~/pivotData/close.float64
+  <file> <1.14 M>  ~/pivotData/high.float64
+  <file> <1.14 M>  ~/pivotData/low.float64
+  <file> <1.14 M>  ~/pivotData/open.float64
+  <file> <1.14 M>  ~/pivotData/pre_close.float64
+  <file> <1.14 M>  ~/pivotData/volume.float64
