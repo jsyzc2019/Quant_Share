@@ -22,3 +22,4 @@ sqlalchemy<2.0
 psycopg2==2.9.6
 psutil~=5.9.5
 bokeh~=2.4.3
+tables~=3.8.0

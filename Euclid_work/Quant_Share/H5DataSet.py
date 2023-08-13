@@ -19,9 +19,6 @@ from psutil._common import bytes2human
 
 class H5DataSet:
     def __init__(self, h5FilePath, tab_path="", **kwargs):
-        self.f_object_handle = self.__get_h5handle(
-            h5FilePath, mode=kwargs.get("mode", "r")
-        )
         self.h5FilePath = h5FilePath
         self.tab_path = tab_path
         self.known_data_map = {}
@@ -95,7 +92,9 @@ class H5DataSet:
     def load_single_pivotDF_from_h5data(cls, h5FilePath):
         if isinstance(h5FilePath, Path):
             h5FilePath = h5FilePath.resolve().as_posix()
-        return cls(h5FilePath).load_pivotDF_from_h5data(Path(h5FilePath).name.split(".")[0])
+        return cls(h5FilePath).load_pivotDF_from_h5data(
+            Path(h5FilePath).name.split(".")[0]
+        )
 
     @staticmethod
     def h5dir(attrs=False, dir_only=False):
@@ -107,6 +106,25 @@ class H5DataSet:
                 for line in f.readlines():
                     if line.strip().startswith("<dir>" if dir_only else "<"):
                         print(line[:-1])
+
+    @classmethod
+    def format_path(cls, path_input, out_format, suffix=None):
+        assert "." in suffix, "suffix should like .h5"
+        if out_format == "str":
+            if isinstance(path_input, Path):
+                path_output = path_input.resolve().as_posix()
+            if suffix and not path_output.endswith(suffix):
+                path_output += suffix
+            return path_output
+        elif out_format == "Path":
+            Path(cls.format_path(path_input, "str", suffix))
+
+    def __get_data_from_h5handle(self, tab_path):
+        assert os.path.exists(self.h5FilePath), "h5FilePath not exits!"
+        f = h5py.File(self.h5FilePath, mode="r")
+        data = f[tab_path]
+        f.close
+        return data
 
     @staticmethod
     def __get_h5handle(h5FilePath, mode="r"):
@@ -127,11 +145,12 @@ class H5DataSet:
             )
 
     def load_h5data(self, tab_name):
-        dataSet = self.f_object_handle[self.__get_tab_path(tab_name)]
+        dataSet = self.__get_data_from_h5handle(self.__get_tab_path(tab_name))
 
         if "view_dtype" in dataSet.attrs.keys():
             return dataSet[:].view(dataSet.attrs["view_dtype"])
         else:
+            # 对O类型进行解码, r"000001.SHSE" -> "000001.SHSE"
             if dataSet[:].dtype == "O":
                 decode_func = np.vectorize(lambda x: x.decode())
                 return decode_func(dataSet[:])
@@ -147,7 +166,7 @@ class H5DataSet:
             return None, data_array
 
     def __write_array_to_h5dataset(
-            self, h5Object, tableName: str, arrayData: np.ndarray
+        self, h5Object, tableName: str, arrayData: np.ndarray
     ):
         assert h5Object, h5py.Group | h5py.File
         view_dtype, arrayData = self.format_h5data_type(arrayData)
@@ -157,7 +176,7 @@ class H5DataSet:
 
     @classmethod
     def write_pivotDF_to_h5data(
-            cls, h5FilePath, pivotDF: pd.DataFrame, pivotKey: str, rewrite=False
+        cls, h5FilePath, pivotDF: pd.DataFrame, pivotKey: str, rewrite=False
     ):
         if isinstance(h5FilePath, Path):
             h5FilePath = h5FilePath.resolve().as_posix()
@@ -190,7 +209,7 @@ class H5DataSet:
 
     @classmethod
     def add_pivotDF_to_h5data(
-            cls, h5FilePath, pivotDF: pd.DataFrame, pivotKey: str, reindex=False
+        cls, h5FilePath, pivotDF: pd.DataFrame, pivotKey: str, reindex=False
     ):
         if isinstance(h5FilePath, Path):
             h5FilePath = h5FilePath.resolve().as_posix()
@@ -200,7 +219,6 @@ class H5DataSet:
         exists_h5DataSet = H5DataSet(h5FilePath)
         index_array_exists = exists_h5DataSet.load_h5data("index")
         columns_array_exists = exists_h5DataSet.load_h5data("columns")
-        exists_h5DataSet.f_object_handle.close()
 
         index_array_add = pivotDF.index.values
         columns_array_add = pivotDF.columns.values
@@ -215,8 +233,6 @@ class H5DataSet:
             cls.__write_array_to_h5dataset(
                 H5DataSet, file, "pivotData/" + pivotKey, data_array
             )
-            # 关闭HDF5文件
-            file.close()
 
     def load_pivotDF_from_h5data(self, pivotKey: str = None):
         index_array = self.load_h5data("index")
@@ -264,11 +280,11 @@ class H5DataTS:
                 self.load_h5_data(h5FilePath=self.transform_file_path)
 
     def ergodic_process(
-            self,
-            func,
-            break_count: Optional[int] = None,
-            reload: bool = True,
-            args: Optional = (),
+        self,
+        func,
+        break_count: Optional[int] = None,
+        reload: bool = True,
+        args: Optional[str] = (),
     ):
         assert callable(func)
 
