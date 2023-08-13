@@ -9,6 +9,7 @@ import os
 from datetime import date, datetime
 import random
 from typing import Union
+
 from bokeh.models import ColumnDataSource, DataTable, TableColumn, NumberFormatter
 from bokeh.io import save  # 引入保存函数
 from bokeh.layouts import gridplot
@@ -31,22 +32,39 @@ TimeType = Union[str, int, datetime, date, pd.Timestamp]
 
 
 class QScache:
-    def __init__(self, cache_path):
+    """
+    共用缓存路径:
+    """
+
+    def __init__(self, cache_path: str = None):
+        if cache_path is None:
+            cache_path = r"E:\Share\QS_signal_analysis_cache"
         self.cache_path = cache_path
         self.cache_dict = self.load_cache(cache_path)
 
-    @classmethod
-    def load_cache(cls, path):
-        if isinstance(path, str):
-            path = Path(path)
+    def print_cache(self):
+        print("cache path: {}/n".format(self.cache_path))
+        print_file_tree(self.cache_path)
+
+    def load_cache(self, sub_path: Union[list[str], str, Path]):
+        if isinstance(sub_path, list):
+            path = Path(self.cache_path).joinpath("/".join(sub_path))
+        elif isinstance(sub_path, str):
+            path = Path(self.cache_path) / sub_path
+        else:
+            path = sub_path
+        assert path.exists(), f"{path} not exits!"
         cache = {}
         for item in path.iterdir():
             if item.is_dir():
-                cache[item.name] = cls.load_cache(item)
+                cache[item.name] = self.load_cache(item)
             elif item.is_file() and item.name.endswith(".h5"):
                 data: H5DataSet = H5DataSet(item)
                 cache[item.name.split(".")[0]] = data
         return cache
+
+    def remove_cache(self, sub_path):
+        pass
 
 
 class DataPrepare:
@@ -54,30 +72,28 @@ class DataPrepare:
         self,
         begin_date: TimeType = "2015-01-01",
         end_date: TimeType = None,
-        data_path: str = "./",
+        cache_path: str = None,
         sub_name: str = "",
-        **kwargs
+        **kwargs,
     ):
         # format param
         self.begin_date = format_date(begin_date)
         end_date = date.today() if end_date is None else end_date
         self.end_date = format_date(end_date)
-
-
-
-        self.data_path = data_path
+        # 使用Qscache管理缓存
+        self.cache = QScache(cache_path)
         # cache path
         self.back_test_cache_path = Path(
-            self.data_path,
+            self.cache.cache_path,
             self.begin_date.strftime("%Y%m%d") + "_" + self.end_date.strftime("%Y%m%d"),
             sub_name,
         )
-        # Path(self.back_test_cache_path, exist_ok=True)
+        # 创建区间路径
         self.back_test_cache_path.mkdir(parents=True, exist_ok=True)
         print("cache path : {}".format(self.back_test_cache_path.resolve()))
 
         # meta data: index(trade dates) and columns(stock ids)
-        # # trade dates
+        ## trade dates
         self.tradeDateBase = tradeDate_info.loc[
             format_date(self.begin_date) : format_date(self.end_date)
         ]
@@ -89,12 +105,11 @@ class DataPrepare:
             self.bench_code = "A_all"
             symbolList = pd.read_sql(
                 """select symbol  from stock_info where delisted_date >= '2015-01-01'""",
-                con=postgres_engine(ini_filepath=self.data_path),
+                con=postgres_engine(),
             )["symbol"].values
             self.stock_ids = [format_stockCode(x) for x in symbolList]
         else:
             self.bench_code = str(bench_code).zfill(6)
-            print(self.bench_code)
             self.get_bench_info()
             # 由con code获取stock_ids
             self.stock_ids = np.unique(
@@ -146,7 +161,7 @@ class DataPrepare:
                 """.format(
                     self.bench_code
                 ),
-                con=postgres_engine(ini_filepath=self.data_path),
+                con=postgres_engine(),
             )
             bench_price_df["tradedate"] = pd.to_datetime(bench_price_df["tradedate"])
             bench_price_df = bench_price_df.set_index("tradedate")
@@ -161,7 +176,7 @@ class DataPrepare:
                 """.format(
                         self.bench_code
                     ),
-                    con=postgres_engine(ini_filepath=self.data_path),
+                    con=postgres_engine(),
                 )
                 .drop_duplicates(subset=["constickersymbol", "effdate"])
                 .pivot(index="effdate", columns="constickersymbol", values="weight")
@@ -190,7 +205,9 @@ class DataPrepare:
             print("load price_data ...")
             sub_path.mkdir(parents=True)
             price_df = load_gmData_history(
-                begin=self.begin_date, end=self.end_date, adj=True, ini_filepath=self.data_path
+                begin=self.begin_date,
+                end=self.end_date,
+                adj=True,
             )
             close = reindex(
                 price_df.pivot(index="bob", columns="symbol", values="close"),
@@ -231,9 +248,12 @@ class back_test:
         data_prepare: DataPrepare,
         signal: pd.DataFrame = None,
         method: str = "long_only",
-        **kwargs
+        weight=False,
+        **kwargs,
     ):
-        self.back_test_path = None  # 存放back test结果数据
+        self.back_test_path = data_prepare.back_test_cache_path.joinpath(
+            "back_test"
+        )  # 存放back test结果数据
         self.ticker_rtn = None  # 个股的日度收益, np.ndarray, shape(T,N), T为交易日期数, N为ticker数
         self.group_nums = None
         self.bench_plot = False
@@ -258,25 +278,25 @@ class back_test:
         )
         # get ticker rtn
         self.get_ticker_rtn()  # -> self.ticker_rtn
-
-        # reindex signal
-        self.signal = reindex(
-            signal, index=data_prepare.trade_dates, columns=data_prepare.stock_ids
-        )
-        print(
-            "back test span : {} -- {}".format(
-                data_prepare.begin_date, data_prepare.end_date
+        if not weight:
+            # reindex signal
+            self.signal = reindex(
+                signal, index=data_prepare.trade_dates, columns=data_prepare.stock_ids
             )
-        )
+            print(
+                "back test span : {} -- {}".format(
+                    data_prepare.begin_date, data_prepare.end_date
+                )
+            )
 
-        # adjust
-        self.signal_adjustment(kwargs.get("adjustments", []))
+            # adjust
+            self.signal_adjustment(kwargs.get("adjustments", []))
 
-        # calc weight, rtn
-        self.main_back_test(**kwargs)
+            # calc weight, rtn
+            self.main_back_test(**kwargs)
 
-        # result
-        self.signal_result()
+            # result
+            self.signal_result()
 
     def signal_adjustment(self, adjustments: list[str]):
         sub_path = self.back_test_cache_path.joinpath("back_test")
@@ -291,6 +311,87 @@ class back_test:
             pivotKey="adjusted_signal",
             rewrite=True,
         )
+
+    def weight_analysis(self, weight: pd.DataFrame):
+        weight_formate = reindex(
+            weight,
+            index=self.stock_price_h5_dataSet["index"],
+            columns=self.stock_price_h5_dataSet["columns"],
+        )
+        # rtn
+        self.rtn = pd.DataFrame(
+            data=clean(self.ticker_rtn) * clean(weight_formate.values),
+            index=self.stock_price_h5_dataSet["index"],
+            columns=self.stock_price_h5_dataSet["columns"],
+        )
+        # write rtn to cache
+        self.write_to_cache(
+            self.rtn,
+            self.back_test_path,
+            "rtn",
+            "rtn",
+            add=True,
+            rewrite=True,
+        )
+
+        self.result = {}
+        # 创建一个绘图对象
+        rtn_fig = figure(
+            width=1200,
+            height=600,
+            title="signal back test cum_rtn",
+            x_axis_label="trade_date",
+            y_axis_label="cum_rtn",
+        )
+        daily_rtn = self.rtn.values.sum(axis=1)
+        self.result[self.method] = curve_analysis(daily_rtn)
+        # plot
+        # 绘制第一个线图并设置标签
+        rtn_fig.line(
+            self.rtn.index,
+            daily_rtn.cumsum(),
+            legend_label="cum_rtn",
+            line_color="#{:02x}{:02x}{:02x}".format(
+                random.randint(0, 255),
+                random.randint(0, 255),
+                random.randint(0, 255),
+            ),
+            line_width=2,
+        )
+        if self.bench_plot and self.bench_code != "A_all":
+            bench_rtn = H5DataSet(
+                self.bench_data_path.joinpath("bench_price_pct_chg.h5")
+            )["values"]
+
+            rtn_fig.line(
+                self.rtn.index,
+                bench_rtn.cumsum(),
+                legend_label="{}_cum_rtn".format(self.bench_code),
+                line_color="#{:02x}{:02x}{:02x}".format(
+                    random.randint(0, 255),
+                    random.randint(0, 255),
+                    random.randint(0, 255),
+                ),
+                line_width=2,
+            )
+        # 设置图例位置
+        rtn_fig.legend.location = "top_left"
+        rtn_fig.add_tools(WheelZoomTool())
+        rtn_fig.xaxis.formatter = DatetimeTickFormatter(days=["%Y-%d-%d"])
+        fig_path = self.back_test_path.joinpath("weight_result.html")
+        output_file(fig_path)
+        table = self.plot_table_result()
+        # 组合两个figure对象为网格排布
+        grid = gridplot(
+            [
+                [rtn_fig],
+                [table],
+            ],
+            toolbar_location=None,
+        )
+        save(obj=grid, filename=fig_path, title="output_cum_rtn")
+
+        return fig_path, self.result
 
     def signal_result(self):
         """
@@ -545,7 +646,9 @@ class back_test:
                     # )
 
         if self.method == "long_only":
-            assert np.all(clean(self.signal.values) >= 0), "when use long_only, please assure signal >= 0"
+            assert np.all(
+                clean(self.signal.values) >= 0
+            ), "when use long_only, please assure signal >= 0"
             self.bench_plot = True  # 绘制bench rtn
             self.weight = signal_to_weight(self.signal)
             # write weight to cache
@@ -645,23 +748,29 @@ class back_test:
         计算个股的日度收益, 存储至./bench_code/price_data/
         将array格式的ticker_rtn, 加入self中
         """
-        self.ticker_rtn = np.divide(
-            self.stock_price_h5_dataSet["close"]
-            - self.stock_price_h5_dataSet["pre_close"],
-            self.stock_price_h5_dataSet["pre_close"],
-        )
+        ticker_rtn_path = self.price_data_path.joinpath("ticker_rtn.h5")
+        if not ticker_rtn_path.exists():
+            self.ticker_rtn = np.divide(
+                self.stock_price_h5_dataSet["close"]
+                - self.stock_price_h5_dataSet["pre_close"],
+                self.stock_price_h5_dataSet["pre_close"],
+            )
 
-        # ticker_rtn
-        H5DataSet.write_pivotDF_to_h5data(
-            h5FilePath=self.price_data_path.joinpath("ticker_rtn.h5"),
-            pivotDF=pd.DataFrame(
-                data=self.ticker_rtn,
-                index=self.stock_price_h5_dataSet["index"],
-                columns=self.stock_price_h5_dataSet["columns"],
-            ),
-            pivotKey="ticker_rtn",
-            rewrite=True,
-        )
+            # ticker_rtn
+            H5DataSet.write_pivotDF_to_h5data(
+                h5FilePath=self.price_data_path.joinpath("ticker_rtn.h5"),
+                pivotDF=pd.DataFrame(
+                    data=self.ticker_rtn,
+                    index=self.stock_price_h5_dataSet["index"],
+                    columns=self.stock_price_h5_dataSet["columns"],
+                ),
+                pivotKey="ticker_rtn",
+                rewrite=True,
+            )
+        else:
+            self.ticker_rtn = H5DataSet.load_single_pivotDF_from_h5data(
+                ticker_rtn_path
+            ).values
 
     @classmethod
     def write_to_cache(
@@ -724,6 +833,9 @@ class back_test:
 
     @staticmethod
     def _format_path(raw_path: str | Path):
+        """
+        format raw_path to pathlib.Path
+        """
         if isinstance(raw_path, str):
             Path(raw_path).mkdir(parents=True, exist_ok=True)
             return Path(raw_path)

@@ -215,13 +215,11 @@ def postgres_config(ini_filepath: str = None, section="postgresql") -> Dict:
     """
     由配置文件postgresDB.ini获取并返回config
     """
-    ini_filepath = Path(ini_filepath)
-    if ini_filepath.suffix != ".ini":
-        ini_filepath = list(ini_filepath.glob("*.ini"))
-        print(ini_filepath)
-    # if ini_filepath is None and os.path.exists("postgresDB.ini"):
-    #     ini_filepath = "postgresDB.ini"
-    assert ini_filepath is not None, "ini_filepath is needed!"
+    if ini_filepath is None and os.path.exists("postgresDB.ini"):
+        ini_filepath = "postgresDB.ini"
+    if ini_filepath is None:
+        ini_filepath = r"E:\Euclid\Quant_Share\Euclid_work\Quant_Share\test\postgresDB.ini"
+        # print("default postgres config has been used")
     # create a parser
     parser = ConfigParser()
     # read config file
@@ -264,12 +262,12 @@ def postgres_connect(database: str = None, config: Dict = None):
             print("Database connection closed.")
 
 
-def postgres_engine(database: str = None, config: Dict = None, **kwargs):
+def postgres_engine(database: str = None, config: Dict = None):
     """
     根据config返回engine, 一般供write_df_to_pgDB调用
     """
     if config is None:
-        config = postgres_config(kwargs.get("ini_filepath", './'))
+        config = postgres_config()
     if database is not None:
         config["database"] = database
     return create_engine(
@@ -297,7 +295,7 @@ def write_df_to_pgDB(df, table_name, engine=None, **kwargs):
 
 
 def load_gmData_history(
-    symbols: str | list[str] = None, begin=None, end=None, adj: bool = True, **kwargs
+    symbols: str | list[str] = None, begin=None, end=None, adj: bool = True
 ):
     # TODO 进行self.stock_ids的转换, 传入筛选
     if adj:
@@ -330,7 +328,7 @@ def load_gmData_history(
         query += " bob <= %(end)s"
         params["end"] = end
 
-    return pd.read_sql(query, postgres_engine(**kwargs), params=params)
+    return pd.read_sql(query, postgres_engine(), params=params)
 
 
 def load_data_from_sql(

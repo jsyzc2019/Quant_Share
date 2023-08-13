@@ -90,11 +90,8 @@ class H5DataSet:
 
     @classmethod
     def load_single_pivotDF_from_h5data(cls, h5FilePath):
-        if isinstance(h5FilePath, Path):
-            h5FilePath = h5FilePath.resolve().as_posix()
-        return cls(h5FilePath).load_pivotDF_from_h5data(
-            Path(h5FilePath).name.split(".")[0]
-        )
+        dataset = cls(h5FilePath)
+        return dataset.load_pivotDF_from_h5data(dataset.known_data[-1])
 
     @staticmethod
     def h5dir(attrs=False, dir_only=False):
@@ -119,13 +116,6 @@ class H5DataSet:
         elif out_format == "Path":
             Path(cls.format_path(path_input, "str", suffix))
 
-    def __get_data_from_h5handle(self, tab_path):
-        assert os.path.exists(self.h5FilePath), "h5FilePath not exits!"
-        f = h5py.File(self.h5FilePath, mode="r")
-        data = f[tab_path]
-        f.close
-        return data
-
     @staticmethod
     def __get_h5handle(h5FilePath, mode="r"):
         if isinstance(h5FilePath, Path):
@@ -145,17 +135,19 @@ class H5DataSet:
             )
 
     def load_h5data(self, tab_name):
-        dataSet = self.__get_data_from_h5handle(self.__get_tab_path(tab_name))
-
-        if "view_dtype" in dataSet.attrs.keys():
-            return dataSet[:].view(dataSet.attrs["view_dtype"])
-        else:
-            # 对O类型进行解码, r"000001.SHSE" -> "000001.SHSE"
-            if dataSet[:].dtype == "O":
-                decode_func = np.vectorize(lambda x: x.decode())
-                return decode_func(dataSet[:])
+        assert os.path.exists(self.h5FilePath), "h5FilePath not exits!"
+        tab_path = self.__get_tab_path(tab_name)
+        with h5py.File(self.h5FilePath, mode="r") as f:
+            dataSet = f[tab_path]
+            if "view_dtype" in dataSet.attrs.keys():
+                return dataSet[:].view(dataSet.attrs["view_dtype"])
             else:
-                return dataSet[:]
+                # 对O类型进行解码, r"000001.SHSE" -> "000001.SHSE"
+                if dataSet[:].dtype == "O":
+                    decode_func = np.vectorize(lambda x: x.decode())
+                    return decode_func(dataSet[:])
+                else:
+                    return dataSet[:]
 
     @staticmethod
     def format_h5data_type(data_array: np.ndarray):

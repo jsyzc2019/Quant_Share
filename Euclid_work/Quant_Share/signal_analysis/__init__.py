@@ -4,4 +4,4 @@
 # @Author  : Euclid-Jie
 # @File    : __init__.py.py
 """
-from .signal_back_test import DataPrepare, back_test
+from .signal_back_test import DataPrepare, back_test, QScache
