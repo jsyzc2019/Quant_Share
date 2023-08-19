@@ -378,13 +378,13 @@ def save_data_h5(toSaveData, name, subPath="dataFile", reWrite=False, append=Fal
                         print("{} has none Updated!".format(fullPath))
             else:  # file not exists
                 toSaveData.to_hdf(
-                    fullPath, "a", mode="a", format="b" if append else "f"
+                    fullPath, "a", mode="a", format="t" if append else "f"
                 )
                 print("{} has been created!".format(fullPath))
         else:  # can not rewrite
             if os.path.exists(fullPath):
                 raise FileExistsError("{} has Existed!".format(fullPath))
-            toSaveData.to_hdf(fullPath, "a", mode="a", format="b" if append else "f")
+            toSaveData.to_hdf(fullPath, "a", mode="a", format="t" if append else "f")
     else:
         raise TypeError("only save pd.DataFrame format!")
         # pd.DataFrame(toSaveData).to_hdf(name,'a','w')
