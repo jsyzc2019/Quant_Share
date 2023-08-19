@@ -15,16 +15,22 @@ import pandas as pd
 from pathlib import Path
 import psutil
 from psutil._common import bytes2human
+import getpass
 
 
 class H5DataSet:
+    # 给dirTreeCache 安家了
+    dir_cache_path = Path(
+        r"E:\Share\QS_signal_analysis_cache"
+    ) / "{}_dirTreeCache".format(getpass.getuser())
+
     def __init__(self, h5FilePath, tab_path="", **kwargs):
         self.h5FilePath = h5FilePath
         self.tab_path = tab_path
         self.known_data_map = {}
         # 重定向print内容
         current = sys.stdout
-        f = open("dirTreeCache", "w")
+        f = open(self.dir_cache_path, "w")
         sys.stdout = f
         self.__h5dir(h5FilePath, tab_path)
         sys.stdout = current
@@ -93,9 +99,9 @@ class H5DataSet:
         dataset = cls(h5FilePath)
         return dataset.load_pivotDF_from_h5data(dataset.known_data[-1])
 
-    @staticmethod
-    def h5dir(attrs=False, dir_only=False):
-        with open("dirTreeCache", "r") as f:
+    @classmethod
+    def h5dir(cls, attrs=False, dir_only=False):
+        with open(cls.dir_cache_path, "r") as f:
             if attrs:
                 for line in f.readlines():
                     print(line[:-1])
