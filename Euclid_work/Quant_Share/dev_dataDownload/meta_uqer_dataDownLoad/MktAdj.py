@@ -4,7 +4,7 @@
 # @Author  : Euclid-Jie
 # @File    : MktAdj.py
 """
-from base_package import *
+from .base_package import *
 from Euclid_work.Quant_Share.warehouse import *
 
 

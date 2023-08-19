@@ -6,6 +6,7 @@ from tqdm import tqdm
 # from uqer import Client
 
 from ...EuclidGetData import get_data
+from ...Utils import save_data_Y, save_data_Q, save_data_h5
 import os
 import time
 from .FakeDataAPI import FakeDataAPI as DataAPI

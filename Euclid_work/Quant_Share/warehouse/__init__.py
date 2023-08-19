@@ -15,6 +15,7 @@ import psycopg2
 from configparser import ConfigParser
 import os
 from ..Utils import format_date
+from ..TableInfo import tableInfo
 from tqdm import tqdm
 
 TimeType = Union[str, int, datetime, date, pd.Timestamp]
@@ -30,7 +31,7 @@ def format_table(
     处理postgres中数据表中的列名为小写
     :param table_name: 数据表名
     :param columns: if True(default), 将对数据表的所有列名称转为小写
-    :param record_time: if Ture, 会未表添加record_time列, default False
+    :param record_time: if Ture, 会为表添加record_time列, default False
     :param dataBase: 数据库名称, 默认为ini文件中的dataBase
     """
     if table_name.lower() != table_name:
@@ -333,12 +334,18 @@ def load_gmData_history(
 
 def load_data_from_sql(
     tableName: str,
-    ticker_column: str,
-    date_column: str,
+    ticker_column: str = None,
+    date_column: str = None,
     symbols: str | list[str] = None,
     begin=None,
     end=None,
 ):
+    if ticker_column is None:
+        assert tableName in list(tableInfo.keys()), "{} is not ready for use!".format(tableName)
+        ticker_column = tableInfo[tableName]["ticker_column"]
+    if date_column is None:
+        assert tableName in list(tableInfo.keys()), "{} is not ready for use!".format(tableName)
+        date_column = tableInfo[tableName]["date_column"]
     conn = postgres_connect()
     # 将 bob 列作为 timestamp 类型进行筛
     # TODO@AlkaidYuan, 表名带大写才需要额外引号, 可以进一步考虑一下

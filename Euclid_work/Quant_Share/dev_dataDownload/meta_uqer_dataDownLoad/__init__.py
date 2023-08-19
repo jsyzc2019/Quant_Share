@@ -19,7 +19,8 @@ from .ResConIndustrySw import ResConIndustrySw_update
 from .ResConIndustrySwFy12 import ResConIndustrySwFy12_update
 from .ResConSecReportHeat import ResConSecReportHeat_update
 from .ResConSecCoredata import ResConSecCoredata_update
-from .ResConSecTarpriScore import ResConSecTarpriScore_update
+from .ResConSecTarpriScore import ResConSecTarpriScore_update, ResConSecTarpriScore
 from .ResConSecCorederi import ResConSecCorederi_update
 
+from .MktAdj import MktAdj
 from .MktEqudAdj import MktEqudAdj

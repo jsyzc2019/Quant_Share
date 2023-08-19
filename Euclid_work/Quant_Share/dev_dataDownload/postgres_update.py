@@ -3,6 +3,7 @@
 # @Time    : 2023/8/3 21:08
 # @Author  : Euclid-Jie
 # @File    : postgres_update.py
+# @Desc    : 用于统一数据更新的BaseClass, 目前主要用于更新Uqer数据
 """
 import numpy as np
 from typing import List
@@ -10,8 +11,6 @@ from pathlib import Path
 import pandas as pd
 import logging
 from datetime import datetime, date
-import time
-import multiprocessing
 from gm.api import GmError
 from tqdm import tqdm
 
@@ -21,6 +20,8 @@ from Euclid_work.Quant_Share.dev_dataDownload.meta_uqer_dataDownLoad import (
     MktLimit,
     MktIdx,
     mIdxCloseWeight,
+    MktEqudAdj,
+    ResConSecTarpriScore,
 )
 
 from Euclid_work.Quant_Share.warehouse import (
@@ -88,29 +89,39 @@ class postgres_update_base:
         self.record_time_exits = "record_time" in self.table_column_names
         self.update_time_exits = "update_time" in self.table_column_names
 
-    def load_begin(self, begin_update_date_column: str, ticker_column_name: str = None):
+    def load_begin(
+        self, begin_update_date_column: str = None, ticker_column_name: str = None
+    ):
         """
         确定上次开始更新的时间
         """
         # 全局begin date设置为同一天
         if ticker_column_name is None:
-            self.begin_update_date = pd.read_sql(
-                """select max(Date({})) as date from {};""".format(
-                    begin_update_date_column, self.table_name
-                ),
-                con=postgres_engine(),
-            ).values[0][0]
+            if begin_update_date_column is not None:
+                self.begin_update_date = pd.read_sql(
+                    """select max(Date({})) as date from {};""".format(
+                        begin_update_date_column, self.table_name
+                    ),
+                    con=postgres_engine(),
+                ).values[0][0]
+            else:
+                self.begin_update_date = "2015-01-01"
+                self.logger.info("begin data set to 2015-01-01")
         # 每个symbol 对应一个update begin date
         else:
-            self.begin_update_date = pd.read_sql(
-                """select {}, max(Date({})) as date from {} group by {};""".format(
-                    ticker_column_name,
-                    begin_update_date_column,
-                    self.table_name,
-                    ticker_column_name,
-                ),
-                con=postgres_engine(),
-            )
+            if begin_update_date_column is not None:
+                self.begin_update_date = pd.read_sql(
+                    """select {}, max(Date({})) as date from {} group by {};""".format(
+                        ticker_column_name,
+                        begin_update_date_column,
+                        self.table_name,
+                        ticker_column_name,
+                    ),
+                    con=postgres_engine(),
+                )
+            else:
+                self.begin_update_date = "2015-01-01"
+                self.logger.info("begin data set to 2015-01-01")
 
     @classmethod
     def logger_update_to_PG(cls, log_file_name: str, sub_path: str = "update_log"):
@@ -167,8 +178,8 @@ class postgres_update_base:
 
     def main_update_to_postgres(
         self,
-        begin_update_date_column: str,
-        unique_index_columns: str | List[str],
+        begin_update_date_column: str = None,
+        unique_index_columns: str | List[str] = None,
         update=True,
     ):
         self.begin_update_date_column = begin_update_date_column
@@ -177,8 +188,8 @@ class postgres_update_base:
         if isinstance(unique_index_columns, str):
             unique_index_columns = [unique_index_columns]
         if isinstance(self.begin_update_date, str):
-            # get single data 中不需要传ticker参数
             self.single_begin_date = self.begin_update_date
+            # get single data 中不需要传ticker参数
             if self.ticker_list is None:
                 # 无需loop读取
                 self.t = None
@@ -194,6 +205,20 @@ class postgres_update_base:
                 with tqdm(self.ticker_list) as self.t:
                     for single_ticker in self.t:
                         self.single_ticker = single_ticker
+                        self.t.set_postfix(
+                            {
+                                "状态": "{}:{}-{}开始获取数据...".format(
+                                    single_ticker,
+                                    self.begin_update_date,
+                                    self.update_end_date,
+                                )
+                            }
+                        )
+                        self.single_ticker = single_ticker
+                        self.save_single_data(unique_index_columns, update)
+                        self.update_time(
+                            time_column_name="update_time", ticker=self.single_ticker
+                        )
         elif isinstance(self.begin_update_date, pd.DataFrame):
             exit_info = self.begin_update_date.set_index(self.ticker_column_name)
             with tqdm(self.ticker_list) as self.t:
@@ -313,8 +338,8 @@ class postgres_update_base:
 class uqer_FdmtIndiRtnPit_updater(postgres_update_base):
     def __init__(
         self,
-        table_name: str,
-        ticker_column_name: str,
+        table_name: str = "uqer_FdmtIndiRtnPit",
+        ticker_column_name: str = "ticker",
         update_end_date=date.today().strftime("%Y-%m-%d"),
         ticker_list: List | str = None,
         database: str = "QS",
@@ -342,8 +367,8 @@ class uqer_FdmtIndiRtnPit_updater(postgres_update_base):
 class uqer_MktLimit_updater(postgres_update_base):
     def __init__(
         self,
-        table_name: str,
-        ticker_column_name: str,
+        table_name: str = "uqer_MktLimit",
+        ticker_column_name: str = "ticker",
         update_end_date=date.today().strftime("%Y-%m-%d"),
         ticker_list: List | str = None,
         database: str = "QS",
@@ -398,22 +423,70 @@ class uqer_MktIdx_updater(postgres_update_base):
         )
 
 
+class uqer_mkt_equd_adj_updater(postgres_update_base):
+    def __init__(
+        self,
+        table_name: str = "uqer_mkt_equd_adj",
+        ticker_column_name: str = "ticker",
+        update_end_date=date.today().strftime("%Y-%m-%d"),
+        ticker_list: List | str = None,
+        database: str = "QS",
+    ):
+        super().__init__(
+            table_name, ticker_column_name, update_end_date, ticker_list, database
+        )
+
+    def get_single_data(self):
+        data = MktEqudAdj(
+            begin=self.single_begin_date,
+            end=self.update_end_date,
+            ticker=self.single_ticker,
+        )
+        return clean_data_frame_to_postgres(data, lower=True)
+
+    def main_update(self):
+        self.main_update_to_postgres(
+            begin_update_date_column="update_time",
+            unique_index_columns=["ticker", "tradedate"],
+            update=True,
+        )
+
+
+class uqer_ResConSecTarpriScore_updater(postgres_update_base):
+    def __init__(
+        self,
+        table_name: str = "uqer_ResConSecTarpriScore",
+        ticker_column_name: str = "seccode",
+        update_end_date=date.today().strftime("%Y-%m-%d"),
+        ticker_list: List | str = None,
+        database: str = "QS",
+    ):
+        super().__init__(
+            table_name, ticker_column_name, update_end_date, ticker_list, database
+        )
+
+    def get_single_data(self):
+        data = ResConSecTarpriScore(
+            begin=self.single_begin_date,
+            end=self.update_end_date,
+            secCode=self.single_ticker,
+        )
+        return clean_data_frame_to_postgres(data, lower=True)
+
+    def main_update(self):
+        self.main_update_to_postgres(
+            begin_update_date_column="updatetime",
+            unique_index_columns=["seccode", "repforedate"],
+            update=True,
+        )
+
+
 if __name__ == "__main__":
     stockNumList = postgres_update_base.get_stock_num_list()
     benchSecIdList = postgres_update_base.get_bench_secID_list()
-    # updater1 = uqer_FdmtIndiRtnPit_updater(
-    #     table_name="uqer_FdmtIndiRtnPit",
-    #     ticker_column_name="ticker",
-    #     ticker_list=stockNumList,
-    # )
 
-    # updater2 = uqer_MktLimit_updater(
-    #     table_name="uqer_MktLimit",
-    #     ticker_column_name="ticker",
-    #     ticker_list=stockNumList,
-    # )
-
-    updater3 = uqer_MktIdx_updater(
-        ticker_list=benchSecIdList,
-    )
-    updater3.main_update()
+    uqer_FdmtIndiRtnPit_updater(ticker_list=stockNumList).main_update()
+    uqer_MktLimit_updater(ticker_list=stockNumList).main_update()
+    uqer_MktIdx_updater(ticker_list=benchSecIdList).main_update()
+    uqer_mkt_equd_adj_updater(ticker_list=stockNumList).main_update()
+    uqer_ResConSecTarpriScore_updater(ticker_list=stockNumList).main_update()
