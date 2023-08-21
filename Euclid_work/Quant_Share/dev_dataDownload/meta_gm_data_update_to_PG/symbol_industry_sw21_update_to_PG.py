@@ -8,27 +8,35 @@
             - use warehouse.load_latest_sw21_data to load data
 """
 from base_package import *
+
 logger = logger_update_to_PG("symbol_industry_sw21")
 industry_category_info = pd.read_sql(
     "select industryid3 as industry_id from industry_category_info",
     con=postgres_engine(),
 )
 query_date = format_date(date.today())
-if query_date.is_month_end:
-    all_industry_data = pd.DataFrame()
-    for industry_id in industry_category_info["industry_id"]:
-        one_industry_data = stk_get_industry_constituents(
-            industry_id, date=query_date.strftime("%Y-%m-%d")
-        )
-        all_industry_data = pd.concat([all_industry_data, one_industry_data])
-    all_industry_data["query_date"] = query_date.strftime("%Y-%m-%d")
-    postgres_write_data_frame(
-        all_industry_data,
-        table_name="symbol_industry_sw21",
-        update=True,
-        unique_index=["symbol", "query_date"],
-    )
-    logger.info("symbol_industry_sw21 get {} itme(s)".format(len(all_industry_data)))
-else:
-    logger.info("{} is not month end skip".format(query_date.strftime("%Y-%m-%d")))
-
+least_query_date = pd.read_sql(
+    "select max(query_date) from symbol_industry_sw21", con=postgres_engine()
+).values[0][0]
+if not query_date.is_month_end:
+    query_date = query_date - pd.offsets.MonthEnd(n=1)
+    if query_date == format_date(least_query_date):
+        logger.info("{} has exited, skip".format(query_date.strftime("%Y-%m-%d")))
+    else:
+        all_industry_data = pd.DataFrame()
+        for industry_id in tqdm(industry_category_info["industry_id"]):
+            one_industry_data = stk_get_industry_constituents(
+                industry_id, date=query_date.strftime("%Y-%m-%d")
+            )
+            one_industry_data["query_date"] = query_date.strftime("%Y-%m-%d")
+            postgres_write_data_frame(
+                one_industry_data,
+                table_name="symbol_industry_sw21",
+                update=True,
+                unique_index=["symbol", "query_date"],
+            )
+            logger.info(
+                "symbol_industry_sw21 {} get {} itme(s)".format(
+                    industry_id, len(one_industry_data)
+                )
+            )
