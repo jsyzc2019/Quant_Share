@@ -510,11 +510,13 @@ def is_tradeDate(date: Union[int, str, datetime.datetime]) -> bool:
 
 
 def format_date(
-    date: Union[datetime.datetime, datetime.date, int, str]
+    date: Union[datetime.datetime, datetime.date, np.datetime64, int, str]
 ) -> Series | Timestamp:
     if isinstance(date, datetime.datetime):
         return pd.to_datetime(date.date())
     elif isinstance(date, datetime.date):
+        return pd.to_datetime(date)
+    elif isinstance(date, np.datetime64):
         return pd.to_datetime(date)
     elif isinstance(date, int):
         date = pd.to_datetime(date, format="%Y%m%d")
