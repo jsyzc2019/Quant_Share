@@ -244,6 +244,25 @@ class H5DataSet:
     def to_data_frame(self, tableKey):
         return pd.read_hdf(self.h5FilePath, key=tableKey)
 
+    def load_table(self):
+        """
+        完全等同于pd.read_hdf
+        """
+        assert [
+            "table",
+            "abounds",
+            "bounds",
+            "indices",
+            "indicesLR",
+            "mbounds",
+            "mranges",
+            "ranges",
+            "sorted",
+            "sortedLR",
+            "zbounds",
+        ] == self.known_data, "此h5文件不能使用pd.read_hdf读取, 请使用其他方式 "
+        return pd.read_hdf(self.h5FilePath)
+
 
 class H5DataTS:
     def __init__(self, **kwargs):

@@ -42,7 +42,7 @@ class FakeDataAPI:
             pat_len: int
         :return:
         """
-        beginDate, endDate, tradeDate = cls.assert_format_data(
+        beginDate, endDate, tradeDate = cls.assert_format_date(
             beginDate, endDate, tradeDate
         )
         base_url = "/api/market/getMktEqud.json?field=&beginDate={}&endDate={}&secID=&ticker={}&tradeDate={}"
@@ -74,12 +74,12 @@ class FakeDataAPI:
 
     @classmethod
     def MktEqudAdjGet(
-            cls,
-            ticker: Union[list, str],
-            tradeDate: Union[list[Union[pd.datetime, str]], pd.datetime, str] = "",
-            beginDate: Union[pd.datetime, str, int] = None,
-            endDate: Union[pd.datetime, str, int] = None,
-            **kwargs
+        cls,
+        ticker: Union[list, str],
+        tradeDate: Union[list[Union[pd.datetime, str]], pd.datetime, str] = "",
+        beginDate: Union[pd.datetime, str, int] = None,
+        endDate: Union[pd.datetime, str, int] = None,
+        **kwargs
     ):
         """
         沪深股票前复权行情
@@ -93,7 +93,7 @@ class FakeDataAPI:
             pat_len: int
         :return:
         """
-        beginDate, endDate, tradeDate = cls.assert_format_data(
+        beginDate, endDate, tradeDate = cls.assert_format_date(
             beginDate, endDate, tradeDate
         )
         base_url = "/api/market/getMktEqudAdj.json?field=&beginDate={}&endDate={}&secID=&ticker={}&tradeDate={}"
@@ -140,7 +140,7 @@ class FakeDataAPI:
         :param kwargs:
         :return:
         """
-        beginDate, endDate, _ = cls.assert_format_data(beginDate, endDate)
+        beginDate, endDate, _ = cls.assert_format_date(beginDate, endDate)
         base_url = "/api/idx/getmIdxCloseWeight.json?field=&ticker={}&secID=&beginDate={}&endDate={}"
         if isinstance(ticker, list):
             outData_df = pd.DataFrame()
@@ -179,7 +179,7 @@ class FakeDataAPI:
             pat_len: int
         :return:
         """
-        beginDate, endDate, tradeDate = cls.assert_format_data(
+        beginDate, endDate, tradeDate = cls.assert_format_date(
             beginDate, endDate, tradeDate
         )
         base_url = (
@@ -231,7 +231,7 @@ class FakeDataAPI:
         """
         无权限
         """
-        beginDate, endDate, tradeDate = cls.assert_format_data(beginDate, endDate, "")
+        beginDate, endDate, tradeDate = cls.assert_format_date(beginDate, endDate, "")
         base_url = "/api/market/getMktIdxd.json?field=&indexID={}&ticker=&exchangeCD={}&tradeDate={}&beginDate={}&endDate={}"
         pat_len = kwargs.get("pat_len", 5)
         if isinstance(indexID, list):
@@ -283,7 +283,7 @@ class FakeDataAPI:
         :param kwargs:
         :return:
         """
-        beginDate, endDate, _ = cls.assert_format_data(beginDate, endDate)
+        beginDate, endDate, _ = cls.assert_format_date(beginDate, endDate)
         base_url = "/api/researchReport/getResConIndex.json?field=&indexID=&indexCode={}&beginDate={}&endDate={}"
         if isinstance(ticker, list):
             outData_df = pd.DataFrame()
@@ -318,7 +318,7 @@ class FakeDataAPI:
         :param kwargs:
         :return:
         """
-        beginDate, endDate, _ = cls.assert_format_data(beginDate, endDate)
+        beginDate, endDate, _ = cls.assert_format_date(beginDate, endDate)
         base_url = "/api/researchReport/getResConIndexFy12.json?field=&indexID=&indexCode={}&beginDate={}&endDate={}"
         if isinstance(ticker, list):
             outData_df = pd.DataFrame()
@@ -354,7 +354,7 @@ class FakeDataAPI:
         :param kwargs:
         :return:
         """
-        beginDate, endDate, _ = cls.assert_format_data(beginDate, endDate)
+        beginDate, endDate, _ = cls.assert_format_date(beginDate, endDate)
         base_url = "/api/researchReport/getResConIndustryCitic.json?field=&induID=&induLevel=&indexID=3&indexCode=&beginDate={}&endDate={}"
         outData_df = pd.DataFrame()
         _, result = cls.client.getData(base_url.format(beginDate, endDate))
@@ -382,7 +382,7 @@ class FakeDataAPI:
         :param kwargs:
         :return:
         """
-        beginDate, endDate, _ = cls.assert_format_data(beginDate, endDate)
+        beginDate, endDate, _ = cls.assert_format_date(beginDate, endDate)
         base_url = "/api/researchReport/getResConIndustryCiticFy12.json?field=&induID=&induLevel=&indexID={}&indexCode=&beginDate={}&endDate={}"
         if isinstance(indexID, list):
             outData_df = pd.DataFrame()
@@ -418,7 +418,7 @@ class FakeDataAPI:
         :param kwargs:
         :return:
         """
-        beginDate, endDate, _ = cls.assert_format_data(beginDate, endDate)
+        beginDate, endDate, _ = cls.assert_format_date(beginDate, endDate)
         base_url = "/api/researchReport/getResConIndustrySw.json?field=&induID=&induID=&induLevel=&indexID={}&indexCode=&beginDate={}&endDate={}&repForeDate="
         if isinstance(indexID, list):
             outData_df = pd.DataFrame()
@@ -454,7 +454,7 @@ class FakeDataAPI:
         :param kwargs:
         :return:
         """
-        beginDate, endDate, _ = cls.assert_format_data(beginDate, endDate)
+        beginDate, endDate, _ = cls.assert_format_date(beginDate, endDate)
         base_url = "/api/researchReport/getResConIndustrySwFy12.json?field=&induID=&induID=&induLevel=&indexID={}&indexCode=&beginDate={}&endDate={}&repForeDate="
         if isinstance(indexID, list):
             outData_df = pd.DataFrame()
@@ -490,7 +490,7 @@ class FakeDataAPI:
         :param kwargs:
         :return:
         """
-        beginDate, endDate, _ = cls.assert_format_data(beginDate, endDate)
+        beginDate, endDate, _ = cls.assert_format_date(beginDate, endDate)
         base_url = "/api/researchReport/getResConSecReportHeat.json?field=&secCode={}&secName=&beginDate={}&endDate={}&repForeDate="
         if isinstance(secCode, list):
             outData_df = pd.DataFrame()
@@ -526,7 +526,7 @@ class FakeDataAPI:
         :param kwargs:
         :return:
         """
-        beginDate, endDate, _ = cls.assert_format_data(beginDate, endDate)
+        beginDate, endDate, _ = cls.assert_format_date(beginDate, endDate)
         base_url = "/api/researchReport/getResConSecCoredata.json?field=&secCode={}&secName=&beginDate={}&endDate={}&repForeDate="
         if isinstance(secCode, list):
             outData_df = pd.DataFrame()
@@ -562,7 +562,7 @@ class FakeDataAPI:
         :param kwargs:
         :return:
         """
-        beginDate, endDate, _ = cls.assert_format_data(beginDate, endDate)
+        beginDate, endDate, _ = cls.assert_format_date(beginDate, endDate)
         base_url = "/api/researchReport/getResConSecTarpriScore.json?field=&secCode={}&secName=&beginDate={}&endDate={}&repForeDate="
         if isinstance(secCode, list):
             outData_df = pd.DataFrame()
@@ -598,7 +598,7 @@ class FakeDataAPI:
         :param kwargs:
         :return:
         """
-        beginDate, endDate, _ = cls.assert_format_data(beginDate, endDate)
+        beginDate, endDate, _ = cls.assert_format_date(beginDate, endDate)
         base_url = "/api/researchReport/getResConSecCorederi.json?field=&secCode={}&secName=&beginDate={}&endDate={}&repForeDate="
         if isinstance(secCode, list):
             outData_df = pd.DataFrame()
@@ -636,7 +636,7 @@ class FakeDataAPI:
             exDivDate: str, "20200101"
         :return:
         """
-        beginDate, endDate, tradeDate = cls.assert_format_data(beginDate, endDate, "")
+        beginDate, endDate, tradeDate = cls.assert_format_date(beginDate, endDate, "")
         base_url = "/api/market/getMktAdjf.json?field=&secID=&ticker={}&exDivDate={}&beginDate={}&endDate={}"
         pat_len = kwargs.get("pat_len", 5)
         if isinstance(ticker, list):
@@ -691,7 +691,7 @@ class FakeDataAPI:
         :return:
         """
         # TODO 似乎beginDate和endDate并不起filter作用
-        beginDate, endDate, tradeDate = cls.assert_format_data(beginDate, endDate, "")
+        beginDate, endDate, tradeDate = cls.assert_format_date(beginDate, endDate, "")
         base_url = "/api/fundamental/getFdmtIndiRtnPit.json?field=&ticker={}&beginYear={}&endYear={}&reportType={}&publishDateBegin{}=&publishDateEnd={}"
         pat_len = kwargs.get("pat_len", 5)
         if isinstance(ticker, list):
@@ -749,7 +749,7 @@ class FakeDataAPI:
             endYear: str, 2020
         :return:
         """
-        beginDate, endDate, tradeDate = cls.assert_format_data(beginDate, endDate, "")
+        beginDate, endDate, tradeDate = cls.assert_format_date(beginDate, endDate, "")
         base_url = (
             "/api/fundamental/getFdmtIndiPSPit.json?field=&ticker={}&beginYear={}&endYear={}&reportType={"
             "}&publishDateBegin={}&publishDateEnd={}"
@@ -789,8 +789,57 @@ class FakeDataAPI:
             )
             return pd.DataFrame(eval(result)["data"])
 
+    @classmethod
+    def EquDivGet(
+        cls,
+        ticker: Union[list, str],
+        beginDate: Union[pd.datetime, str, int] = None,
+        endDate: Union[pd.datetime, str, int] = None,
+        **kwargs
+    ):
+        """
+        doc: https://mall.datayes.com/datapreview/108
+        demoUrl = /api/equity/getEquDiv.json?field=&ticker=000001&secID=&beginDate=&endDate=&eventProcessCD=&beginPublishDate=&endPublishDate=&beginRecordDate=&endRecordDate=
+        :param ticker:
+        :param beginDate:
+        :param endDate:
+        :param kwargs:
+            pat_len: int, 5
+        :return:
+        """
+        beginDate, endDate, tradeDate = cls.assert_format_date(beginDate, endDate, "")
+        base_url = "/api/equity/getEquDiv.json?field=&ticker={}&secID=&beginDate=&endDate=&eventProcessCD=&beginPublishDate={}&endPublishDate={}&beginRecordDate=&endRecordDate="
+        pat_len = kwargs.get("pat_len", 5)
+        if isinstance(ticker, list):
+            outData_df = pd.DataFrame()
+            for pat_ticker_list in tqdm(patList(ticker, pat_len)):
+                _, result = cls.client.getData(
+                    base_url.format(
+                        ",".join(pat_ticker_list),
+                        beginDate,
+                        endDate,
+                    )
+                )
+                try:
+                    outData_df = pd.concat(
+                        [outData_df, pd.DataFrame(eval(result)["data"])]
+                    )
+                except KeyError:
+                    print(eval(result)["retMsg"])
+                    continue
+            return outData_df
+        else:
+            _, result = cls.client.getData(
+                base_url.format(
+                    ticker,
+                    beginDate,
+                    endDate,
+                )
+            )
+            return pd.DataFrame(eval(result)["data"])
+
     @staticmethod
-    def assert_format_data(beginDate, endDate, tradeDate=""):
+    def assert_format_date(beginDate, endDate, tradeDate=""):
         if beginDate is None and endDate is None and tradeDate == "":
             raise AttributeError("begin + end or tradeDate should be param in")
 

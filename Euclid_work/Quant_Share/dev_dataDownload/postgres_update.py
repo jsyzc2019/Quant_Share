@@ -50,9 +50,10 @@ class postgres_update_base:
         self.single_ticker = None
         self.single_begin_date = None
         self.begin_update_date = None
+        print(f"{table_name} update begin ...")
         # 对于table name带有大写字母的需要加双层引号
         # prepare logger
-        self.logger = self.logger_update_to_PG(table_name)
+        self.logger = self.logger_update_to_PG(log_file_name=table_name)
         if table_name.lower() != table_name:
             table_name = '"{}"'.format(table_name)
         self.table_name = table_name
@@ -202,6 +203,7 @@ class postgres_update_base:
                     record_time=self.record_time_exits,
                 )
             if self.ticker_list is not None:
+                # TODO 有的接口可以同时传入多个ticker
                 with tqdm(self.ticker_list) as self.t:
                     for single_ticker in self.t:
                         self.single_ticker = single_ticker

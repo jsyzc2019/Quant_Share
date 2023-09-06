@@ -5,7 +5,6 @@
 # @File    : MktEqud.py
 """
 from .base_package import *
-from Euclid_work.Quant_Share.warehouse import *
 
 
 def MktEqudAdj(begin, end, **kwargs):
