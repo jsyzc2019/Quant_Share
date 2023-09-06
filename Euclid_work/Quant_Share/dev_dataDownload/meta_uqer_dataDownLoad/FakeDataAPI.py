@@ -10,7 +10,7 @@ import os
 import pandas as pd
 from tqdm import tqdm
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from ...Utils import format_date, patList
+from Euclid_work.Quant_Share import format_date, patList
 from .dataapi_win36 import Client
 
 
@@ -334,6 +334,55 @@ class FakeDataAPI:
             return outData_df
         else:
             _, result = cls.client.getData(base_url.format(ticker, beginDate, endDate))
+            return pd.DataFrame(eval(result)["data"])
+
+    @classmethod
+    def EquDiv(
+        cls,
+        ticker: Union[list, str],
+        beginDate: Union[pd.datetime, str, int] = None,
+        endDate: Union[pd.datetime, str, int] = None,
+        pat_len: int = 30,
+        **kwargs
+    ):
+        """
+        股票分红信息
+        doc: https://mall.datayes.com/datapreview/108
+        demoUrl: /api/equity/getEquDiv.json?field=&ticker=000001&secID=&beginDate=&endDate=&eventProcessCD=&beginPublishDate=&endPublishDate=&beginRecordDate=&endRecordDate=
+        :param ticker:
+        :param beginDate:
+        :param endDate:
+        :param kwargs:
+        :return:
+        """
+        beginDate, endDate, _ = cls.assert_format_data(beginDate, endDate)
+        base_url = "/api/equity/getEquDiv.json?field=&ticker={}&secID=&beginDate={}&endDate={}&eventProcessCD=&beginPublishDate=&endPublishDate=&beginRecordDate=&endRecordDate="
+        if isinstance(ticker, list):
+            outData_df = pd.DataFrame()
+            for pat_indexID_list in tqdm(patList(ticker, pat_len)):
+                _, result = cls.client.getData(
+                    base_url.format(
+                        ",".join(pat_indexID_list),
+                        beginDate,
+                        endDate
+                    )
+                )
+                try:
+                    outData_df = pd.concat(
+                        [outData_df, pd.DataFrame(eval(result)["data"])]
+                    )
+                except KeyError:
+                    print(eval(result)["retMsg"])
+                    break
+            return outData_df
+        else:
+            _, result = cls.client.getData(
+                base_url.format(
+                    ticker,
+                    beginDate,
+                    endDate,
+                )
+            )
             return pd.DataFrame(eval(result)["data"])
 
     @classmethod

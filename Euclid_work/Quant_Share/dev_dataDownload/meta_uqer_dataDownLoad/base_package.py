@@ -5,8 +5,8 @@ from tqdm import tqdm
 # from uqer import DataAPI
 # from uqer import Client
 
-from ...EuclidGetData import get_data
-from ...Utils import save_data_Y, save_data_Q, save_data_h5
+from Euclid_work.Quant_Share import get_data
+from Euclid_work.Quant_Share import save_data_Y, save_data_Q, save_data_h5, dataBase_root_path, stockNumList
 import os
 import time
 from .FakeDataAPI import FakeDataAPI as DataAPI

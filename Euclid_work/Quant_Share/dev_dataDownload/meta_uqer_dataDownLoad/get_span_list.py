@@ -7,7 +7,7 @@
 import datetime
 
 import pandas as pd
-from ...Utils import format_date, extend_date_span
+from Euclid_work.Quant_Share import format_date, extend_date_span
 
 
 def get_span_list(

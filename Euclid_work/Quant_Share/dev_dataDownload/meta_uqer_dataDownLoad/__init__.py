@@ -21,6 +21,7 @@ from .ResConSecReportHeat import ResConSecReportHeat_update
 from .ResConSecCoredata import ResConSecCoredata_update
 from .ResConSecTarpriScore import ResConSecTarpriScore_update, ResConSecTarpriScore
 from .ResConSecCorederi import ResConSecCorederi_update
+from .EquDiv import EquDiv_update
 
 from .MktAdj import MktAdj
 from .MktEqudAdj import MktEqudAdj

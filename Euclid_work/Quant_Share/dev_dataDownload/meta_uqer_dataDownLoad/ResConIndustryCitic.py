@@ -4,7 +4,7 @@ from .rolling_save import rolling_save
 
 def ResConIndustryCitic(begin, end, **kwargs):
     """
-    指数一致预期动态预测数据表
+    中信行业一致预期数据表
     :param begin:
     :param end:
     :param kwargs:

@@ -26,11 +26,12 @@ tableNameList = [
     "ResConSecReportHeat",
     "ResConSecCoredata",
     "ResConSecTarpriScore",
-    "ResConSecCorederi"
+    "ResConSecCorederi",
+    "EquDiv"
 ]
 for tableName in tableNameList:
-    # begin = get_tradeDate(get_table_info(tableName)["Modify Time"], -1)
-    begin = datetime(year=2023, month=1, day=1)
+    begin = get_tradeDate(get_table_info(tableName)["Modify Time"], -1)
+    # begin = datetime(year=2016, month=1, day=1)
     print("-*-" * 35)
     if begin < get_tradeDate(datetime.now(), -5):
         print("{} update from {} start!".format(tableName, begin.strftime("%Y%m%d")))
