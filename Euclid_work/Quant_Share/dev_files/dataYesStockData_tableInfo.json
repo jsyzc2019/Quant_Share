@@ -17,6 +17,12 @@
         "date_column": "tradeDate",
         "ticker_column": "ticker"
     },
+    "uqer_EquDiv": {
+        "assets": "stock",
+        "description": "股票分红信息",
+        "date_column": "publishdate",
+        "ticker_column": "ticker"
+    },
     "mIdxCloseWeight": {
         "assets": "stock",
         "description": "指数月度权重",

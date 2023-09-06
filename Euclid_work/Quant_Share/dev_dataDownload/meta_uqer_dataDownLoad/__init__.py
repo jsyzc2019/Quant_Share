@@ -24,3 +24,4 @@ from .ResConSecCorederi import ResConSecCorederi_update
 
 from .MktAdj import MktAdj
 from .MktEqudAdj import MktEqudAdj
+from .EquDiv import EquDiv
